@@ -3,5 +3,7 @@
 {% block title %}Dashboard - AdminLTE{% endblock %}
 
 {% block content %}
-    
+    <div class="logout-button">
+        <a href="{{ path('security_logout') }}" class="btn btn-danger">Logout</a>
+    </div>
 {% endblock %}
