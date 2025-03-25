@@ -1,0 +1,63 @@
+{% extends "@PdUser/base.html.twig" %}
+
+{% block head_title %}{{ 'security.login_title'|trans }}{% endblock %}
+
+{% block body %}
+<div class="login">
+    <img src="{{ asset('assets//front/auth/bg-image.png') }}" alt="login image" class="login__img">
+
+    <form action="{{ path('security_login') }}" method="post" class="login__form">
+        <h1 class="login__title">{{ 'security.login_title'|trans }}</h1>
+
+        {% if error %}
+            <div class="alert alert-danger">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        {% endif %}
+        {% for label, message in app.session.flashBag.all %}
+            {% if label == 'error' %}{% set label = 'danger' %}{% endif %}
+            {% for msg in message %}
+                <div class="alert alert-{{ label }}">{{ msg }}</div>
+            {% endfor %}
+        {% endfor %}
+
+        <div class="login__content">
+            <div class="login__box">
+                <i class="ri-user-3-line login__icon"></i>
+                <div class="login__box-input">
+                    <input name="_username" value="{{ last_username }}" type="email" required class="login__input" id="login-email" placeholder=" ">
+                    <label for="login-email" class="login__label">{{ 'security.login_username'|trans }}</label>
+                </div>
+            </div>
+
+            <div class="login__box">
+                <i class="ri-lock-2-line login__icon"></i>
+                <div class="login__box-input">
+                    <input name="_password" type="password" required class="login__input" id="login-pass" placeholder=" ">
+                    <label for="login-pass" class="login__label">{{ 'security.login_password'|trans }}</label>
+                    <i class="ri-eye-off-line login__eye" id="login-eye"></i>
+                </div>
+            </div>
+        </div>
+
+        <div class="login__check">
+            <div class="login__check-group">
+                <input type="checkbox" class="login__check-input" id="login-check" name="_remember_me" value="on">
+                <label for="login-check" class="login__check-label">{{ 'security.login_rememberme'|trans }}</label>
+            </div>
+
+            <a href="{{ path('security_resetting') }}" class="login__forgot">{{ 'security.forgot_password'|trans }}</a>
+        </div>
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
+
+        <button type="submit" class="login__button">{{ 'security.login_btn'|trans }}</button>
+
+        <p class="login__register">
+            Don’t have an account?
+            {% if user_registration is not empty %}
+                <a href="{{ path('security_register') }}">{{ 'security.register'|trans }}</a>
+            {% endif %}
+        </p>
+    </form>
+</div>
+
+{% endblock %}

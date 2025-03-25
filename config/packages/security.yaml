@@ -23,7 +23,7 @@ security:
             pattern: ^/
             provider: pdadmin_auth
             lazy: true
-            user_checker: Pd\UserBundle\Security\UserChecker
+            user_checker: App\Appaydin\PdUser\Security\UserChecker
             form_login:
                 use_referer: true
                 login_path: security_login

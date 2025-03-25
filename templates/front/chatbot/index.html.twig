@@ -1,0 +1,58 @@
+{# templates/chatbot/index.html.twig #}
+
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Waste Management Chatbot{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    {# {{ encore_entry_link_tags('chatbot') }} #}
+{% endblock %}
+
+{% block body %}
+<div class="container my-5">
+    <h1 class="mb-4">Waste Management Assistant</h1>
+    
+    <div class="card">
+        <div class="card-header bg-success text-white">
+            <i class="bi bi-recycle me-2"></i> Ask me about recycling, disposal, and waste reduction
+        </div>
+        
+        <div class="card-body chat-container" style="height: 500px; overflow-y: auto;">
+            <div id="chat-messages" class="mb-3">
+                <!-- Messages will appear here -->
+                <div class="alert alert-info">
+                    Hello! I'm your waste management assistant. Ask me anything about recycling, 
+                    composting, hazardous waste disposal, or any other waste-related questions.
+                </div>
+            </div>
+        </div>
+        
+        <div class="card-footer">
+            <form id="chat-form" class="d-flex" onsubmit="return false;">
+                <input type="text" 
+                       id="chat-input" 
+                       class="form-control" 
+                       placeholder="Ask about waste management..." 
+                       required
+                       autocomplete="off">
+                <button type="submit" class="btn btn-success ms-2">
+                    <i class="bi bi-send-fill"></i> Send
+                </button>
+            </form>
+        </div>
+    </div>
+    
+    <div class="mt-3 text-muted small">
+        <i class="bi bi-info-circle"></i> This chatbot provides general information. 
+        For specific local regulations, check with your municipality.
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+        <script src="{{ asset('assets/chatbot.js') }}"></script>
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    {# {{ encore_entry_script_tags('chatbot') }} #}
+{% endblock %}

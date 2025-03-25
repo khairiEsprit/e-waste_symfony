@@ -1,0 +1,34 @@
+{% extends "@PdUser/base.html.twig" %}
+
+{% block head_title %}{{ 'security.register_title'|trans }}{% endblock %}
+
+{% block body %}
+    <div class="login">
+        <img src="{{ asset('assets/front/auth/bg-image.png') }}" alt="register success image" class="login__img">
+
+        <div class="login__form">
+            <h1 class="login__title">{{ 'security.register_title'|trans }}</h1>
+
+            <div class="login__content">
+                <div class="login__box">
+                    <i class="ri-check-line login__icon"></i>
+                    <div class="login__box-input">
+                        <p class="login__message">
+                            {% if user.isActive %}
+                                {{ 'security.register_success'|trans }}
+                            {% else %}
+                                {{ 'security.register_confirmed'|trans }}
+                            {% endif %}
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <a href="{{ path('security_login') }}" class="login__button">{{ 'security.login_btn'|trans }}</a>
+
+            <p class="login__register">
+                Back to <a href="{{ path('security_login') }}">{{ 'security.login_title'|trans }}</a>
+            </p>
+        </div>
+    </div>
+{% endblock %}

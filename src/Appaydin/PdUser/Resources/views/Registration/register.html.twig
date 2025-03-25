@@ -1,0 +1,129 @@
+{% extends "@PdUser/base.html.twig" %}
+
+
+{% block body %}
+    {% form_theme form 'bootstrap_4_layout.html.twig' %}
+{# templates/bundles/PdUserBundle/Auth/register.html.twig #}
+<div class="login">
+        <img src="{{ asset('assets/front/auth/bg-image.png') }}" alt="register image" class="login__img">
+
+        {{ form_start(form, {'attr': {'class': 'login__form'}}) }}
+            <h1 class="login__title">{{ 'security.register_title'|trans }}</h1>
+
+            <div class="login__content">
+                <div class="login__box">
+                    <i class="riuser-3-line login__icon"></i>
+                    <div class="login__box-input">
+                        {{ form_widget(form.email, {'attr': {'class': 'login__input', 'id': 'register-email'}}) }}
+                        <label for="register-email" class="login__label">{{ 'security.login_username'|trans }}</label>
+                        <span class="error-text">{{ form_errors(form.email) }}</span>
+                    </div>
+                </div>
+                <div class="login__box">
+                    <i class="ri-lock-2-line login__icon"></i>
+                    <div class="login__box-input">
+                        {{ form_widget(form.plainPassword.first, {'attr': {'class': 'login__input', 'id': 'register-pass'}}) }}
+                        <label for="register-pass" class="login__label">{{ 'security.login_password'|trans }}</label>
+                        <i class="ri-eye-off-line login__eye" id="register-eye"></i>
+                        <span class="error-text">{{ form_errors(form.plainPassword.first) }}</span>
+                    </div>
+                </div>
+                <div class="login__box">
+                    <i class="ri-lock-2-line login__icon"></i>
+                    <div class="login__box-input">
+                        {{ form_widget(form.plainPassword.second, {'attr': {'class': 'login__input', 'id': 'register-pass-confirm'}}) }}
+                        <label for="register-pass-confirm" class="login__label">Confirm Password</label>
+                        <span class="error-text">{{ form_errors(form.plainPassword.second) }}</span>
+                    </div>
+                </div>
+                <div class="login__box login__box-select">
+                    <i class="ri-user-star-line login__icon"></i>
+                    <div class="login__box-input">
+                        {{ form_widget(form.selectedRole, {'attr': {'class': 'login__input login__select', 'id': 'register-role'}}) }}
+                        <label for="register-role" class="login__label">{{ 'security.role'|trans }}</label>
+                        <span class="error-text">{{ form_errors(form.selectedRole) }}</span>
+                    </div>
+                </div>
+            </div>
+
+            <button type="submit" class="login__button">{{ 'security.register_btn'|trans }}</button>
+
+            <p class="login__register">
+                Already have an account? 
+                <a href="{{ path('security_login') }}">{{ 'security.login_title'|trans }}</a>
+            </p>
+        {{ form_end(form) }}
+    </div>
+<style>
+
+.login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label {
+        top: -12px;
+        font-size: var(--small-font-size);
+    }
+.login__input:focus + .login__label {
+        top: -12px;
+        font-size: var(--small-font-size);
+    }
+
+.login__register {
+        text-align: center;
+        font-size: var(--small-font-size);
+    }
+    .login__register a {
+        color: var(--white-color);
+        font-weight: var(--font-medium);
+    }
+    .login__register a:hover {
+        text-decoration: underline;
+    }
+
+    
+input,
+    button,
+    select {
+        border: none;
+        outline: none;
+    }
+
+
+.login__form {
+        position: relative;
+        background-color: hsla(0, 0%, 10%, 0.1);
+        border: 2px solid var(--white-color);
+        margin-inline: 1.5rem;
+        padding: 1.5rem 3rem 1rem; /* Reduced padding to minimize height */
+        border-radius: 1rem;
+        backdrop-filter: blur(8px);
+    }
+.login__box-select .login__select option {
+        color: var(--black-color); /* Black text for dropdown options */
+        background: var(--white-color); /* White background for dropdown */
+    }
+</style>
+
+
+<script>
+    // Add 'has-value' class to select when a value is chosen
+    document.getElementById('register-role').addEventListener('change', function() {
+        if (this.value) {
+            this.classList.add('has-value');
+        }
+    });
+
+    // Check on page load if a value is already selected (e.g., form validation error)
+    document.addEventListener('DOMContentLoaded', function() {
+        const select = document.getElementById('register-role');
+        if (select.value) {
+            select.classList.add('has-value');
+        }
+    });
+
+    const eye = document.getElementById('register-eye');
+    const pass = document.getElementById('register-pass');
+    eye.addEventListener('click', () => {
+        pass.type = pass.type === 'password' ? 'text' : 'password';
+        eye.classList.toggle('ri-eye-off-line');
+        eye.classList.toggle('ri-eye-line');
+    });
+</script>
+{% endblock %}

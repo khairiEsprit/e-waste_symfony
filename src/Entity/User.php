@@ -3,7 +3,7 @@ namespace App\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
-use Pd\UserBundle\Model\User as BaseUser;
+use App\Appaydin\PdUser\Model\User as BaseUser;
 
 #[ORM\Entity(repositoryClass: "App\Repository\UserRepository")]
 #[ORM\Table(name: "user")]

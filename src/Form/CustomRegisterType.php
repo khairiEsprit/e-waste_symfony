@@ -3,7 +3,7 @@
 // src/Form/CustomRegisterType.php
 namespace App\Form;
 
-use Pd\UserBundle\Form\RegisterType as BaseRegisterType;
+use App\Appaydin\PdUser\Form\RegisterType as BaseRegisterType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;

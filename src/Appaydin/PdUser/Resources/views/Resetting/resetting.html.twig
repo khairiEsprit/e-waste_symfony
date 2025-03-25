@@ -1,0 +1,30 @@
+{% extends "@PdUser/base.html.twig" %}
+
+
+{% block body %}
+    {% form_theme form 'bootstrap_4_layout.html.twig' %}
+<div class="login">
+    <img src="{{ asset('assets/front/auth/bg-image.png') }}" alt="reset password image" class="login__img">
+
+    {{ form_start(form, {'attr': {'class': 'login__form'}}) }}
+        <h1 class="login__title">{{ 'security.reset_title'|trans }}</h1>
+
+        <div class="login__content">
+            <div class="login__box">
+                <i class="ri-user-3-line login__icon"></i>
+                <div class="login__box-input">
+                    {{ form_widget(form.username, {'attr': {'class': 'login__input', 'id': 'reset-email'}}) }}
+                    <label for="reset-email" class="login__label">{{ 'security.login_username'|trans }}</label>
+                </div>
+            </div>
+        </div>
+
+        <button type="submit" class="login__button">{{ 'security.reset_btn'|trans }}</button>
+
+        <p class="login__register">
+            Remember your password? 
+            <a href="{{ path('security_login') }}">{{ 'security.login_title'|trans }}</a>
+        </p>
+    {{ form_end(form) }}
+</div>
+{% endblock %}

@@ -1,0 +1,2 @@
+parameters:
+    user_class: App\Entity\User  # Adjust this to match your user entity class

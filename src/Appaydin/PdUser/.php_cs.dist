@@ -1,0 +1,26 @@
+<?php
+
+$fileHeaderComment = <<<COMMENT
+This file is part of the pd-admin pd-user package.
+
+@package     pd-user
+@license     LICENSE
+@author      Ramazan APAYDIN <apaydin541@gmail.com>
+@link        https://github.com/appaydin/pd-user
+COMMENT;
+
+$finder = PhpCsFixer\Finder::create()
+    ->in(__DIR__)
+;
+
+return PhpCsFixer\Config::create()
+    ->setRiskyAllowed(true)
+    ->setRules([
+        '@Symfony' => true,
+        '@Symfony:risky' => true,
+        'array_syntax' => ['syntax' => 'short'],
+        'header_comment' => ['header' => $fileHeaderComment, 'separate' => 'both', 'commentType' => 'PHPDoc'],
+    ])
+    ->setFinder($finder)
+    ->setCacheFile(__DIR__.'.php_cs.cache')
+;
