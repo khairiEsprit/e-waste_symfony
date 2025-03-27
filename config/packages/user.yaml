@@ -11,4 +11,3 @@ pd_user:
     mail_sender_address: 'khairibouzid95@gmail.com'
     mail_sender_name: 'e-waste'
     active_language: ['en'] # Supported languages
-    register_type: App\Form\CustomRegisterType # Optional: Custom registration form

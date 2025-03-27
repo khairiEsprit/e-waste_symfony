@@ -12,7 +12,9 @@ services:
     # Default configuration for services in *this* file
     _defaults:
         autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true # Automatically registers your services as commands, event subscribers, etc.
+        autoconfigure: true
+        bind:
+            $userClass: '%user_class%' # Automatically registers your services as commands, event subscribers, etc.
 
     # Makes classes in src/ available to be used as services
     App\:

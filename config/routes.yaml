@@ -11,6 +11,6 @@ kernel:
 #     prefix: /auth
 
 authorization:
-    resource: "@PdUserBundle/Resources/config/routing.yaml"
+    resource: "../src/Appaydin/PdUser/Resources/config/routing.yaml"
     prefix: /auth
 
