@@ -9,8 +9,3 @@ kernel:
 # authorization:
 #     resource: "@PdUserBundle/Resources/config/routing.yaml"
 #     prefix: /auth
-
-authorization:
-    resource: "@PdUserBundle/Resources/config/routing.yaml"
-    prefix: /auth
-
