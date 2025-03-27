@@ -1,0 +1,14 @@
+# config/packages/user.yaml
+pd_user:
+    user_class: App\Entity\User
+    group_class: App\Entity\Group
+    default_group: '' # Optional: Set a default group name
+    login_redirect: 'front_home' # Route to redirect after login
+    email_confirmation: true # Require email confirmation for sign-up
+    welcome_email: true # Send a welcome email after sign-up
+    user_registration: true # Enable registration
+    resetting_request_time: 7200 # Time (in seconds) for reset password link validity
+    mail_sender_address: 'khairibouzid95@gmail.com'
+    mail_sender_name: 'e-waste'
+    active_language: ['en'] # Supported languages
+    register_type: App\Form\CustomRegisterType # Optional: Custom registration form

@@ -1,0 +1,35 @@
+<header id="header" class="fixed-top">
+    <div class="container d-flex align-items-center">
+        <div class="logo me-auto d-flex align-items-center">
+            <!-- Image logo -->
+            <a href="{{ path('front_home') }}" class="me-2">
+                <img src="{{ asset('assets/front/assets/img/logo-landing.png') }}" alt="" class="img-fluid">
+            </a>
+            <!-- Text logo -->
+            <h1><a href="{{ path('front_home') }}">E-WASTE</a></h1>
+        </div>
+
+        <nav id="navbar" class="navbar">
+            <ul>
+                <li><a class="nav-link scrollto active" href="#hero"><span class="fa fa-home"> Home </span></a></li>
+                <li><a class="nav-link scrollto" href="#about"><span class="fa fa-info-circle" aria-hidden="true"> About us</span></a></li>
+                <li><a class="nav-link scrollto" href="phpGmailSMTP/trash.php"><span class="fa fa-trash"> Complain</span></a></li>
+                <li><a class="nav-link scrollto" href="adminlogin/welcome.php"><span class="fa fa-award"> Reward </span></a></li>
+                <li><a class="nav-link scrollto" href="#faq"><span class="fa fa-question-circle"> FAQ</span></a></li>
+                <li><a class="nav-link scrollto" href="{{ path('security_login') }}">
+                    <button type="button" class="btn">
+                        <strong>LOGIN</strong>
+                        <div id="container-stars">
+                            <div id="stars"></div>
+                        </div>
+                        <div id="glow">
+                            <div class="circle"></div>
+                            <div class="circle"></div>
+                        </div>
+                    </button>
+                </a></li>
+            </ul>
+            <i class="bi bi-list mobile-nav-toggle"></i>
+        </nav><!-- .navbar -->
+    </div>
+</header>

@@ -4,8 +4,59 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "3bb6a679870cf4ef7ae6e0f9b534ce73",
+    "content-hash": "f63def1e1e9f02e079e7eb625e02c774",
     "packages": [
+        {
+            "name": "appaydin/pd-user",
+            "version": "3.0.4",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/cesurapp/pd-user.git",
+                "reference": "bb830275ae295aa6e094b3559a7a834e3d260926"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/cesurapp/pd-user/zipball/bb830275ae295aa6e094b3559a7a834e3d260926",
+                "reference": "bb830275ae295aa6e094b3559a7a834e3d260926",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.0.0",
+                "symfony/event-dispatcher": "*",
+                "symfony/mailer": "*",
+                "twig/twig": "*"
+            },
+            "type": "symfony-bundle",
+            "autoload": {
+                "psr-4": {
+                    "Pd\\UserBundle\\": ""
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Ramazan APAYDIN",
+                    "homepage": "https://github.com/appaydin"
+                }
+            ],
+            "description": "Symfony Simple User Bundle",
+            "homepage": "https://github.com/appaydin/pd-user",
+            "keywords": [
+                "account",
+                "pd-admin",
+                "pd-user",
+                "symfony-user",
+                "user-management"
+            ],
+            "support": {
+                "issues": "https://github.com/cesurapp/pd-user/issues",
+                "source": "https://github.com/cesurapp/pd-user/tree/3.0.4"
+            },
+            "time": "2021-06-03T21:35:14+00:00"
+        },
         {
             "name": "composer/semver",
             "version": "3.4.3",
@@ -1303,16 +1354,16 @@
         },
         {
             "name": "egulias/email-validator",
-            "version": "4.0.3",
+            "version": "4.0.4",
             "source": {
                 "type": "git",
                 "url": "https://github.com/egulias/EmailValidator.git",
-                "reference": "b115554301161fa21467629f1e1391c1936de517"
+                "reference": "d42c8731f0624ad6bdc8d3e5e9a4524f68801cfa"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/b115554301161fa21467629f1e1391c1936de517",
-                "reference": "b115554301161fa21467629f1e1391c1936de517",
+                "url": "https://api.github.com/repos/egulias/EmailValidator/zipball/d42c8731f0624ad6bdc8d3e5e9a4524f68801cfa",
+                "reference": "d42c8731f0624ad6bdc8d3e5e9a4524f68801cfa",
                 "shasum": ""
             },
             "require": {
@@ -1358,7 +1409,7 @@
             ],
             "support": {
                 "issues": "https://github.com/egulias/EmailValidator/issues",
-                "source": "https://github.com/egulias/EmailValidator/tree/4.0.3"
+                "source": "https://github.com/egulias/EmailValidator/tree/4.0.4"
             },
             "funding": [
                 {
@@ -1366,7 +1417,7 @@
                     "type": "github"
                 }
             ],
-            "time": "2024-12-27T00:36:43+00:00"
+            "time": "2025-03-06T22:45:56+00:00"
         },
         {
             "name": "monolog/monolog",

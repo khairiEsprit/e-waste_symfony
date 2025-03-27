@@ -1,4 +1,7 @@
 {
+    "appaydin/pd-user": {
+        "version": "3.0.4"
+    },
     "doctrine/doctrine-bundle": {
         "version": "2.13",
         "recipe": {
