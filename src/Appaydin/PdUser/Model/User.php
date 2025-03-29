@@ -23,7 +23,7 @@ use Doctrine\Common\Collections\ArrayCollection;
  * @author Ramazan APAYDIN <apaydin541@gmail.com>
  */
 
- 
+
 #[ORM\Entity]
 #[ORM\Table(name: "user")]
 class User implements UserInterface, PasswordAuthenticatedUserInterface, \Serializable
@@ -98,6 +98,8 @@ class User implements UserInterface, PasswordAuthenticatedUserInterface, \Serial
         $this->createdAt = new \DateTime();
         $this->groups = new ArrayCollection();
     }
+
+
 
     public function getId(): int
     {

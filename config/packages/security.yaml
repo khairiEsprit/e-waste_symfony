@@ -1,7 +1,5 @@
 # config/packages/security.yaml
 security:
-
-    
     enable_authenticator_manager: true
     password_hashers:
         App\Entity\User:
@@ -15,29 +13,41 @@ security:
             entity:
                 class: App\Entity\User
                 property: email
+        oauth_provider:
+            id: my_oauth_user_provider
+        chain_provider:
+            chain:
+                providers: [pdadmin_auth, oauth_provider]
     firewalls:
         dev:
             pattern: ^/(_(profiler|wdt)|css|images|js)/
             security: false
         main:
             pattern: ^/
-            provider: pdadmin_auth
+            provider: chain_provider
             lazy: true
             user_checker: App\Appaydin\PdUser\Security\UserChecker
+            entry_point: form_login # Set form_login as the entry point
             form_login:
                 use_referer: true
                 login_path: security_login
                 check_path: security_login
-                success_handler: App\Security\AuthenticationSuccessHandler  # Add this line
-
-                # default_target_path: web_home # Redirect after login
+                success_handler: App\Security\AuthenticationSuccessHandler
             logout:
                 path: security_logout
-                target: front_home # Redirect after logout
+                target: front_home
             remember_me:
                 secret: '%env(APP_SECRET)%'
                 lifetime: 604800 # 1 week
                 path: /
+            oauth:
+                resource_owners:
+                    google: "/login/check-google"
+                login_path: security_login
+                failure_path: security_login
+                oauth_user_provider:
+                    service: my_oauth_user_provider
+                default_target_path: back_dashboard
     access_control:
         # - { path: ^/auth/login$, role: PUBLIC_ACCESS }
         # - { path: ^/auth/register, role: PUBLIC_ACCESS }
@@ -46,5 +56,4 @@ security:
         # - { path: ^/citoyen/dashboard, roles: ROLE_CITOYEN }
         # - { path: ^/employee/dashboard, roles: ROLE_EMPLOYEE }
         # - { path: ^/, roles: PUBLIC_ACCESS }
-        # Uncomment to restrict all other routes to authenticated users
         # - { path: ^/, role: ROLE_USER }

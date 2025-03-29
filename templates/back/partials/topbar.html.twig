@@ -22,29 +22,30 @@
     
 <ul class="navbar-nav ms-auto">
     <!-- User Profile Dropdown -->
-    <li class="nav-item dropdown user-menu">
-        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+   <li class="nav-item dropdown user-menu">
+    <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+        <img
+            src="{{ app.user.profileImage ? asset('uploads/profile_images/' ~ app.user.profileImage) : asset('assets/back/assets/img/avatar.png') }}"
+            class="user-image rounded-circle shadow"
+            alt="User Image"
+        />
+        <span class="d-none d-md-inline">{{ app.user.firstName ?? 'Guest' }}</span>
+    </a>
+    <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
+        <!--begin::User Image-->
+        <li class="user-header text-bg-primary">
             <img
-                src="{{ asset('assets/back/assets/img/avatar.png') }}"
-                class="user-image rounded-circle shadow"
+                src="{{ app.user.profileImage ? asset('uploads/profile_images/' ~ app.user.profileImage) : asset('assets/back/assets/img/avatar.png') }}"
+                class="rounded-circle shadow"
                 alt="User Image"
             />
-            <span class="d-none d-md-inline">Alexander Pierce</span>
-        </a>
-        <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
-            <!--begin::User Image-->
-            <li class="user-header text-bg-primary">
-                <img
-                    src="{{ asset('assets/back/assets/img/avatar.png') }}"
-                    class="rounded-circle shadow"
-                    alt="User Image"
-                />
-                <p>
-                    Alexander Pierce - Web Developer
-                    <small>Member since Nov. 2023</small>
-                </p>
-            </li>
-            <!--end::User Image-->
+            <p>
+                {{ app.user.firstName }} {{ app.user.lastName ?? '' }}
+                <small>
+                    Member since {{ app.user.createdAt ? app.user.createdAt|date('M. Y') : 'N/A' }}
+                </small>
+            </p>
+        </li>
             <!--begin::Menu Body-->
             <li class="user-body">
                 <div class="row">

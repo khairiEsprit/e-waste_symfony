@@ -13,6 +13,8 @@ security:
     password: Password
     password_confirmation: Repeat Password
     password_current: Current Password
+    birthdate: Birthdate
+    profile_image: Profile Image
     register_success: Thank you for registering. Your account has been activated, you can log in now.
     register_confirmed: Thank you for registering. To activate your account, click on the link sent to your email address.
     reset_title: Forgot Password

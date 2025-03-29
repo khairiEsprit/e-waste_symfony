@@ -4,7 +4,7 @@
 
 {% block body %}
 <div class="login">
-    <img src="{{ asset('assets//front/auth/bg-image.png') }}" alt="login image" class="login__img">
+    <img src="{{ asset('assets/front/auth/bg-image.png') }}" alt="login image" class="login__img">
 
     <form action="{{ path('security_login') }}" method="post" class="login__form">
         <h1 class="login__title">{{ 'security.login_title'|trans }}</h1>
@@ -51,6 +51,15 @@
 
         <button type="submit" class="login__button">{{ 'security.login_btn'|trans }}</button>
 
+        {# Refactored Google Login Button #}
+        <div class="login__social">
+            <p class="login__social-text">Or sign in with:</p>
+            <a href="{{ path('hwi_oauth_redirect_to_service') }}" class="login__button login__button--social">
+                <i class="ri-google-fill login__icon--social"></i>
+                <span>Login with Google</span>
+            </a>
+        </div>
+
         <p class="login__register">
             Don’t have an account?
             {% if user_registration is not empty %}
@@ -60,4 +69,69 @@
     </form>
 </div>
 
+<style>
+.login__social {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+.login__social-text {
+  font-size: var(--small-font-size);
+  color: var(--white-color);
+  margin-bottom: 0.75rem;
+}
+
+.login__form {
+  position: relative;
+  background-color: hsla(0, 0%, 10%, 0.1);
+  border: 2px solid var(--white-color);
+  margin-inline: 1.5rem;
+  padding: 2.5rem 3rem 1rem 3rem; /* Reduced padding from 2.5rem 1.5rem */
+    border-radius: 1rem;
+  backdrop-filter: blur(8px);
+}
+
+.login__button--social {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: transparent; /* Match form's transparency */
+  border: 2px solid var(--white-color); /* Consistent border style */
+  font-weight: var(--font-medium);
+  color: black; /* White text to match theme */
+  cursor: pointer;
+  transition: background-color 0.3s;
+}
+
+.login__button--social:hover {
+  background-color: hsla(0, 0%, 100%, 0.1); /* Subtle hover effect */
+}
+
+.login__icon--social {
+  font-size: 1.25rem;
+  margin-right: 0.75rem; /* Space between icon and text */
+}
+
+/* Ensure the span inside the button aligns properly */
+.login__button--social span {
+  font-size: var(--normal-font-size);
+}
+
+.login__button {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--white-color);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  margin-bottom: 2rem;
+  text-align: center; /* Ensure text is centered */
+}
+</style>
+
+
+
 {% endblock %}
+

@@ -1,129 +1,328 @@
 {% extends "@PdUser/base.html.twig" %}
 
-
 {% block body %}
     {% form_theme form 'bootstrap_4_layout.html.twig' %}
-{# templates/bundles/PdUserBundle/Auth/register.html.twig #}
-<div class="login">
+    {# templates/bundles/PdUserBundle/Auth/register.html.twig #}
+    <div class="login">
         <img src="{{ asset('assets/front/auth/bg-image.png') }}" alt="register image" class="login__img">
 
         {{ form_start(form, {'attr': {'class': 'login__form'}}) }}
             <h1 class="login__title">{{ 'security.register_title'|trans }}</h1>
 
             <div class="login__content">
-                <div class="login__box">
-                    <i class="riuser-3-line login__icon"></i>
-                    <div class="login__box-input">
-                        {{ form_widget(form.email, {'attr': {'class': 'login__input', 'id': 'register-email'}}) }}
-                        <label for="register-email" class="login__label">{{ 'security.login_username'|trans }}</label>
-                        <span class="error-text">{{ form_errors(form.email) }}</span>
+                <div class="login__column">
+                    <div class="login__box">
+                        <i class="ri-user-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.firstName, {'attr': {'class': 'login__input', 'id': 'register-firstname'}}) }}
+                            <label for="register-firstname" class="login__label">First Name</label>
+                            <span class="error-text">{{ form_errors(form.firstName) }}</span>
+                        </div>
+                    </div>
+                    {# <div class="login__box">
+                        <i class="ri-calendar-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.birthdate, {'attr': {'class': 'login__input', 'id': 'register-birthdate', 'type': 'date'}}) }}
+                            <label for="register-birthdate" class="login__label">Birthdate</label>
+                            <span class="error-text">{{ form_errors(form.birthdate) }}</span>
+                        </div>
+                    </div> #}
+                    <div class="login__box">
+                        <i class="ri-image-line login__icon"></i>
+                        <div class="login__box-input">
+                            {# Hide the default file input #}
+                            {{ form_widget(form.profileImageFile, {
+                                'attr': {
+                                    'class': 'login__input file-input',
+                                    'id': 'register-image',
+                                    'type': 'file',
+                                    'accept': 'image/jpeg, image/png, image/gif'
+                                }
+                            }) }}
+                            
+                            {# Custom file input label #}
+                            <label for="register-image" class="file-label">
+                                <i class="ri-upload-cloud-line"></i> Choose File
+                                <span class="file-name">No file chosen</span>
+                            </label>
+                            
+                            {# Progress bar container #}
+                            <div class="progress-container" id="progress-container" style="display: none;">
+                                <div class="progress-bar" id="progress-bar"></div>
+                                <span class="progress-text" id="progress-text">0%</span>
+                            </div>
+                            
+                            {# Error message display #}
+                            <span class="error-text">{{ form_errors(form.profileImageFile) }}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="login__box">
-                    <i class="ri-lock-2-line login__icon"></i>
-                    <div class="login__box-input">
-                        {{ form_widget(form.plainPassword.first, {'attr': {'class': 'login__input', 'id': 'register-pass'}}) }}
-                        <label for="register-pass" class="login__label">{{ 'security.login_password'|trans }}</label>
-                        <i class="ri-eye-off-line login__eye" id="register-eye"></i>
-                        <span class="error-text">{{ form_errors(form.plainPassword.first) }}</span>
+                <div class="login__column">
+                    <div class="login__box">
+                        <i class="ri-user-3-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.email, {'attr': {'class': 'login__input', 'id': 'register-email'}}) }}
+                            <label for="register-email" class="login__label">{{ 'security.login_username'|trans }}</label>
+                            <span class="error-text">{{ form_errors(form.email) }}</span>
+                        </div>
+                    </div>
+                    <div class="login__box">
+                        <i class="ri-lock-2-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.plainPassword.first, {'attr': {'class': 'login__input', 'id': 'register-pass'}}) }}
+                            <label for="register-pass" class="login__label">{{ 'security.login_password'|trans }}</label>
+                            <i class="ri-eye-off-line login__eye" id="register-eye"></i>
+                            <span class="error-text">{{ form_errors(form.plainPassword.first) }}</span>
+                        </div>
+                    </div>
+                    <div class="login__box">
+                        <i class="ri-lock-2-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.plainPassword.second, {'attr': {'class': 'login__input', 'id': 'register-pass-confirm'}}) }}
+                            <label for="register-pass-confirm" class="login__label">Confirm Password</label>
+                            <span class="error-text">{{ form_errors(form.plainPassword.second) }}</span>
+                        </div>
                     </div>
                 </div>
-                <div class="login__box">
-                    <i class="ri-lock-2-line login__icon"></i>
-                    <div class="login__box-input">
-                        {{ form_widget(form.plainPassword.second, {'attr': {'class': 'login__input', 'id': 'register-pass-confirm'}}) }}
-                        <label for="register-pass-confirm" class="login__label">Confirm Password</label>
-                        <span class="error-text">{{ form_errors(form.plainPassword.second) }}</span>
-                    </div>
-                </div>
-                <div class="login__box login__box-select">
-                    <i class="ri-user-star-line login__icon"></i>
-                    <div class="login__box-input">
-                        {{ form_widget(form.selectedRole, {'attr': {'class': 'login__input login__select', 'id': 'register-role'}}) }}
-                        <label for="register-role" class="login__label">{{ 'security.role'|trans }}</label>
-                        <span class="error-text">{{ form_errors(form.selectedRole) }}</span>
-                    </div>
+            </div>
+            
+            <div class="login__box login__box-select">
+                <i class="ri-user-star-line login__icon"></i>
+                <div class="login__box-input">
+                    {{ form_widget(form.selectedRole, {'attr': {'class': 'login__input login__select', 'id': 'register-role'}}) }}
+                    <label for="register-role" class="login__label">{{ 'security.role'|trans }}</label>
+                    <span class="error-text">{{ form_errors(form.selectedRole) }}</span>
                 </div>
             </div>
 
             <button type="submit" class="login__button">{{ 'security.register_btn'|trans }}</button>
 
             <p class="login__register">
-                Already have an account? 
+                Already have an account?
                 <a href="{{ path('security_login') }}">{{ 'security.login_title'|trans }}</a>
             </p>
         {{ form_end(form) }}
     </div>
-<style>
 
-.login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label {
-        top: -12px;
-        font-size: var(--small-font-size);
-    }
-.login__input:focus + .login__label {
-        top: -12px;
-        font-size: var(--small-font-size);
-    }
-
-.login__register {
-        text-align: center;
-        font-size: var(--small-font-size);
-    }
-    .login__register a {
-        color: var(--white-color);
-        font-weight: var(--font-medium);
-    }
-    .login__register a:hover {
-        text-decoration: underline;
-    }
-
-    
-input,
-    button,
-    select {
-        border: none;
-        outline: none;
-    }
-
-
-.login__form {
-        position: relative;
-        background-color: hsla(0, 0%, 10%, 0.1);
-        border: 2px solid var(--white-color);
-        margin-inline: 1.5rem;
-        padding: 1.5rem 3rem 1rem; /* Reduced padding to minimize height */
-        border-radius: 1rem;
-        backdrop-filter: blur(8px);
-    }
-.login__box-select .login__select option {
-        color: var(--black-color); /* Black text for dropdown options */
-        background: var(--white-color); /* White background for dropdown */
-    }
-</style>
-
-
-<script>
-    // Add 'has-value' class to select when a value is chosen
-    document.getElementById('register-role').addEventListener('change', function() {
-        if (this.value) {
-            this.classList.add('has-value');
+    <style>
+        .login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label {
+            top: -12px;
+            font-size: var(--small-font-size);
         }
-    });
-
-    // Check on page load if a value is already selected (e.g., form validation error)
-    document.addEventListener('DOMContentLoaded', function() {
-        const select = document.getElementById('register-role');
-        if (select.value) {
-            select.classList.add('has-value');
+        .login__input:focus + .login__label {
+            top: -12px;
+            font-size: var(--small-font-size);
         }
-    });
 
-    const eye = document.getElementById('register-eye');
-    const pass = document.getElementById('register-pass');
-    eye.addEventListener('click', () => {
-        pass.type = pass.type === 'password' ? 'text' : 'password';
-        eye.classList.toggle('ri-eye-off-line');
-        eye.classList.toggle('ri-eye-line');
-    });
-</script>
+        .login__register {
+            text-align: center;
+            font-size: var(--small-font-size);
+        }
+        .login__register a {
+            color: var(--white-color);
+            font-weight: var(--font-medium);
+        }
+        .login__register a:hover {
+            text-decoration: underline;
+        }
+
+        input,
+        button,
+        select {
+            border: none;
+            outline: none;
+        }
+
+        .login__form {
+            position: relative;
+            background-color: hsla(0, 0%, 10%, 0.1);
+            border: 2px solid var(--white-color);
+            margin-inline: 1.5rem;
+            padding: 1.5rem 3rem 1rem;
+            border-radius: 1rem;
+            width: 800px;
+            backdrop-filter: blur(8px);
+        }
+        .login__box-select .login__select option {
+            color: var(--black-color);
+            background: var(--white-color);
+        }
+        .login__button {
+            width: 100%;
+            padding: 1rem;
+            border-radius: 0.5rem;
+            background-color: var(--white-color);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            margin-bottom: 2rem;
+            text-align: center;
+        }
+        .login__content {
+            display: flex;
+            justify-content: space-between;
+            gap: 1.5rem;
+        }
+        .login__column {
+            width: 48%;
+        }
+        .login__box {
+            margin-bottom: 1rem;
+        }
+        
+        /* File input styles */
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        /* Custom file upload button */
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+            padding: 10px 15px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .file-label i {
+            font-size: 1.5rem;
+        }
+
+        .file-label:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+
+        .file-name {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+        
+        /* Progress bar styles */
+        .progress-container {
+            width: 100%;
+            margin-top: 10px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            position: relative;
+            height: 20px;
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 12px;
+            font-weight: bold;
+        }
+    </style>
+
+    <script>
+        // Add 'has-value' class to select when a value is chosen
+        document.getElementById('register-role').addEventListener('change', function() {
+            if (this.value) {
+                this.classList.add('has-value');
+            }
+        });
+
+        // Check on page load if a value is already selected (e.g., form validation error)
+        document.addEventListener('DOMContentLoaded', function() {
+            const select = document.getElementById('register-role');
+            if (select.value) {
+                select.classList.add('has-value');
+            }
+        });
+
+        const eye = document.getElementById('register-eye');
+        const pass = document.getElementById('register-pass');
+        eye.addEventListener('click', () => {
+            pass.type = pass.type === 'password' ? 'text' : 'password';
+            eye.classList.toggle('ri-eye-off-line');
+            eye.classList.toggle('ri-eye-line');
+        });
+
+       document.addEventListener('DOMContentLoaded', function() {
+    // File upload with progress bar
+    const fileInput = document.getElementById("register-image");
+    if (fileInput) { // Check if element exists
+        fileInput.addEventListener("change", function () {
+            const fileName = this.files[0] ? this.files[0].name : "No file chosen";
+            document.querySelector(".file-name").textContent = fileName;
+            
+            // Show progress bar when file is selected
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            if (progressContainer && progressBar && progressText) {
+                progressContainer.style.display = 'block';
+                
+                // Simulate upload progress
+                let progress = 0;
+                const interval = setInterval(() => {
+                    progress += 5;
+                    progressBar.style.width = progress + '%';
+                    progressText.textContent = progress + '%';
+                    
+                    if (progress >= 100) {
+                        clearInterval(interval);
+                        setTimeout(() => {
+                            progressContainer.style.display = 'none';
+                        }, 1000);
+                    }
+                }, 100);
+            }
+        });
+    }
+            // In a real implementation, you would use something like this:
+            /*
+            const formData = new FormData();
+            formData.append('profileImage', this.files[0]);
+            
+            const xhr = new XMLHttpRequest();
+            xhr.open('POST', '/upload-endpoint', true);
+            
+            xhr.upload.onprogress = function(e) {
+                if (e.lengthComputable) {
+                    const percentComplete = (e.loaded / e.total) * 100;
+                    progressBar.style.width = percentComplete + '%';
+                    progressText.textContent = Math.round(percentComplete) + '%';
+                }
+            };
+            
+            xhr.onload = function() {
+                if (xhr.status === 200) {
+                    setTimeout(() => {
+                        progressContainer.style.display = 'none';
+                    }, 1000);
+                }
+            };
+            
+            xhr.send(formData);
+            */
+        });
+    </script>
 {% endblock %}

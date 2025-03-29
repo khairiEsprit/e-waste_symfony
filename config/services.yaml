@@ -3,8 +3,15 @@
 parameters:
     # Define the user class as a parameter (replace with your actual User entity class)
     app.user_class: 'App\Entity\User'
+    profile_images_directory: '%kernel.project_dir%/public/uploads/profile_images'
+
 
 services:
+
+    my_oauth_user_provider:
+            class: App\Security\MyOAuthUserProvider
+            arguments: ['@doctrine.orm.entity_manager']
+            
     App\Security\AuthenticationSuccessHandler:
         arguments:
             $router: '@router'

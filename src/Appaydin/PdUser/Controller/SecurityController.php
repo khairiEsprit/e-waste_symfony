@@ -15,10 +15,12 @@ use Symfony\Component\Mailer\MailerInterface;
 use Symfony\Component\Mime\Address;
 use Symfony\Component\Mime\Email;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Symfony\Component\String\Slugger\AsciiSlugger;
 
 class SecurityController extends AbstractController
 {
@@ -90,74 +92,157 @@ class SecurityController extends AbstractController
      */
     public function register(Request $request): Response
     {
+        error_log('Starting registration process');
+
+        // Check authentication and registration availability
         if ($this->checkAuth()) {
+            error_log('User already authenticated, redirecting');
             return $this->redirectToRoute($this->getParameter('login_redirect'));
         }
 
         if (!$this->getParameter('user_registration')) {
+            error_log('Registration is disabled');
             $this->addFlash('error', $this->translator->trans('security.registration_disable'));
             return $this->redirectToRoute('security_login');
         }
 
+        // Initialize user
+        error_log('Initializing user instance');
         $userClass = $this->getParameter('user_class');
         $user = new $userClass();
+
         if (!$user instanceof UserInterface) {
+            error_log('ERROR: Invalid user class provided - ' . get_class($user));
             throw new InvalidArgumentException();
         }
 
+        // Dispatch before registration event
+        error_log('Dispatching REGISTER_BEFORE event');
         if ($response = $this->dispatcher->dispatch(new UserEvent($user), UserEvent::REGISTER_BEFORE)->getResponse()) {
+            error_log('REGISTER_BEFORE event returned a response, redirecting');
             return $response;
         }
 
+        // Create form and handle request
+        error_log('Creating registration form');
         $form = $this->createForm($this->getParameter('register_type'), $user);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            $em = $this->registry->getManager();
-            $password = $this->hasher->hashPassword($user, $form->get('plainPassword')->getData());
-            $user->setPassword($password);
+        if ($form->isSubmitted()) {
+            error_log('Form submitted');
 
-            if ($this->getParameter('email_confirmation')) {
-                $user->setActive(false);
-                if (empty($user->getConfirmationToken()) || null === $user->getConfirmationToken()) {
-                    $user->createConfirmationToken();
+            if ($form->isValid()) {
+                error_log('Form is valid, processing registration');
+
+                // Handle file upload
+                error_log('Checking for file upload');
+                $profileImageFile = $form->get('profileImageFile')->getData();
+                $newFilename = null;
+
+                if ($profileImageFile) {
+                    error_log('Processing file upload: ' . $profileImageFile->getClientOriginalName());
+
+                    $slugger = new AsciiSlugger();
+                    $originalFilename = pathinfo($profileImageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $slugger->slug($originalFilename)->lower();
+                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $profileImageFile->guessExtension();
+                    error_log('Generated filename: ' . $newFilename);
+
+                    try {
+                        error_log('Attempting to move uploaded file');
+                        $profileImageFile->move(
+                            $this->getParameter('profile_images_directory'),
+                            $newFilename
+                        );
+                        $user->setProfileImage($newFilename);
+                        error_log('File successfully uploaded and saved');
+                    } catch (FileException $e) {
+                        error_log('ERROR uploading file: ' . $e->getMessage());
+                        $this->addFlash('error', $this->translator->trans('security.profile_image_upload_error'));
+                    }
+                } else {
+                    error_log('No file was uploaded');
                 }
-                $emailBody = [
-                    'confirmationUrl' => $this->generateUrl(
-                        'security_register_confirm',
-                        ['token' => $user->getConfirmationToken()],
-                        UrlGeneratorInterface::ABSOLUTE_URL
-                    ),
-                ];
-                $this->sendEmail($user, 'email.account_confirmation', 'register', $emailBody);
-            } elseif ($this->getParameter('welcome_email')) {
-                $this->sendEmail($user, 'email.registration_complete', 'welcome');
-            }
 
-            if ($group = $this->getParameter('default_group')) {
-                $getGroup = $em->getRepository($this->getParameter('group_class'))->find($group);
-                if ($getGroup instanceof GroupInterface) {
-                    $user->addGroup($getGroup);
+                // Set password
+                error_log('Hashing password');
+                $password = $this->hasher->hashPassword($user, $form->get('plainPassword')->getData());
+                $user->setPassword($password);
+
+                // Handle email confirmation if enabled
+                if ($this->getParameter('email_confirmation')) {
+                    error_log('Email confirmation enabled, processing');
+                    $user->setActive(false);
+                    if (empty($user->getConfirmationToken()) || null === $user->getConfirmationToken()) {
+                        error_log('Generating new confirmation token');
+                        $user->createConfirmationToken();
+                    }
+
+                    $emailBody = [
+                        'confirmationUrl' => $this->generateUrl(
+                            'security_register_confirm',
+                            ['token' => $user->getConfirmationToken()],
+                            UrlGeneratorInterface::ABSOLUTE_URL
+                        ),
+                        'profileImage' => $newFilename ?? null,
+                    ];
+
+                    error_log('Sending confirmation email');
+                    $this->sendEmail($user, 'email.account_confirmation', 'register', $emailBody);
+                } elseif ($this->getParameter('welcome_email')) {
+                    error_log('Sending welcome email');
+                    $this->sendEmail($user, 'email.registration_complete', 'welcome');
                 }
+
+                // Add to default group if configured
+                $em = $this->registry->getManager();
+                if ($group = $this->getParameter('default_group')) {
+                    error_log('Checking default group assignment');
+                    $getGroup = $em->getRepository($this->getParameter('group_class'))->find($group);
+                    if ($getGroup instanceof GroupInterface) {
+                        error_log('Adding user to group: ' . $group);
+                        $user->addGroup($getGroup);
+                    }
+                }
+
+                // Persist user
+                error_log('Persisting user to database');
+                $em->persist($user);
+                $em->flush();
+                error_log('User successfully persisted');
+
+                // Dispatch after registration event
+                error_log('Dispatching REGISTER event');
+                if ($response = $this->dispatcher->dispatch(new UserEvent($user), UserEvent::REGISTER)->getResponse()) {
+                    error_log('REGISTER event returned a response, redirecting');
+                    return $response;
+                }
+
+                error_log('Registration complete, rendering success page');
+                return $this->render($this->getParameter('template_path') . '/registration/registerSuccess.html.twig', [
+                    'user' => $user,
+                ]);
+            } else {
+                error_log('Form validation failed');
+                error_log('Form errors: ' . json_encode($this->getFormErrors($form)));
             }
-
-            $em->persist($user);
-            $em->flush();
-
-            if ($response = $this->dispatcher->dispatch(new UserEvent($user), UserEvent::REGISTER)->getResponse()) {
-                return $response;
-            }
-
-            return $this->render($this->getParameter('template_path') . '/registration/registerSuccess.html.twig', [
-                'user' => $user,
-            ]);
         }
 
+        error_log('Rendering registration form');
         return $this->render($this->getParameter('template_path') . '/registration/register.html.twig', [
             'form' => $form->createView(),
         ]);
     }
 
+    // Helper function to get form errors
+    private function getFormErrors($form)
+    {
+        $errors = [];
+        foreach ($form->getErrors(true) as $error) {
+            $errors[] = $error->getMessage();
+        }
+        return $errors;
+    }
     /**
      * Confirm registration with token.
      */

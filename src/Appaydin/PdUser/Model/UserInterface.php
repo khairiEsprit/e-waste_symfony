@@ -71,5 +71,6 @@ interface UserInterface extends BaseUserInterface
     public function getPhone(): ?string;
     public function setPhone(?string $phone): self;
     public function getLanguage(): ?string;
+    
     public function setLanguage(?string $language): self;
 }
