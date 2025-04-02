@@ -1,13 +1,5 @@
 <?php
 
-/**
- * This file is part of the pd-admin pd-user package.
- *
- * @package     pd-user
- * @license     LICENSE
- * @author      Ramazan APAYDIN <apaydin541@gmail.com>
- * @link        https://github.com/appaydin/pd-user
- */
 
 namespace App\Appaydin\PdUser\Form;
 
@@ -20,11 +12,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Security\Core\Validator\Constraints\UserPassword;
 use Symfony\Component\Validator\Constraints\Length;
 
-/**
- * Registration Form Type.
- *
- * @author Ramazan APAYDIN <apaydin541@gmail.com>
- */
+
 class ChangePasswordType extends AbstractType
 {
     public function buildForm(FormBuilderInterface $builder, array $options)

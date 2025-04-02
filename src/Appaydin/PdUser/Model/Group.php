@@ -1,24 +1,12 @@
 <?php
 
-/**
- * This file is part of the pd-admin pd-user package.
- *
- * @package     pd-user
- * @license     LICENSE
- * @author      Ramazan APAYDIN <apaydin541@gmail.com>
- * @link        https://github.com/appaydin/pd-user
- */
 
 namespace App\Appaydin\PdUser\Model;
 
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
-/**
- * User Group.
- *
- * @author Ramazan APAYDIN <apaydin541@gmail.com>
- */
+
 #[ORM\Entity]
 #[ORM\Table(name: "user_group")]
 class Group implements GroupInterface

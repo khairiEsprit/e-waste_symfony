@@ -1,13 +1,5 @@
 <?php
 
-/**
- * This file is part of the pd-admin pd-user package.
- *
- * @package     pd-user
- * @license     LICENSE
- * @author      Ramazan APAYDIN <apaydin541@gmail.com>
- * @link        https://github.com/appaydin/pd-user
- */
 
 namespace App\Appaydin\PdUser\Model;
 
@@ -16,12 +8,6 @@ use Doctrine\ORM\PersistentCollection;
 use Symfony\Component\Security\Core\User\PasswordAuthenticatedUserInterface;
 use Symfony\Component\Validator\Constraints as Assert;
 use Doctrine\Common\Collections\ArrayCollection;
-
-/**
- * User Account.
- *
- * @author Ramazan APAYDIN <apaydin541@gmail.com>
- */
 
 
 #[ORM\Entity]

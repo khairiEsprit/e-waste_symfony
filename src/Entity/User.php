@@ -5,15 +5,15 @@ use Doctrine\ORM\Mapping as ORM;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Appaydin\PdUser\Model\User as BaseUser;
+use Doctrine\DBAL\Types\Types;
 
 #[ORM\Entity(repositoryClass: "App\Repository\UserRepository")]
 #[ORM\Table(name: "user")]
 #[UniqueEntity(fields: ["email"], message: "email_already_taken")]
 class User extends BaseUser
 {
-    #[ORM\Column(type: "date", nullable: true)]
-    // #[Assert\NotBlank(message: "Please enter your birthdate.")]
-    #[Assert\Date(message: "Please enter a valid date.")]
+    #[ORM\Column(type: Types::DATE_MUTABLE, nullable: true)]
+   
     private ?\DateTimeInterface $birthdate = null;
 
     #[ORM\Column(type: "string", length: 255, nullable: true)]

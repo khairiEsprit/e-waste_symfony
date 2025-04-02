@@ -1,13 +1,5 @@
 <?php
 
-/**
- * This file is part of the pd-admin pd-user package.
- *
- * @package     pd-user
- * @license     LICENSE
- * @author      Ramazan APAYDIN <apaydin541@gmail.com>
- * @link        https://github.com/appaydin/pd-user
- */
 
 namespace App\Appaydin\PdUser\Security;
 
@@ -16,11 +8,7 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authorization\Voter\Voter;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-/**
- * User Switcher.
- *
- * @author Ramazan APAYDIN <apaydin541@gmail.com>
- */
+
 class SwitchUserVoter extends Voter
 {
     protected function supports($attribute, $subject): bool

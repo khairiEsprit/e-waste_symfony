@@ -48,6 +48,17 @@ img {
   height: auto;
 }
 
+.login__button {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--white-color);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  margin-bottom: 2rem;
+  text-align: center; /* Ensure text is centered */
+}
+
 /*=============== LOGIN ===============*/
 .login {
   position: relative;
@@ -61,6 +72,16 @@ img {
   height: 100%;
   object-fit: cover;
   object-position: center;
+}
+
+.login__form {
+  position: relative;
+  background-color: hsla(0, 0%, 10%, 0.1);
+  border: 2px solid var(--white-color);
+  margin-inline: 1.5rem;
+  padding: 2.5rem 3rem 1rem 3rem; /* Reduced padding from 2.5rem 1.5rem */
+    border-radius: 1rem;
+  backdrop-filter: blur(8px);
 }
 
 

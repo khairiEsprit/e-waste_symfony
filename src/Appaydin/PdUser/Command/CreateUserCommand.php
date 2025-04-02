@@ -1,13 +1,5 @@
 <?php
 
-/**
- * This file is part of the pd-admin pd-user package.
- *
- * @package     pd-user
- * @license     LICENSE
- * @author      Ramazan APAYDIN <apaydin541@gmail.com>
- * @link        https://github.com/appaydin/pd-user
- */
 
 namespace App\Appaydin\PdUser\Command;
 
@@ -21,11 +13,7 @@ use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-/**
- * Create New User.
- *
- * @author Ramazan APAYDIN <apaydin541@gmail.com>
- */
+
 class CreateUserCommand extends Command
 {
     public function __construct(

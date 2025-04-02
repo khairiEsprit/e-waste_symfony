@@ -127,12 +127,33 @@ class SecurityController extends AbstractController
         error_log('Creating registration form');
         $form = $this->createForm($this->getParameter('register_type'), $user);
         $form->handleRequest($request);
+        error_log('Form data after handling: ' . json_encode($form->getData()));
+
 
         if ($form->isSubmitted()) {
             error_log('Form submitted');
 
             if ($form->isValid()) {
                 error_log('Form is valid, processing registration');
+                if (!$form->isValid()) {
+                    $errors = [];
+                    foreach ($form->getErrors(true) as $error) {
+                        $errors[$error->getOrigin()->getName()] = $error->getMessage();
+                    }
+                    error_log('Form validation errors: ' . json_encode($errors));
+                }
+
+                // $birthdateString = $form->get('birthdate')->getData();
+                // if ($birthdateString) {
+                //     try {
+                //         $user->setBirthdate(new \DateTime($birthdateString));
+                //     } catch (\Exception $e) {
+                //         $form->addError(new FormError('Invalid birthdate format.'));
+                //         return $this->render($this->getParameter('template_path') . '/registration/register.html.twig', [
+                //             'form' => $form->createView(),
+                //         ]);
+                //     }
+                // }
 
                 // Handle file upload
                 error_log('Checking for file upload');

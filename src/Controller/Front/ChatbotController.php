@@ -1,104 +1,88 @@
 <?php
-
+// src/Controller/ChatController.php
 namespace App\Controller\Front;
 
-use App\Entity\ChatMessage;
-use App\Service\ChatbotService;
-use Doctrine\ORM\EntityManagerInterface;
+use App\Entity\Chat;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
-use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
-
+use Doctrine\ORM\EntityManagerInterface;
+use Symfony\Contracts\HttpClient\HttpClientInterface;
+use Symfony\Component\HttpFoundation\JsonResponse;
 class ChatbotController extends AbstractController
 {
-    #[Route('/chatbot', name: 'app_chatbot')]
-    public function index(Request $request, EntityManagerInterface $entityManager): Response
+    private HttpClientInterface $httpClient;
+
+    public function __construct(HttpClientInterface $httpClient)
     {
-        // Clear chat history when the page loads
-        $this->clearChatHistory($request, $entityManager);
-
-        return $this->render('front/chatbot/index.html.twig');
+        $this->httpClient = $httpClient;
     }
-
-    #[Route('/chatbot/send', name: 'app_chatbot_send', methods: ['POST'])]
-    public function sendMessage(
-        Request $request,
-        ChatbotService $chatbotService,
-        EntityManagerInterface $entityManager
-    ): JsonResponse {
-        $userMessage = $request->request->get('message', '');
-        $ipAddress = $request->getClientIp();
-
-        // Save user message
-        $userChatMessage = new ChatMessage();
-        $userChatMessage->setContent($userMessage);
-        $userChatMessage->setIsFromUser(true);
-        $userChatMessage->setIpAddress($ipAddress);
-        $entityManager->persist($userChatMessage);
-
-        // Get bot response
-        $botResponse = $chatbotService->getEducationalResponse($userMessage, [
-            'location' => 'Montreal', // Can be dynamic based on user
-            'language' => $request->getLocale(),
-        ]);
-
-        // Save bot response
-        $botChatMessage = new ChatMessage();
-        $botChatMessage->setContent($botResponse);
-        $botChatMessage->setIsFromUser(false);
-        $botChatMessage->setIpAddress($ipAddress);
-        $entityManager->persist($botChatMessage);
-
-        $entityManager->flush();
-
-        return $this->json([
-            'user_message' => $userMessage,
-            'bot_response' => $botResponse,
-            'timestamp' => (new \DateTime())->format('H:i'),
+    #[Route('/chat', name: 'chat', methods: ['GET'])]
+    public function index(): Response
+    {
+        // Render the template without passing previous messages
+        // The frontend will handle messages dynamically via AJAX
+        return $this->render('front/chatbot/index.html.twig', [
+            'messages' => [], // Empty array since we clear on reload
         ]);
     }
 
-    #[Route('/chatbot/history', name: 'app_chatbot_history')]
-    public function getHistory(EntityManagerInterface $entityManager, Request $request): JsonResponse
+    #[Route('/chat/upload', name: 'chat_upload', methods: ['POST'])]
+    public function upload(Request $request, EntityManagerInterface $em): Response
     {
-        $messages = $entityManager->getRepository(ChatMessage::class)
-            ->findBy(
-                ['ipAddress' => $request->getClientIp()], 
-                ['createdAt' => 'ASC'], 
-                20
-            );
+        $file = $request->files->get('image');
+        $userMessage = $request->request->get('message', 'User uploaded an image');
 
-        return $this->json(array_map(function(ChatMessage $message) {
-            return [
-                'content' => $message->getContent(),
-                'isFromUser' => $message->isFromUser(),
-                'time' => $message->getCreatedAt()->format('H:i'),
-            ];
-        }, $messages));
-    }
-
-    #[Route('/chatbot/clear-history', name: 'app_chatbot_clear', methods: ['POST'])]
-    public function clearHistory(Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $this->clearChatHistory($request, $entityManager);
-        return new JsonResponse(['status' => 'success']);
-    }
-
-    /**
-     * Helper method to clear chat history based on IP address.
-     */
-    private function clearChatHistory(Request $request, EntityManagerInterface $entityManager): void
-    {
-        $ip = $request->getClientIp();
-        $messages = $entityManager->getRepository(ChatMessage::class)
-            ->findBy(['ipAddress' => $ip]);
-        
-        foreach ($messages as $message) {
-            $entityManager->remove($message);
+        if (!$file) {
+            return new JsonResponse([
+                'success' => false,
+                'error' => 'No image uploaded',
+            ], Response::HTTP_BAD_REQUEST);
         }
-        
-        $entityManager->flush();
+
+        // Save the file temporarily
+        $filename = uniqid() . '.' . $file->guessExtension();
+        $filePath = $this->getParameter('upload_directory') . '/' . $filename;
+        $file->move($this->getParameter('upload_directory'), $filename);
+
+        // Save user message to database
+        $chat = new Chat();
+        $chat->setUser('User')->setMessage($userMessage . ' [Image: ' . $filename . ']');
+        $em->persist($chat);
+
+        try {
+            // Prepare the multipart/form-data request
+            $response = $this->httpClient->request('POST', 'http://localhost:5000/predict', [
+                'body' => [
+                    'image' => fopen($filePath, 'r'),
+                ],
+                'headers' => [
+                    'Content-Type' => 'multipart/form-data',
+                ],
+            ]);
+
+            $data = $response->toArray();
+            $prediction = $data['prediction'] ?? 'Unknown';
+            $probability = $data['probability'] ?? 'N/A';
+            $botMessage = "This waste is classified as: $prediction (Probability: $probability)";
+        } catch (\Exception $e) {
+            $botMessage = "Sorry, I couldn’t classify this waste. Error: " . $e->getMessage();
+        }
+
+        // Save bot response to database
+        $botChat = new Chat();
+        $botChat->setUser('Bot')->setMessage($botMessage);
+        $em->persist($botChat);
+        $em->flush();
+
+        // Optionally, delete the temporary file
+        // unlink($filePath);
+
+        // Return JSON response instead of redirect
+        return new JsonResponse([
+            'success' => true,
+            'message' => $botMessage, // This will be displayed by the frontend
+        ]);
     }
 }

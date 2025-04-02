@@ -1,13 +1,6 @@
 <?php
 
-/**
- * This file is part of the pd-admin pd-user package.
- *
- * @package     pd-user
- * @license     LICENSE
- * @author      Ramazan APAYDIN <apaydin541@gmail.com>
- * @link        https://github.com/appaydin/pd-user
- */
+
 
 namespace App\Appaydin\PdUser\Command;
 
@@ -19,11 +12,6 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\Question;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
 
-/**
- * User Change Password.
- *
- * @author Ramazan APAYDIN <apaydin541@gmail.com>
- */
 class ChangePasswordCommand extends Command
 {
     public function __construct(

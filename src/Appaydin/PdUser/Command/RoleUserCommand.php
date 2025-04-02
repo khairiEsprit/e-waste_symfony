@@ -1,14 +1,5 @@
 <?php
 
-/**
- * This file is part of the pd-admin pd-user package.
- *
- * @package     pd-user
- * @license     LICENSE
- * @author      Ramazan APAYDIN <apaydin541@gmail.com>
- * @link        https://github.com/appaydin/pd-user
- */
-
 namespace App\Appaydin\PdUser\Command;
 
 use Doctrine\ORM\EntityManagerInterface;
@@ -20,11 +11,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Question\ChoiceQuestion;
 use Symfony\Component\Console\Question\Question;
 
-/**
- * User Role Changer.
- *
- * @author Ramazan APAYDIN <apaydin541@gmail.com>
- */
+
 class RoleUserCommand extends Command
 {
     public function __construct(
