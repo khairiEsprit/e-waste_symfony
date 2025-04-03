@@ -1,0 +1,113 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier Avis{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --dark-green: #013220;
+            --deep-green: #00693E;
+            --medium-green: #29AB87;
+            --light-green: #ACE1AF;
+            --cream-white: #FEFEFA;
+        }
+
+        .edit-container {
+            max-width: 800px;
+            margin: 40px auto;
+            transform: translateY(20px);
+        }
+
+        .edit-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 6px 20px rgba(0, 105, 62, 0.1);
+            overflow: hidden;
+        }
+
+        .edit-card .card-header {
+            background-color: var(--deep-green);
+            color: white;
+            padding: 18px 25px;
+            border-bottom: 3px solid var(--medium-green);
+        }
+
+        .edit-card .card-title {
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+        }
+
+        .edit-card .card-title i {
+            margin-right: 12px;
+            font-size: 1.4rem;
+        }
+
+        .edit-card .card-body {
+            padding: 30px;
+            background-color: var(--cream-white);
+        }
+
+        .edit-card .card-footer {
+            background-color: white;
+            border-top: 1px solid var(--light-green);
+            padding: 20px 30px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .btn-edit {
+            background-color: var(--medium-green);
+            border-color: var(--medium-green);
+            color: white;
+            padding: 10px 25px;
+            font-weight: 500;
+            transition: all 0.3s;
+        }
+
+        .btn-edit:hover {
+            background-color: var(--deep-green);
+            transform: translateY(-2px);
+        }
+
+        .btn-back {
+            color: var(--deep-green);
+            border-color: var(--deep-green);
+            padding: 10px 25px;
+            transition: all 0.3s;
+        }
+
+        .btn-back:hover {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="edit-container">
+        <div class="edit-card card">
+            <div class="card-header">
+                <h1 class="card-title">
+                    <i class="fas fa-edit"></i>
+                    Modifier l'avis
+                </h1>
+            </div>
+
+            <div class="card-body">
+                {{ include('avis/_form.html.twig', {'button_label': 'Mettre à jour'}) }}
+            </div>
+
+            <div class="card-footer">
+                <a href="{{ path('app_avis_index') }}" class="btn btn-back btn-outline-secondary">
+                    <i class="fas fa-arrow-left me-2"></i> Retour à la liste
+                </a>
+
+                {{ include('avis/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+{% endblock %}

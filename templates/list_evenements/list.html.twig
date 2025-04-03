@@ -1,0 +1,46 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Événements | Smart Poubelle{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .content-translate {
+            transform: translateY(70px);
+            margin-bottom: 70px; /* Pour compenser l'espace vide créé par la translation */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="content-translate">
+        <div class="container py-5">
+            <h1 class="mb-4">Nos Événements</h1>
+
+            <div class="row">
+                {% for event in events %}
+                    <div class="col-md-4 mb-4">
+                        <div class="card h-100">
+                            <div class="card-body">
+                                <h5 class="card-title">{{ event.title }}</h5>
+                                <p class="card-text">{{ event.description|u.truncate(100, '...') }}</p>
+                                <p class="text-muted">
+                                    <i class="fas fa-calendar-alt"></i> {{ event.date|date('d/m/Y H:i') }}
+                                </p>
+                            </div>
+                            <div class="card-footer bg-white">
+                                <a href="{{ path('app_front_event_show', {id: event.id}) }}" class="btn btn-sm btn-primary">
+                                    Voir détails
+                                </a>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-info">Aucun événement à afficher.</div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

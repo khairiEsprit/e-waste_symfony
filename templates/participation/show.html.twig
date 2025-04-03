@@ -1,0 +1,175 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Détails Participation{% endblock %}
+
+{% block body %}
+    <!-- Début de la translation vers le bas -->
+    <div style="transform: translateY(50px);">
+
+        <div class="participation-details" style="max-width: 850px; margin: 0 auto; padding: 30px 20px; font-family: 'Segoe UI', Roboto, sans-serif;">
+            <!-- Header with gradient background -->
+            <div style="background: linear-gradient(135deg, #013220 0%, #00693E 100%); border-radius: 12px; padding: 20px 25px; margin-bottom: 30px; box-shadow: 0 4px 20px rgba(1, 50, 32, 0.15);">
+                <div style="display: flex; justify-content: space-between; align-items: center;">
+                    <h1 style="color: #FEFEFA; margin: 0; font-size: 2rem; font-weight: 600;">
+                        <i class="fas fa-user-circle mr-2"></i>Détails Participant
+                    </h1>
+                    <div style="display: flex; gap: 12px;">
+                        <a href="{{ path('app_participation_index') }}"
+                           style="background: rgba(254, 254, 250, 0.1); color: #FEFEFA; border: 1px solid #FEFEFA; padding: 8px 16px; border-radius: 6px; text-decoration: none; display: flex; align-items: center; transition: all 0.3s;"
+                           onmouseover="this.style.background='rgba(254, 254, 250, 0.2)';this.style.transform='translateY(-2px)'"
+                           onmouseout="this.style.background='rgba(254, 254, 250, 0.1)';this.style.transform='translateY(0)'">
+                            <i class="fas fa-arrow-left mr-2"></i> Retour
+                        </a>
+                        <a href="{{ path('app_participation_edit', {'id': participation.id}) }}"
+                           style="background: #FEFEFA; color: #013220; border: none; padding: 8px 16px; border-radius: 6px; text-decoration: none; display: flex; align-items: center; font-weight: 500; transition: all 0.3s;"
+                           onmouseover="this.style.background='#ACE1AF';this.style.transform='translateY(-2px)'"
+                           onmouseout="this.style.background='#FEFEFA';this.style.transform='translateY(0)'">
+                            <i class="fas fa-edit mr-2"></i> Modifier
+                        </a>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Participant Card - Completely redesigned -->
+            <div style="background: #FEFEFA; border-radius: 12px; box-shadow: 0 5px 25px rgba(0, 105, 62, 0.08); overflow: hidden; margin-bottom: 30px;">
+                <!-- Card Header -->
+                <div style="background: #29AB87; padding: 15px 25px; display: flex; align-items: center;">
+                    <i class="fas fa-id-card-alt" style="color: #FEFEFA; font-size: 1.5rem; margin-right: 15px;"></i>
+                    <h2 style="color: #FEFEFA; margin: 0; font-size: 1.4rem; font-weight: 500;">Informations Personnelles</h2>
+                </div>
+
+                <!-- Card Body - Redesigned as two columns -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 0;">
+                    <!-- Left Column -->
+                    <div style="padding: 25px; border-right: 1px dashed #ACE1AF;">
+                        <div class="info-item" style="margin-bottom: 20px;">
+                            <div style="color: #00693E; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; letter-spacing: 0.5px;">IDENTIFIANT</div>
+                            <div style="font-size: 1.1rem; color: #333; font-weight: 500;">{{ participation.id }}</div>
+                        </div>
+
+                        <div class="info-item" style="margin-bottom: 20px;">
+                            <div style="color: #00693E; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; letter-spacing: 0.5px;">PRÉNOM</div>
+                            <div style="font-size: 1.1rem; color: #333; font-weight: 500;">{{ participation.firstName }}</div>
+                        </div>
+
+                        <div class="info-item" style="margin-bottom: 20px;">
+                            <div style="color: #00693E; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; letter-spacing: 0.5px;">NOM</div>
+                            <div style="font-size: 1.1rem; color: #333; font-weight: 500;">{{ participation.lastName }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div style="color: #00693E; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; letter-spacing: 0.5px;">EMAIL</div>
+                            <div style="font-size: 1.1rem; color: #333; font-weight: 500;">{{ participation.email }}</div>
+                        </div>
+                    </div>
+
+                    <!-- Right Column -->
+                    <div style="padding: 25px;">
+                        <div class="info-item" style="margin-bottom: 20px;">
+                            <div style="color: #00693E; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; letter-spacing: 0.5px;">TÉLÉPHONE</div>
+                            <div style="font-size: 1.1rem; color: #333; font-weight: 500;">{{ participation.phone }}</div>
+                        </div>
+
+                        <div class="info-item" style="margin-bottom: 20px;">
+                            <div style="color: #00693E; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; letter-spacing: 0.5px;">VILLE</div>
+                            <div style="font-size: 1.1rem; color: #333; font-weight: 500;">{{ participation.city }}</div>
+                        </div>
+
+                        <div class="info-item" style="margin-bottom: 20px;">
+                            <div style="color: #00693E; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; letter-spacing: 0.5px;">CODE POSTAL</div>
+                            <div style="font-size: 1.1rem; color: #333; font-weight: 500;">{{ participation.zipCode }}</div>
+                        </div>
+
+                        <div class="info-item">
+                            <div style="color: #00693E; font-size: 0.85rem; font-weight: 600; margin-bottom: 5px; letter-spacing: 0.5px;">PAYS</div>
+                            <div style="font-size: 1.1rem; color: #333; font-weight: 500;">{{ participation.country }}</div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Delete Section - Redesigned -->
+            <div style="background: #FEFEFA; border-radius: 12px; box-shadow: 0 5px 25px rgba(0, 105, 62, 0.08); padding: 25px; margin-bottom: 30px; text-align: center; border-top: 4px solid #ACE1AF;">
+                <h3 style="color: #013220; margin-top: 0; margin-bottom: 15px; font-size: 1.3rem; display: flex; align-items: center; justify-content: center;">
+                    <i class="fas fa-exclamation-triangle mr-2" style="color: #d9534f;"></i>Zone de Suppression
+                </h3>
+                <p style="color: #666; margin-bottom: 20px; line-height: 1.5;">
+                    Cette action est irréversible. Êtes-vous sûr de vouloir supprimer cette participation ?
+                </p>
+                <div style="display: inline-block;">
+                    {{ include('participation/_delete_form.html.twig') }}
+                </div>
+            </div>
+
+            <!-- Useful Links - Redesigned as cards -->
+            <div style="margin-top: 40px;">
+                <h3 style="color: #013220; font-size: 1.4rem; margin-bottom: 20px; display: flex; align-items: center;">
+                    <i class="fas fa-link mr-2"></i>Liens Utiles
+                </h3>
+
+                <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 20px;">
+                    <a href="#" style="background: #FEFEFA; border-radius: 8px; padding: 20px; text-decoration: none; box-shadow: 0 3px 15px rgba(0, 105, 62, 0.05); transition: all 0.3s; border-left: 4px solid #29AB87;"
+                       onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 25px rgba(0, 105, 62, 0.12)'"
+                       onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 3px 15px rgba(0, 105, 62, 0.05)'">
+                        <div style="color: #00693E; font-weight: 600; margin-bottom: 10px;"><i class="fas fa-home mr-2"></i>Accueil</div>
+                        <div style="color: #666; font-size: 0.9rem;">Retour à la page d'accueil</div>
+                    </a>
+
+                    <a href="#" style="background: #FEFEFA; border-radius: 8px; padding: 20px; text-decoration: none; box-shadow: 0 3px 15px rgba(0, 105, 62, 0.05); transition: all 0.3s; border-left: 4px solid #29AB87;"
+                       onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 25px rgba(0, 105, 62, 0.12)'"
+                       onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 3px 15px rgba(0, 105, 62, 0.05)'">
+                        <div style="color: #00693E; font-weight: 600; margin-bottom: 10px;"><i class="fas fa-concierge-bell mr-2"></i>Nos Services</div>
+                        <div style="color: #666; font-size: 0.9rem;">Découvrez nos services</div>
+                    </a>
+
+                    <a href="#" style="background: #FEFEFA; border-radius: 8px; padding: 20px; text-decoration: none; box-shadow: 0 3px 15px rgba(0, 105, 62, 0.05); transition: all 0.3s; border-left: 4px solid #29AB87;"
+                       onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 25px rgba(0, 105, 62, 0.12)'"
+                       onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 3px 15px rgba(0, 105, 62, 0.05)'">
+                        <div style="color: #00693E; font-weight: 600; margin-bottom: 10px;"><i class="fas fa-trash-alt mr-2"></i>Ramassage</div>
+                        <div style="color: #666; font-size: 0.9rem;">Programmez un ramassage</div>
+                    </a>
+
+                    <a href="#" style="background: #FEFEFA; border-radius: 8px; padding: 20px; text-decoration: none; box-shadow: 0 3px 15px rgba(0, 105, 62, 0.05); transition: all 0.3s; border-left: 4px solid #29AB87;"
+                       onmouseover="this.style.transform='translateY(-5px)';this.style.boxShadow='0 8px 25px rgba(0, 105, 62, 0.12)'"
+                       onmouseout="this.style.transform='translateY(0)';this.style.boxShadow='0 3px 15px rgba(0, 105, 62, 0.05)'">
+                        <div style="color: #00693E; font-weight: 600; margin-bottom: 10px;"><i class="fas fa-share-alt mr-2"></i>Réseaux Sociaux</div>
+                        <div style="color: #666; font-size: 0.9rem;">Suivez-nous en ligne</div>
+                    </a>
+                </div>
+
+                <p style="color: #666; margin-top: 25px; text-align: center; font-style: italic; border-top: 1px solid #ACE1AF; padding-top: 15px;">
+                    Suivez-nous sur nos réseaux sociaux pour rester informé sur la gestion communautaire des déchets.
+                </p>
+            </div>
+        </div>
+
+    </div>  {-- Fin de la div de translation --}
+
+    <style>
+        /* Animation for info items */
+        .info-item {
+            transition: all 0.3s;
+            padding: 10px;
+            border-radius: 6px;
+        }
+        .info-item:hover {
+            background: rgba(169, 225, 175, 0.1);
+            transform: translateX(3px);
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .participation-details > div {
+                padding: 20px 15px;
+            }
+            .participation-card > div {
+                grid-template-columns: 1fr !important;
+            }
+            .participation-card > div > div {
+                border-right: none !important;
+                border-bottom: 1px dashed #ACE1AF;
+                padding-bottom: 20px;
+            }
+        }
+    </style>
+{% endblock %}

@@ -1,0 +1,207 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Détails de l'Avis #{{ avi.id }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Translation UNIQUEMENT pour le contenu principal */
+        .main-content {
+            transform: translateY(70px);
+            margin-bottom: 70px;
+        }
+
+        /* [Conserver TOUS vos autres styles existants...] */
+        :root {
+            --dark-green: #013220;
+            --deep-green: #00693E;
+            --medium-green: #29AB87;
+            --light-green: #ACE1AF;
+            --cream-white: #FEFEFA;
+        }
+        .detail-card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 8px 30px rgba(0, 105, 62, 0.15);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .detail-card:hover {
+            box-shadow: 0 10px 35px rgba(0, 105, 62, 0.2);
+        }
+
+        .detail-card .card-header {
+            background-color: var(--deep-green);
+            color: white;
+            padding: 20px;
+            border-bottom: 3px solid var(--medium-green);
+        }
+
+        .detail-card .card-body {
+            padding: 30px;
+            background-color: var(--cream-white);
+        }
+
+        .detail-card .card-footer {
+            background-color: white;
+            border-top: 1px solid var(--light-green);
+            padding: 20px 30px;
+        }
+
+        /* Éléments de détail */
+        .detail-item {
+            margin-bottom: 20px;
+            padding-bottom: 15px;
+            border-bottom: 1px dashed var(--light-green);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+        }
+
+        .detail-label {
+            color: var(--dark-green);
+            font-weight: 600;
+            display: block;
+            margin-bottom: 5px;
+        }
+
+        .detail-value {
+            color: #555;
+            font-size: 1.05rem;
+        }
+
+        /* Étoiles */
+        .star-rating {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .star-rating .fa-star {
+            font-size: 1.2rem;
+            margin-right: 3px;
+        }
+
+        .star-rating .text-warning {
+            color: #FFC107 !important;
+        }
+
+        .star-rating .text-secondary {
+            color: var(--light-green) !important;
+        }
+
+        /* Boutons */
+        .btn-primary {
+            background-color: var(--deep-green);
+            border-color: var(--dark-green);
+            padding: 8px 20px;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--dark-green);
+        }
+
+        .btn-outline-secondary {
+            color: var(--deep-green);
+            border-color: var(--deep-green);
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: var(--light-green);
+            color: var(--dark-green);
+        }
+
+        /* Disposition responsive */
+        @media (max-width: 768px) {
+            .detail-card .card-body {
+                padding: 20px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="main-content"> <!-- Nouveau conteneur pour la translation -->
+    <div class="container py-4">
+        <div class="detail-card card">
+            <div class="card-header">
+                <div class="d-flex justify-content-between align-items-center">
+                    <h2 class="h4 mb-0">
+                        <i class="fas fa-file-alt me-2"></i>
+                        Détails de l'avis #{{ avi.id }}
+                    </h2>
+                    <span class="badge bg-light text-dark">
+                            {{ avi.createdAt|date('d/m/Y') }}
+                        </span>
+                </div>
+            </div>
+
+            <div class="card-body">
+                <!-- Section ID et Date -->
+                <div class="row detail-item">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <span class="detail-label">
+                            <i class="fas fa-id-card me-2"></i>Identifiant
+                        </span>
+                        <span class="detail-value">{{ avi.id }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="detail-label">
+                            <i class="far fa-clock me-2"></i>Créé le
+                        </span>
+                        <span class="detail-value">{{ avi.createdAt|date('d/m/Y à H:i') }}</span>
+                    </div>
+                </div>
+
+                <!-- Section Nom et Note -->
+                <div class="row detail-item">
+                    <div class="col-md-6 mb-3 mb-md-0">
+                        <span class="detail-label">
+                            <i class="fas fa-user me-2"></i>Nom
+                        </span>
+                        <span class="detail-value">{{ avi.nom ?? 'Anonyme' }}</span>
+                    </div>
+                    <div class="col-md-6">
+                        <span class="detail-label">
+                            <i class="fas fa-star me-2"></i>Note
+                        </span>
+                        <div class="detail-value">
+                            <div class="star-rating">
+                                {% for i in 1..5 %}
+                                    <i class="fas fa-star {{ i <= avi.note ? 'text-warning' : 'text-secondary' }}"></i>
+                                {% endfor %}
+                                <span class="ms-2">({{ avi.note }}/5)</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Section Description -->
+                <div class="detail-item">
+                    <span class="detail-label">
+                        <i class="fas fa-align-left me-2"></i>Description
+                    </span>
+                    <div class="detail-value mt-3 p-3 bg-white rounded border">
+                        {{ avi.description ?? 'Aucune description fournie' }}
+                    </div>
+                </div>
+            </div>
+
+            <div class="card-footer d-flex flex-wrap justify-content-between align-items-center">
+                <div class="mb-2 mb-md-0">
+                    <a href="{{ path('app_avis_index') }}" class="btn btn-outline-secondary">
+                        <i class="fas fa-arrow-left me-2"></i> Retour à la liste
+                    </a>
+                </div>
+
+                <div class="d-flex">
+                    <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn btn-primary me-2">
+                        <i class="fas fa-edit me-2"></i> Modifier
+                    </a>
+                    {{ include('avis/_delete_form.html.twig') }}
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,247 @@
+{% extends 'front/base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Translation verticale */
+        .translated-content {
+            transform: translateY(70px);
+            margin-bottom: 20px;
+        }
+
+        /* Palette de couleurs */
+        :root {
+            --dark-green: #013220;
+            --deep-green: #00693E;
+            --medium-green: #29AB87;
+            --light-green: #ACE1AF;
+            --cream-white: #FEFEFA;
+        }
+
+        body {
+            background-color: var(--cream-white);
+            padding-bottom: 20px;
+        }
+
+        /* Barre de recherche */
+        .search-container {
+            max-width: 600px;
+            margin: 0 auto 30px;
+        }
+        .search-container .form-control {
+            border-color: var(--medium-green);
+        }
+        .search-container .btn-primary {
+            background-color: var(--deep-green);
+            border-color: var(--dark-green);
+        }
+
+        /* Alertes */
+        .alert-info {
+            background-color: var(--light-green);
+            border-color: var(--medium-green);
+            color: var(--dark-green);
+        }
+        .alert-warning {
+            background-color: rgba(255,193,7,0.1);
+            border-color: #ffc107;
+            color: #856404;
+        }
+
+        /* Cartes */
+        .card {
+            border: 1px solid var(--light-green);
+            border-radius: 10px;
+            transition: all 0.3s ease;
+            background-color: white;
+        }
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0,105,62,0.1);
+        }
+        .card-header {
+            background-color: var(--deep-green) !important;
+            color: white;
+            border-bottom: 2px solid var(--medium-green);
+            font-weight: 600;
+            padding: 15px 20px;
+        }
+        .card-title {
+            color: var(--dark-green);
+            font-weight: 600;
+        }
+
+        /* Boutons */
+        .btn-primary {
+            background-color: var(--deep-green);
+            border-color: var(--dark-green);
+            padding: 8px 20px;
+            font-weight: 500;
+        }
+        .btn-primary:hover {
+            background-color: var(--dark-green);
+        }
+
+        /* Étoiles */
+        .star-rating .star {
+            font-size: 1.3rem;
+            color: #e0e0e0;
+        }
+        .star-rating .star.active {
+            color: #ffc107;
+        }
+
+        /* Boutons d'action */
+        .btn-action {
+            width: 32px;
+            height: 32px;
+            padding: 0;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            margin: 0 3px;
+            border-radius: 50%;
+            transition: all 0.2s;
+        }
+        .btn-action:hover {
+            transform: scale(1.1);
+        }
+        .btn-info {
+            background-color: var(--medium-green);
+            border-color: var(--medium-green);
+        }
+        .btn-outline-primary {
+            color: var(--deep-green);
+            border-color: var(--deep-green);
+        }
+        .btn-outline-danger {
+            color: #dc3545;
+            border-color: #dc3545;
+        }
+
+        /* Texte */
+        .text-muted {
+            color: var(--medium-green) !important;
+        }
+        .card-text {
+            color: #555;
+            line-height: 1.6;
+        }
+
+        /* Disposition */
+        .avis-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+            gap: 25px;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="translated-content">
+        <div class="container py-4">
+            <h1 class="mb-4 text-center" style="color: var(--dark-green);">Avis des Utilisateurs</h1>
+
+            <!-- Barre de recherche -->
+            <div class="search-container">
+                <form method="get" action="{{ path('app_avis_index') }}" class="input-group shadow-sm">
+                    <input type="text"
+                           name="search"
+                           class="form-control form-control-lg"
+                           placeholder="Rechercher par nom..."
+                           value="{{ app.request.query.get('search') }}"
+                           aria-label="Rechercher"
+                           style="border-radius: 50px 0 0 50px;">
+                    <button class="btn btn-primary" type="submit" style="border-radius: 0 50px 50px 0;">
+                        <i class="fas fa-search me-1"></i> Rechercher
+                    </button>
+                    {% if app.request.query.get('search') %}
+                        <a href="{{ path('app_avis_index') }}" class="btn btn-outline-secondary" title="Réinitialiser">
+                            <i class="fas fa-times"></i>
+                        </a>
+                    {% endif %}
+                </form>
+            </div>
+
+            <!-- Note moyenne -->
+            {% if average_rating is defined %}
+                <div class="alert alert-info text-center mb-4 rounded-pill shadow-sm" style="max-width: 300px; margin: 0 auto;">
+                    <div class="d-flex justify-content-center align-items-center">
+                        <div class="me-3">
+                            <h5 class="mb-0" style="color: var(--dark-green);">Note moyenne :</h5>
+                        </div>
+                        <div>
+                            <div class="star-rating">
+                                {% for i in 1..5 %}
+                                    <span class="star {{ i <= average_rating ? 'active' : '' }}">★</span>
+                                {% endfor %}
+                            </div>
+                            <strong style="color: var(--deep-green);">{{ average_rating|number_format(1) }}/5</strong>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            <!-- Bouton Nouvel Avis -->
+            <div class="text-center mb-5">
+                <a href="{{ path('app_avis_new') }}" class="btn btn-primary btn-lg rounded-pill px-4">
+                    <i class="fas fa-plus me-2"></i> Nouvel Avis
+                </a>
+            </div>
+
+            <!-- Grille des avis -->
+            <div class="avis-grid">
+                {% for avi in avis %}
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title mb-0">{{ avi.nom ?: 'Anonyme' }}</h5>
+                            <div class="star-rating">
+                                {% for i in 1..5 %}
+                                    <span class="star {{ i <= avi.note ? 'active' : '' }}">★</span>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        <div class="card-body">
+                            <p class="card-text mb-4">{{ avi.description }}</p>
+                            <div class="d-flex justify-content-between align-items-center">
+                                <small class="text-muted">
+                                    <i class="far fa-calendar-alt me-1"></i> Posté le {{ avi.createdAt|date('d/m/Y') }}
+                                </small>
+                                <div class="btn-group">
+                                    <a href="{{ path('app_avis_show', {'id': avi.id}) }}"
+                                       class="btn btn-info btn-action"
+                                       title="Voir détails">
+                                        <i class="fas fa-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_avis_edit', {'id': avi.id}) }}"
+                                       class="btn btn-outline-primary btn-action"
+                                       title="Modifier">
+                                        <i class="fas fa-edit"></i>
+                                    </a>
+                                    <form method="post" action="{{ path('app_avis_delete', {'id': avi.id}) }}"
+                                          class="d-inline"
+                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet avis ?');">
+                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ avi.id) }}">
+                                        <button class="btn btn-outline-danger btn-action" title="Supprimer">
+                                            <i class="fas fa-trash"></i>
+                                        </button>
+                                    </form>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                {% else %}
+                    <div class="col-12">
+                        <div class="alert alert-warning text-center py-4">
+                            {% if app.request.query.get('search') %}
+                                <i class="fas fa-search-minus me-2"></i> Aucun avis trouvé pour "{{ app.request.query.get('search') }}"
+                            {% else %}
+                                <i class="fas fa-info-circle me-2"></i> Aucun avis disponible.
+                            {% endif %}
+                        </div>
+                    </div>
+                {% endfor %}
+            </div>
+        </div>
+    </div>
+{% endblock %}

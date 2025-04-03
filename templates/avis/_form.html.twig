@@ -1,0 +1,127 @@
+<div style="transform: translateY(100px); margin-bottom: 70px;">
+    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+
+    {# Champ Nom #}
+    <div class="mb-4">
+        {{ form_label(form.nom, 'Votre nom', {
+            'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #013220;'}
+        }) }}
+        {{ form_widget(form.nom, {
+            'attr': {
+                'class': 'form-control',
+                'style': 'border-color: #29AB87;',
+                'placeholder': 'Votre nom complet'
+            }
+        }) }}
+        {{ form_errors(form.nom, {
+            'attr': {'class': 'alert alert-danger mt-2 py-2'}
+        }) }}
+    </div>
+
+    {# Champ Description #}
+    <div class="mb-4">
+        {{ form_label(form.description, 'Votre avis', {
+            'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #013220;'}
+        }) }}
+        {{ form_widget(form.description, {
+            'attr': {
+                'class': 'form-control',
+                'style': 'border-color: #29AB87;',
+                'rows': 5,
+                'placeholder': 'Décrivez votre expérience en détail...'
+            }
+        }) }}
+        {{ form_errors(form.description, {
+            'attr': {'class': 'alert alert-danger mt-2 py-2'}
+        }) }}
+    </div>
+
+    {# Champ Note #}
+    <div class="mb-4">
+        <label class="form-label fw-bold" style="color: #013220;">
+            Note <span class="text-danger">*</span>
+        </label>
+        <div class="star-rating-form">
+            {% for i in 5..1 %}
+                <input type="radio" id="{{ form.note.vars.id }}_{{ i }}"
+                       name="{{ form.note.vars.full_name }}"
+                       value="{{ i }}"
+                        {{ form.note.vars.value == i ? 'checked' : '' }}
+                       required>
+                <label for="{{ form.note.vars.id }}_{{ i }}" title="{{ i }} étoiles">★</label>
+            {% endfor %}
+        </div>
+        {{ form_errors(form.note, {
+            'attr': {'class': 'alert alert-danger mt-2 py-2'}
+        }) }}
+    </div>
+
+    {# Bouton de soumission #}
+    <button type="submit" class="btn w-100 py-3" style="background-color: #00693E; color: white;">
+        <i class="fas fa-save me-2"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+
+    {{ form_end(form) }}
+</div>
+
+<style>
+    /* Style pour les étoiles */
+    .star-rating-form {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 10px;
+        margin-top: 10px;
+    }
+    .star-rating-form input {
+        display: none;
+    }
+    .star-rating-form label {
+        font-size: 1.8rem;
+        color: #ACE1AF;
+        cursor: pointer;
+        transition: all 0.2s;
+    }
+    .star-rating-form input:checked ~ label,
+    .star-rating-form label:hover,
+    .star-rating-form label:hover ~ label {
+        color: #29AB87;
+    }
+    .star-rating-form input:checked + label {
+        color: #00693E;
+        transform: scale(1.1);
+    }
+
+    /* Styles pour les champs de formulaire */
+    .form-control {
+        border-width: 2px;
+    }
+    .form-control:focus {
+        border-color: #00693E;
+        box-shadow: 0 0 0 0.2rem rgba(0, 105, 62, 0.25);
+    }
+
+    /* Styles pour les erreurs */
+    .alert-danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        border-left: 3px solid #dc3545;
+        color: #dc3545;
+    }
+
+    /* Bouton avec effets */
+    .btn {
+        transition: all 0.3s ease;
+        font-weight: 500;
+        letter-spacing: 0.5px;
+    }
+    .btn:hover {
+        background-color: #013220 !important;
+        transform: translateY(-2px);
+        box-shadow: 0 4px 8px rgba(1, 50, 32, 0.2);
+    }
+
+    /* Indicateur de champ obligatoire */
+    .text-danger {
+        color: #dc3545 !important;
+    }
+</style>

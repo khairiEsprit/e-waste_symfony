@@ -1,0 +1,79 @@
+{% extends 'back/index.html.twig' %}
+
+{% block content %}
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0" style="color: #013220;">Gestion des Événements</h1>
+                <a href="{{ path('app_event_new') }}" class="btn" style="background-color: #29AB87; color: white;">
+                    <i class="fas fa-plus-circle me-1"></i> Nouvel Événement
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover align-middle">
+                            <thead style="background-color: #013220; color: #FEFEFA;">
+                            <tr>
+                                <th class="ps-4">Titre</th>
+                                <th>Date</th>
+                                <th>Lieu</th>
+                                <th>Places</th>
+                                <th class="text-end pe-4">Actions</th>
+                            </tr>
+                            </thead>
+                            <tbody>
+                            {% for event in events %}
+                                <tr style="border-left: 4px solid #29AB87;">
+                                    <td class="ps-4 fw-bold">{{ event.title }}</td>
+                                    <td>{{ event.date|date('d/m/Y H:i') }}</td>
+                                    <td>{{ event.location }}</td>
+                                    <td>
+                                    <span class="badge" style="background-color: #ACE1AF; color: #013220;">
+                                        {{ event.remainingPlaces }} places
+                                    </span>
+                                    </td>
+                                    <td class="text-end pe-4">
+                                        <div class="btn-group" role="group">
+                                            <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-sm" style="background-color: #ACE1AF;">
+                                                <i class="fas fa-eye" style="color: #013220;"></i>
+                                            </a>
+                                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-sm" style="background-color: #29AB87; color: white;">
+                                                <i class="fas fa-edit"></i>
+                                            </a>
+                                            <form method="post" action="{{ path('app_event_delete', {'id': event.id}) }}" class="d-inline">
+                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
+                                                <button class="btn btn-sm" style="background-color: #e74c3c; color: white;">
+                                                    <i class="fas fa-trash-alt"></i>
+                                                </button>
+                                            </form>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-4">
+                                        <i class="fas fa-calendar-times fa-2x mb-2" style="color: #29AB87;"></i>
+                                        <p class="mb-0">Aucun événement programmé</p>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .table-hover tbody tr:hover {
+            background-color: rgba(172, 225, 175, 0.2);
+        }
+        .card {
+            border-radius: 10px;
+            overflow: hidden;
+        }
+    </style>
+{% endblock %}

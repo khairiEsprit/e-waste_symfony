@@ -1,0 +1,77 @@
+{% extends 'front/base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Translation uniquement */
+        .translated-content {
+            transform: translateY(70px);
+            margin-bottom: 70px;
+        }
+
+        /* Palette de couleurs */
+        .alert-info {
+            background-color: #ACE1AF; /* Menthe */
+            border-color: #29AB87;    /* Vert moyen */
+            color: #013220;           /* Vert foncé */
+        }
+
+        .card-header.bg-primary {
+            background-color: #00693E !important; /* Vert profond */
+        }
+
+        .text-muted {
+            color: #29AB87 !important; /* Vert moyen */
+        }
+
+        .btn-primary {
+            background-color: #00693E; /* Vert profond */
+            border-color: #013220;     /* Vert foncé */
+        }
+
+        .btn-primary:hover {
+            background-color: #013220; /* Vert foncé */
+        }
+
+        body {
+            background-color: #FEFEFA; /* Blanc crème */
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="translated-content">
+        <div class="container mb-3 mt-4">
+            <div class="alert alert-info mb-3">
+                <i class="fas fa-info-circle"></i> Votre avis nous intéresse !
+            </div>
+
+            <div class="row">
+                <!-- Carte du formulaire -->
+                <div class="col-md-8">
+                    <div class="card shadow-sm">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Donnez votre avis</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ include('avis/_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte de l'image -->
+                <div class="col-md-4">
+                    <div class="card shadow-sm h-100">
+                        <div class="card-body text-center p-0">  <!-- Suppression du padding -->
+                            <img src="{{ asset('assets/front/assets/img/image-avis.jpg') }}"
+                                 alt="E-Waste Recycling"
+                                 class="img-fluid rounded-top">  <!-- Coins arrondis seulement en haut -->
+                            <p class="p-3 mb-0 small">  <!-- Padding réajouté pour le texte -->
+
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

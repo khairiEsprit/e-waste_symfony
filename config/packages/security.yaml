@@ -1,50 +1,26 @@
-# # config/packages/security.yaml
-# security:
+# config/packages/security.yaml
+security:
+  enable_authenticator_manager: true
 
-    
-#     enable_authenticator_manager: true
-#     password_hashers:
-#         App\Entity\User:
-#             algorithm: auto
-#     role_hierarchy:
-#         ROLE_ADMIN: [ROLE_USER]
-#         ROLE_EMPLOYEE: [ROLE_USER]
-#         ROLE_CITOYEN: [ROLE_USER]
-#     providers:
-#         pdadmin_auth:
-#             entity:
-#                 class: App\Entity\User
-#                 property: email
-#     firewalls:
-#         dev:
-#             pattern: ^/(_(profiler|wdt)|css|images|js)/
-#             security: false
-#         main:
-#             pattern: ^/
-#             provider: pdadmin_auth
-#             lazy: true
-#             user_checker: Pd\UserBundle\Security\UserChecker
-#             form_login:
-#                 use_referer: true
-#                 login_path: security_login
-#                 check_path: security_login
-#                 success_handler: App\Security\AuthenticationSuccessHandler  # Add this line
+  password_hashers:
+    Symfony\Component\Security\Core\User\InMemoryUser: plaintext
 
-#                 # default_target_path: web_home # Redirect after login
-#             logout:
-#                 path: security_logout
-#                 target: front_home # Redirect after logout
-#             remember_me:
-#                 secret: '%env(APP_SECRET)%'
-#                 lifetime: 604800 # 1 week
-#                 path: /
-#     access_control:
-        # - { path: ^/auth/login$, role: PUBLIC_ACCESS }
-        # - { path: ^/auth/register, role: PUBLIC_ACCESS }
-        # - { path: ^/auth/resetting, role: PUBLIC_ACCESS }
-        # - { path: ^/admin/dashboard, roles: ROLE_ADMIN }
-        # - { path: ^/citoyen/dashboard, roles: ROLE_CITOYEN }
-        # - { path: ^/employee/dashboard, roles: ROLE_EMPLOYEE }
-        # - { path: ^/, roles: PUBLIC_ACCESS }
-        # Uncomment to restrict all other routes to authenticated users
-        # - { path: ^/, role: ROLE_USER }
+  providers:
+    in_memory:
+      memory:
+        users: []
+
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+
+    main:
+      pattern: ^/
+      provider: in_memory
+      lazy: true
+      security: false  # Remplace 'anonymous: true'
+
+  access_control:
+    - { path: ^/avis, roles: PUBLIC_ACCESS }
+    - { path: ^/, roles: PUBLIC_ACCESS }

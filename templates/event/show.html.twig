@@ -1,0 +1,83 @@
+{% extends 'back/index.html.twig' %}
+
+{% block content %}
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0" style="color: #013220;">{{ event.title }}</h1>
+                <div>
+                    <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn me-2" style="background-color: #29AB87; color: white;">
+                        <i class="fas fa-edit me-1"></i> Modifier
+                    </a>
+                    <a href="{{ path('app_event_index') }}" class="btn" style="background-color: #013220; color: #FEFEFA;">
+                        <i class="fas fa-list me-1"></i> Liste
+                    </a>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-8">
+                            <div class="mb-4">
+                                <h5 class="fw-bold" style="color: #00693E;">
+                                    <i class="fas fa-info-circle me-2"></i>Description
+                                </h5>
+                                <p class="ps-4">{{ event.description ?? 'Aucune description' }}</p>
+                            </div>
+
+                            <div class="row">
+                                <div class="col-md-6 mb-3">
+                                    <h5 class="fw-bold" style="color: #00693E;">
+                                        <i class="fas fa-map-marker-alt me-2"></i>Lieu
+                                    </h5>
+                                    <p class="ps-4">{{ event.location }}</p>
+                                </div>
+                                <div class="col-md-6 mb-3">
+                                    <h5 class="fw-bold" style="color: #00693E;">
+                                        <i class="fas fa-calendar-day me-2"></i>Date
+                                    </h5>
+                                    <p class="ps-4">{{ event.date|date('d/m/Y H:i') }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h5 class="fw-bold" style="color: #00693E;">
+                                        <i class="fas fa-users me-2"></i>Places
+                                    </h5>
+                                    <p class="ps-4">
+                                    <span class="badge" style="background-color: #ACE1AF; color: #013220; font-size: 1em;">
+                                        {{ event.remainingPlaces }} places disponibles
+                                    </span>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            {% if event.imageUrl %}
+                                <div class="text-center">
+                                    <img src="{{ event.imageUrl }}" alt="{{ event.title }}" class="img-fluid rounded shadow" style="max-height: 250px; border: 2px solid #29AB87;">
+                                    <p class="mt-2 small text-muted">Image de l'événement</p>
+                                </div>
+                            {% else %}
+                                <div class="text-center py-4" style="background-color: #F0F0F0; border-radius: 8px;">
+                                    <i class="fas fa-image fa-3x mb-3" style="color: #29AB87;"></i>
+                                    <p class="mb-0" style="color: #013220;">Aucune image</p>
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .card {
+            border-radius: 10px;
+            background-color: #FEFEFA;
+        }
+        h5 i {
+            width: 25px;
+            text-align: center;
+        }
+    </style>
+{% endblock %}

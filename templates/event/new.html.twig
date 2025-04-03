@@ -1,0 +1,88 @@
+{% extends 'back/index.html.twig' %}
+
+{% block content %}
+    <div class="app-content">
+        <div class="container-fluid">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0" style="color: #013220;">Créer un événement</h1>
+                <a href="{{ path('app_event_index') }}" class="btn" style="background-color: #013220; color: #FEFEFA;">
+                    <i class="fas fa-arrow-left me-1"></i> Retour
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true}}) }}
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.title, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.title, {'attr': {
+                                    'class': 'form-control',
+                                    'style': 'border-color: #29AB87',
+                                    'placeholder': 'Titre de l\'événement'
+                                }}) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.description, {'attr': {
+                                    'class': 'form-control',
+                                    'style': 'border-color: #29AB87; height: 120px',
+                                    'placeholder': 'Description détaillée...'
+                                }}) }}
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.date, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.date, {'attr': {
+                                    'class': 'form-control',
+                                    'style': 'border-color: #29AB87'
+                                }}) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.location, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.location, {'attr': {
+                                    'class': 'form-control',
+                                    'style': 'border-color: #29AB87',
+                                    'placeholder': 'Lieu exact...'
+                                }}) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.remainingPlaces, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.remainingPlaces, {'attr': {
+                                    'class': 'form-control',
+                                    'style': 'border-color: #29AB87',
+                                    'min': 0
+                                }}) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn px-4" style="background-color: #29AB87; color: white;">
+                            <i class="fas fa-save me-2"></i> Enregistrer
+                        </button>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-control:focus {
+            border-color: #29AB87;
+            box-shadow: 0 0 0 0.25rem rgba(41, 171, 135, 0.25);
+        }
+        .card {
+            border-radius: 10px;
+            background-color: #FEFEFA;
+        }
+    </style>
+{% endblock %}

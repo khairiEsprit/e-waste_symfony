@@ -4,59 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f63def1e1e9f02e079e7eb625e02c774",
+    "content-hash": "52da833667678ecca10d3b315656719a",
     "packages": [
-        {
-            "name": "appaydin/pd-user",
-            "version": "3.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cesurapp/pd-user.git",
-                "reference": "bb830275ae295aa6e094b3559a7a834e3d260926"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cesurapp/pd-user/zipball/bb830275ae295aa6e094b3559a7a834e3d260926",
-                "reference": "bb830275ae295aa6e094b3559a7a834e3d260926",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.0.0",
-                "symfony/event-dispatcher": "*",
-                "symfony/mailer": "*",
-                "twig/twig": "*"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-4": {
-                    "Pd\\UserBundle\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ramazan APAYDIN",
-                    "homepage": "https://github.com/appaydin"
-                }
-            ],
-            "description": "Symfony Simple User Bundle",
-            "homepage": "https://github.com/appaydin/pd-user",
-            "keywords": [
-                "account",
-                "pd-admin",
-                "pd-user",
-                "symfony-user",
-                "user-management"
-            ],
-            "support": {
-                "issues": "https://github.com/cesurapp/pd-user/issues",
-                "source": "https://github.com/cesurapp/pd-user/tree/3.0.4"
-            },
-            "time": "2021-06-03T21:35:14+00:00"
-        },
         {
             "name": "composer/semver",
             "version": "3.4.3",
@@ -7401,6 +7350,73 @@
             "time": "2025-02-08T09:47:15+00:00"
         },
         {
+            "name": "twig/string-extra",
+            "version": "v3.20.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/twigphp/string-extra.git",
+                "reference": "4b3337544ac8f76c280def94e32b53acfaec0589"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/twigphp/string-extra/zipball/4b3337544ac8f76c280def94e32b53acfaec0589",
+                "reference": "4b3337544ac8f76c280def94e32b53acfaec0589",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=8.1.0",
+                "symfony/string": "^5.4|^6.4|^7.0",
+                "symfony/translation-contracts": "^1.1|^2|^3",
+                "twig/twig": "^3.13|^4.0"
+            },
+            "require-dev": {
+                "symfony/phpunit-bridge": "^6.4|^7.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Twig\\Extra\\String\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com",
+                    "homepage": "http://fabien.potencier.org",
+                    "role": "Lead Developer"
+                }
+            ],
+            "description": "A Twig extension for Symfony String",
+            "homepage": "https://twig.symfony.com",
+            "keywords": [
+                "html",
+                "string",
+                "twig",
+                "unicode"
+            ],
+            "support": {
+                "source": "https://github.com/twigphp/string-extra/tree/v3.20.0"
+            },
+            "funding": [
+                {
+                    "url": "https://github.com/fabpot",
+                    "type": "github"
+                },
+                {
+                    "url": "https://tidelift.com/funding/github/packagist/twig/twig",
+                    "type": "tidelift"
+                }
+            ],
+            "time": "2025-01-31T20:45:36+00:00"
+        },
+        {
             "name": "twig/twig",
             "version": "v3.20.0",
             "source": {
@@ -9810,7 +9826,7 @@
     ],
     "aliases": [],
     "minimum-stability": "stable",
-    "stability-flags": [],
+    "stability-flags": {},
     "prefer-stable": true,
     "prefer-lowest": false,
     "platform": {
@@ -9818,6 +9834,6 @@
         "ext-ctype": "*",
         "ext-iconv": "*"
     },
-    "platform-dev": [],
+    "platform-dev": {},
     "plugin-api-version": "2.6.0"
 }

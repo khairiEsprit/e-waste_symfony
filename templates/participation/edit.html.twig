@@ -1,0 +1,163 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier Participation{% endblock %}
+
+{% block body %}
+    <!-- Début de la translation vers le bas -->
+    <div style="transform: translateY(50px);">
+
+        <div style="background: linear-gradient(to bottom, #FEFEFA 0%, #ACE1AF 100%); min-height: 100vh; padding: 40px 0;">
+            <div class="edit-participation-container" style="max-width: 800px; margin: 0 auto;">
+                <!-- Header Card -->
+                <div style="background: linear-gradient(135deg, #013220 0%, #00693E 100%); border-radius: 12px 12px 0 0; padding: 25px; box-shadow: 0 5px 20px rgba(1, 50, 32, 0.2);">
+                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                        <h1 style="color: #FEFEFA; margin: 0; font-size: 1.8rem; font-weight: 600;">
+                            <i class="fas fa-user-edit mr-2"></i>Modifier Participation
+                        </h1>
+                        <a href="{{ path('app_participation_index') }}"
+                           style="background: rgba(254, 254, 250, 0.15); color: #FEFEFA; border: 1px solid #FEFEFA; padding: 8px 16px; border-radius: 6px; text-decoration: none; display: flex; align-items: center; transition: all 0.3s;"
+                           onmouseover="this.style.background='rgba(254, 254, 250, 0.25)';this.style.transform='translateY(-2px)'"
+                           onmouseout="this.style.background='rgba(254, 254, 250, 0.15)';this.style.transform='translateY(0)'">
+                            <i class="fas fa-arrow-left mr-2"></i> Retour
+                        </a>
+                    </div>
+                </div>
+
+                <!-- Main Form Card -->
+                <div style="background: #FEFEFA; border-radius: 0 0 12px 12px; box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1); padding: 30px;">
+                    {{ form_start(form, {'attr': {'class': 'participation-form', 'style': 'margin-bottom: 25px;'}}) }}
+
+                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                        <!-- Left Column -->
+                        <div>
+                            <!-- First Name -->
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                {{ form_label(form.firstName, 'Prénom', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
+                                {{ form_widget(form.firstName, {'attr': {
+                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
+                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
+                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
+                                }}) }}
+                            </div>
+
+                            <!-- Last Name -->
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                {{ form_label(form.lastName, 'Nom', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
+                                {{ form_widget(form.lastName, {'attr': {
+                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
+                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
+                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
+                                }}) }}
+                            </div>
+
+                            <!-- Email -->
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                {{ form_label(form.email, 'Email', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
+                                {{ form_widget(form.email, {'attr': {
+                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
+                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
+                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
+                                }}) }}
+                            </div>
+                        </div>
+
+                        <!-- Right Column -->
+                        <div>
+                            <!-- Phone -->
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                {{ form_label(form.phone, 'Téléphone', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
+                                {{ form_widget(form.phone, {'attr': {
+                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
+                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
+                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
+                                }}) }}
+                            </div>
+
+                            <!-- City -->
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                {{ form_label(form.city, 'Ville', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
+                                {{ form_widget(form.city, {'attr': {
+                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
+                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
+                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
+                                }}) }}
+                            </div>
+
+                            <!-- Zip Code -->
+                            <div class="form-group" style="margin-bottom: 25px;">
+                                {{ form_label(form.zipCode, 'Code Postal', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
+                                {{ form_widget(form.zipCode, {'attr': {
+                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
+                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
+                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
+                                }}) }}
+                            </div>
+
+                            <!-- Country -->
+                            <div class="form-group">
+                                {{ form_label(form.country, 'Pays', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
+                                {{ form_widget(form.country, {'attr': {
+                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
+                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
+                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
+                                }}) }}
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Submit Button -->
+                    <div style="text-align: center; margin-top: 20px;">
+                        <button type="submit" class="btn" style="background: #00693E; color: #FEFEFA; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 600; font-size: 1rem; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0, 105, 62, 0.2);"
+                                onmouseover="this.style.background='#013220';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(1, 50, 32, 0.3)'"
+                                onmouseout="this.style.background='#00693E';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(0, 105, 62, 0.2)'">
+                            <i class="fas fa-save mr-2"></i> Mettre à jour
+                        </button>
+                    </div>
+                    {{ form_end(form) }}
+
+                    <!-- Delete Section -->
+                    <div style="background: #FEFEFA; border-radius: 8px; border: 1px solid #FFEBEE; padding: 20px; margin-top: 40px; text-align: center;">
+                        <h3 style="color: #D32F2F; font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
+                            <i class="fas fa-exclamation-circle mr-2"></i>Zone de Suppression
+                        </h3>
+                        <p style="color: #666; margin-bottom: 15px;">
+                            Attention : Cette action est irréversible. Toutes les données seront définitivement supprimées.
+                        </p>
+                        {{ include('participation/_delete_form.html.twig') }}
+                    </div>
+                </div>
+            </div>
+        </div>
+
+    </div>  <!-- Fin de la div de translation -->
+
+    <style>
+        /* Responsive adjustments */
+        @media (max-width: 768px) {
+            .edit-participation-container {
+                padding: 0 15px;
+            }
+            .participation-form > div {
+                grid-template-columns: 1fr !important;
+                gap: 15px !important;
+            }
+        }
+
+        /* Form elements styling */
+        input, select {
+            outline: none;
+        }
+
+        /* Delete form button styling */
+        .btn-danger {
+            background: #D32F2F !important;
+            border: none !important;
+            padding: 8px 20px !important;
+            transition: all 0.3s !important;
+        }
+        .btn-danger:hover {
+            background: #B71C1C !important;
+            transform: translateY(-2px) !important;
+        }
+    </style>
+{% endblock %}
