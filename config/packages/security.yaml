@@ -47,7 +47,7 @@ security:
                 failure_path: security_login
                 oauth_user_provider:
                     service: App\Security\MyOAuthUserProvider
-                # default_target_path: back_dashboard
+                default_target_path: back_dashboard
     access_control:
         # - { path: ^/auth/login$, role: PUBLIC_ACCESS }
         # - { path: ^/auth/register, role: PUBLIC_ACCESS }

@@ -29,9 +29,9 @@ class UserRepository extends ServiceEntityRepository
      */
     public function add(User $entity, bool $flush = true): void
     {
-        $this->_em->persist($entity);
+        $this->getEntityManager()->persist($entity);
         if ($flush) {
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
         }
     }
 
@@ -41,9 +41,9 @@ class UserRepository extends ServiceEntityRepository
      */
     public function remove(User $entity, bool $flush = true): void
     {
-        $this->_em->remove($entity);
+        $this->getEntityManager()->remove($entity);
         if ($flush) {
-            $this->_em->flush();
+            $this->getEntityManager()->flush();
         }
     }
 
@@ -75,4 +75,57 @@ class UserRepository extends ServiceEntityRepository
         ;
     }
     */
+
+    public function searchByName(string $term): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('LOWER(u.firstName) LIKE LOWER(:term)')
+            ->orWhere('LOWER(u.lastName) LIKE LOWER(:term)')
+            ->setParameter('term', '%' . $term . '%')
+            ->orderBy('u.firstName', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
+
+    public function findByPage(int $page, int $limit): array
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->orderBy('u.id', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+    
+        return $qb->getQuery()->getResult();
+    }
+    
+    public function searchByNamePaginated(string $term, int $page, int $limit): array
+    {
+        $qb = $this->createQueryBuilder('u')
+            ->where('LOWER(u.firstName) LIKE LOWER(:term)')
+            ->orWhere('LOWER(u.lastName) LIKE LOWER(:term)')
+            ->setParameter('term', '%' . $term . '%')
+            ->orderBy('u.id', 'ASC')
+            ->setFirstResult(($page - 1) * $limit)
+            ->setMaxResults($limit);
+    
+        return $qb->getQuery()->getResult();
+    }
+
+    public function getTotalUsers(): int
+    {
+        return $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
+
+    public function getTotalSearchResults(string $term): int
+    {
+        return $this->createQueryBuilder('u')
+            ->select('COUNT(u.id)')
+            ->where('LOWER(u.firstName) LIKE LOWER(:term)')
+            ->orWhere('LOWER(u.lastName) LIKE LOWER(:term)')
+            ->setParameter('term', '%' . $term . '%')
+            ->getQuery()
+            ->getSingleScalarResult();
+    }
 }

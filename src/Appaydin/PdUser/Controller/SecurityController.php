@@ -54,27 +54,19 @@ class SecurityController extends AbstractController
         $this->logger = $logger;
     }
 
-    public function login(AuthenticationUtils $authenticationUtils, LoggerInterface $logger): Response
+    public function login(AuthenticationUtils $authenticationUtils): Response
     {
+
+   
         if ($this->getUser()) {
             return $this->redirectToDashboard();
         }
-    
-        $error = $authenticationUtils->getLastAuthenticationError();
-        $lastUsername = $authenticationUtils->getLastUsername();
-    
-        if ($error) {
-            $logger->error('Login error occurred', [
-                'message' => $error->getMessage(),
-                'trace' => $error->getTraceAsString(),
-            ]);
-        }
-    
+
         return $this->render(
             $this->getParameter('template_path') . '/security/login.html.twig',
             [
-                'last_username' => $lastUsername,
-                'error' => $error ? $error->getMessage() : null,
+                'last_username' => $authenticationUtils->getLastUsername(),
+                'error' => $authenticationUtils->getLastAuthenticationError(),
                 'user_registration' => $this->getParameter('user_registration'),
             ]
         );
@@ -89,7 +81,7 @@ class SecurityController extends AbstractController
         if ($this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('back_dashboard');
         } elseif ($this->isGranted('ROLE_CITOYEN')) {
-            return $this->redirectToRoute('front_home');
+            return $this->redirectToRoute('back_dashboard');
         } elseif ($this->isGranted('ROLE_EMPLOYEE')) {
             return $this->redirectToRoute('employee_dashboard');
         }

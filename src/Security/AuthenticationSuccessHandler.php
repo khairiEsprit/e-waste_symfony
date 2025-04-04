@@ -12,7 +12,7 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
 {
     private const ROLE_REDIRECTS = [
         'ROLE_ADMIN' => 'back_dashboard',
-        'ROLE_CITOYEN' => 'front_home',
+        'ROLE_CITOYEN' => 'back_dashboard',
         'ROLE_EMPLOYEE' => 'employee_dashboard',
     ];
 
