@@ -8,10 +8,18 @@ parameters:
 
 
 services:
+    # config/services.yaml
+    # config/services.yaml
 
-    my_oauth_user_provider:
-            class: App\Security\MyOAuthUserProvider
-            arguments: ['@doctrine.orm.entity_manager']
+    App\Security\MyOAuthUserProvider:
+        class: App\Security\MyOAuthUserProvider
+        arguments:
+            $em: '@doctrine.orm.entity_manager'
+            $logger: '@logger'
+            $session: '@Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface'
+
+    Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface:
+        factory: ['@session.factory', 'createSession']
             
     App\Security\AuthenticationSuccessHandler:
         arguments:
@@ -51,3 +59,4 @@ services:
             $userClass: '%app.user_class%'
         tags:
             - { name: 'console.command' }
+    

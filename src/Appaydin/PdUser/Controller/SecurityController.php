@@ -21,6 +21,10 @@ use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
 use Symfony\Component\String\Slugger\AsciiSlugger;
+use App\Entity\Notification;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
+
 
 class SecurityController extends AbstractController
 {
@@ -30,17 +34,16 @@ class SecurityController extends AbstractController
     private $hasher;
     private $registry;
     private $config;
+    private $logger;
 
-    /**
-     * Constructor with dependency injection.
-     */
     public function __construct(
         TranslatorInterface $translator,
         MailerInterface $mailer,
         EventDispatcherInterface $dispatcher,
         UserPasswordHasherInterface $hasher,
         ManagerRegistry $registry,
-        ?ConfigInterface $config = null
+        ?ConfigInterface $config = null,
+        LoggerInterface $logger
     ) {
         $this->translator = $translator;
         $this->mailer = $mailer;
@@ -48,27 +51,34 @@ class SecurityController extends AbstractController
         $this->hasher = $hasher;
         $this->registry = $registry;
         $this->config = $config;
+        $this->logger = $logger;
     }
 
-    /**
-     * Login action.
-     */
-    public function login(AuthenticationUtils $authenticationUtils): Response
+    public function login(AuthenticationUtils $authenticationUtils, LoggerInterface $logger): Response
     {
         if ($this->getUser()) {
             return $this->redirectToDashboard();
         }
-
+    
+        $error = $authenticationUtils->getLastAuthenticationError();
+        $lastUsername = $authenticationUtils->getLastUsername();
+    
+        if ($error) {
+            $logger->error('Login error occurred', [
+                'message' => $error->getMessage(),
+                'trace' => $error->getTraceAsString(),
+            ]);
+        }
+    
         return $this->render(
             $this->getParameter('template_path') . '/security/login.html.twig',
             [
-                'last_username' => $authenticationUtils->getLastUsername(),
-                'error' => $authenticationUtils->getLastAuthenticationError(),
+                'last_username' => $lastUsername,
+                'error' => $error ? $error->getMessage() : null,
                 'user_registration' => $this->getParameter('user_registration'),
             ]
         );
     }
-
     /**
      * Redirect authenticated users to their dashboard.
      */
@@ -77,9 +87,9 @@ class SecurityController extends AbstractController
         $defaultRedirect = $this->getParameter('login_redirect');
 
         if ($this->isGranted('ROLE_ADMIN')) {
-            return $this->redirectToRoute('admin_dashboard');
-        } elseif ($this->isGranted('ROLE_CITOYEN')) {
             return $this->redirectToRoute('back_dashboard');
+        } elseif ($this->isGranted('ROLE_CITOYEN')) {
+            return $this->redirectToRoute('front_home');
         } elseif ($this->isGranted('ROLE_EMPLOYEE')) {
             return $this->redirectToRoute('employee_dashboard');
         }
@@ -143,17 +153,7 @@ class SecurityController extends AbstractController
                     error_log('Form validation errors: ' . json_encode($errors));
                 }
 
-                // $birthdateString = $form->get('birthdate')->getData();
-                // if ($birthdateString) {
-                //     try {
-                //         $user->setBirthdate(new \DateTime($birthdateString));
-                //     } catch (\Exception $e) {
-                //         $form->addError(new FormError('Invalid birthdate format.'));
-                //         return $this->render($this->getParameter('template_path') . '/registration/register.html.twig', [
-                //             'form' => $form->createView(),
-                //         ]);
-                //     }
-                // }
+             
 
                 // Handle file upload
                 error_log('Checking for file upload');
@@ -231,7 +231,14 @@ class SecurityController extends AbstractController
                 $em->persist($user);
                 $em->flush();
                 error_log('User successfully persisted');
-
+                $notification = new Notification();
+                $notification->setMessage(sprintf(
+                    'New user "%s" signed up ',
+                    $user->getFirstName()
+                   
+                ));
+                $em->persist($notification);
+                $em->flush();
                 // Dispatch after registration event
                 error_log('Dispatching REGISTER event');
                 if ($response = $this->dispatcher->dispatch(new UserEvent($user), UserEvent::REGISTER)->getResponse()) {

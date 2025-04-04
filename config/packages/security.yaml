@@ -14,7 +14,7 @@ security:
                 class: App\Entity\User
                 property: email
         oauth_provider:
-            id: my_oauth_user_provider
+            id: App\Security\MyOAuthUserProvider
         chain_provider:
             chain:
                 providers: [pdadmin_auth, oauth_provider]
@@ -46,8 +46,8 @@ security:
                 login_path: security_login
                 failure_path: security_login
                 oauth_user_provider:
-                    service: my_oauth_user_provider
-                default_target_path: back_dashboard
+                    service: App\Security\MyOAuthUserProvider
+                # default_target_path: back_dashboard
     access_control:
         # - { path: ^/auth/login$, role: PUBLIC_ACCESS }
         # - { path: ^/auth/register, role: PUBLIC_ACCESS }

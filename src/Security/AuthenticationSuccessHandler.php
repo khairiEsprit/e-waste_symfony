@@ -11,8 +11,8 @@ use Symfony\Component\Routing\RouterInterface;
 class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterface
 {
     private const ROLE_REDIRECTS = [
-        'ROLE_ADMIN' => 'admin_dashboard',
-        'ROLE_CITOYEN' => 'back_dashboard',
+        'ROLE_ADMIN' => 'back_dashboard',
+        'ROLE_CITOYEN' => 'front_home',
         'ROLE_EMPLOYEE' => 'employee_dashboard',
     ];
 
