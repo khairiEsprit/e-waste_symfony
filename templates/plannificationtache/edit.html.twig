@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+
+<title>Edit Plannificationtache</title>
+
+{% block body %}
+    <h1>Edit Plannificationtache</h1>
+
+    {{ include('plannificationtache/_form.html.twig', {'button_label': 'Update'}) }}
+
+    <a href="{{ path('app_plannificationtache_index') }}">back to list</a>
+
+    {{ include('plannificationtache/_delete_form.html.twig') }}
+{% endblock %}

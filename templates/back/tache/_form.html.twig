@@ -1,0 +1,109 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': ''}}) }}
+<div class="row g-3">
+    {% for field in form %}
+        <div class="col-md-6">
+            <div class="form-group">
+                {{ form_label(field, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                {{ form_widget(field, {'attr': {'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : '')}}) }}
+                <div class="invalid-feedback">
+                    {{ form_errors(field) }}
+                </div>
+                {% if field.vars.help is defined and field.vars.help %}
+                    <small class="form-text text-muted">{{ field.vars.help }}</small>
+                {% endif %}
+            </div>
+        </div>
+    {% endfor %}
+</div>
+<div class="mt-4 text-center">
+    <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+</div>
+{{ form_end(form) }}
+
+{# Notification Toast #}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="formToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="toastMessage"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+{# JavaScript pour la validation et les notifications #}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation du toast Bootstrap
+    const toastEl = document.getElementById('formToast');
+    const toastMessage = document.getElementById('toastMessage');
+    const toast = new bootstrap.Toast(toastEl, {
+        autohide: true,
+        delay: 5000
+    });
+
+    // Validation des champs lors de la soumission
+    const forms = document.querySelectorAll('.needs-validation');
+    
+    Array.prototype.slice.call(forms).forEach(function(form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Trouver le premier champ invalide
+                const invalidField = form.querySelector('.is-invalid');
+                if (invalidField) {
+                    toastMessage.textContent = invalidField.validationMessage;
+                    toast.show();
+                    
+                    // Scroll vers le champ invalide
+                    invalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                    invalidField.focus();
+                }
+            }
+            
+            form.classList.add('was-validated');
+        }, false);
+    });
+
+    // Validation en temps réel
+    document.querySelectorAll('.form-control').forEach(function(input) {
+        input.addEventListener('input', function() {
+            if (input.checkValidity()) {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            } else {
+                input.classList.remove('is-valid');
+            }
+        });
+        
+        input.addEventListener('blur', function() {
+            if (!input.checkValidity()) {
+                input.classList.add('is-invalid');
+                toastMessage.textContent = input.validationMessage;
+                toast.show();
+            }
+        });
+    });
+});
+</script>
+
+<style>
+    .form-control.is-valid {
+        border-color: #198754;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    }
+    
+    .toast {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        border-radius: 0.5rem;
+    }
+</style>

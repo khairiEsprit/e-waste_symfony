@@ -1,0 +1,149 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Liste des Tâches{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Liste des Tâches</h1>
+        <a href="{{ path('app_tache_new') }}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Nouvelle tâche
+        </a>
+    </div>
+
+    <!-- Modal de confirmation -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation de suppression</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer cette tâche ?</p>
+                    <p class="text-muted"><small>Cette action est irréversible.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form id="deleteForm" method="post" action="">
+                        <input type="hidden" name="_token" value="">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Tâches</h3>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>ID</th>
+                        <th>ID Centre</th>
+                        <th>ID Employé</th>
+                        <th>Localisation</th>
+                        <th>Message</th>
+                        <th>État</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for tache in taches %}
+                    <tr class="align-middle">
+                        <td>{{ tache.id }}</td>
+                        <td>{{ tache.idCentre }}</td>
+                        <td>{{ tache.idEmploye }}</td>
+                        <td>
+                            <small>Lat: {{ tache.altitude }}</small><br>
+                            <small>Lng: {{ tache.longitude }}</small>
+                        </td>
+                        <td>{{ tache.message|slice(0, 30) }}{% if tache.message|length > 30 %}...{% endif %}</td>
+                        <td>
+                            {% if tache.etat == 'Terminé' %}
+                                <span class="badge text-bg-success">{{ tache.etat }}</span>
+                            {% elseif tache.etat == 'En cours' %}
+                                <span class="badge text-bg-warning">{{ tache.etat }}</span>
+                            {% elseif tache.etat == 'En attente' %}
+                                <span class="badge text-bg-secondary">{{ tache.etat }}</span>
+                            {% else %}
+                                <span class="badge text-bg-primary">{{ tache.etat }}</span>
+                            {% endif %}
+                        </td>
+                        <td>
+                            <div class="btn-group" role="group">
+                                <a href="{{ path('app_tache_show', {'id': tache.id}) }}" class="btn btn-sm btn-info" title="Voir">
+                                    <i class="bi bi-eye"></i>
+                                </a>
+                                <a href="{{ path('app_tache_edit', {'id': tache.id}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                                    <i class="bi bi-pencil"></i>
+                                </a>
+                                <button type="button" class="btn btn-sm btn-danger delete-btn" 
+                                        title="Supprimer" 
+                                        data-bs-toggle="modal" 
+                                        data-bs-target="#deleteConfirmationModal"
+                                        data-url="{{ path('app_tache_delete', {'id': tache.id}) }}"
+                                        data-token="{{ csrf_token('delete' ~ tache.id) }}">
+                                    <i class="bi bi-trash"></i>
+                                </button>
+                            </div>
+                        </td>
+                    </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Aucune tâche trouvée</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Suivant</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion de la suppression
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const deleteForm = document.getElementById('deleteForm');
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Mise à jour du formulaire avec les données du bouton cliqué
+            deleteForm.action = this.dataset.url;
+            deleteForm.querySelector('input[name="_token"]').value = this.dataset.token;
+        });
+    });
+    
+    // Optionnel: Affichage d'un toast après suppression réussie
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('deleted')) {
+        const toast = new bootstrap.Toast(document.getElementById('successToast'));
+        document.getElementById('toastMessage').textContent = 'La tâche a été supprimée avec succès';
+        toast.show();
+    }
+});
+</script>
+{% endblock %}

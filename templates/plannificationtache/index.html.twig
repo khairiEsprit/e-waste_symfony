@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+
+<title>Plannificationtache index</title>
+
+{% block body %}
+    <h1>Plannificationtache index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Priorite</th>
+                <th>Date_limite</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for plannificationtache in plannificationtaches %}
+            <tr>
+                <td>{{ plannificationtache.id }}</td>
+                <td>{{ plannificationtache.priorite }}</td>
+                <td>{{ plannificationtache.dateLimite ? plannificationtache.dateLimite|date('Y-m-d') : '' }}</td>
+                <td>
+                    <a href="{{ path('app_plannificationtache_show', {'id': plannificationtache.id}) }}">show</a>
+                    <a href="{{ path('app_plannificationtache_edit', {'id': plannificationtache.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="4">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_plannificationtache_new') }}">Create new</a>
+{% endblock %}

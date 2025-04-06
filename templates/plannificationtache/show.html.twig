@@ -1,0 +1,30 @@
+<!DOCTYPE html>
+
+<title>Plannificationtache</title>
+
+{% block body %}
+    <h1>Plannificationtache</h1>
+
+    <table class="table">
+        <tbody>
+            <tr>
+                <th>Id</th>
+                <td>{{ plannificationtache.id }}</td>
+            </tr>
+            <tr>
+                <th>Priorite</th>
+                <td>{{ plannificationtache.priorite }}</td>
+            </tr>
+            <tr>
+                <th>Date_limite</th>
+                <td>{{ plannificationtache.dateLimite ? plannificationtache.dateLimite|date('Y-m-d') : '' }}</td>
+            </tr>
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_plannificationtache_index') }}">back to list</a>
+
+    <a href="{{ path('app_plannificationtache_edit', {'id': plannificationtache.id}) }}">edit</a>
+
+    {{ include('plannificationtache/_delete_form.html.twig') }}
+{% endblock %}
