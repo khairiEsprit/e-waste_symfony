@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+
+<title>Capteur index</title>
+
+{% block body %}
+    <h1>Capteur index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id_c</th>
+                <th>Distance_mesuree</th>
+                <th>Date_mesure</th>
+                <th>PorteeMaximale</th>
+                <th>Precision_capteur</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for capteur in capteurs %}
+            <tr>
+                <td>{{ capteur.idC }}</td>
+                <td>{{ capteur.distanceMesuree }}</td>
+                <td>{{ capteur.dateMesure ? capteur.dateMesure|date('Y-m-d H:i:s') : '' }}</td>
+                <td>{{ capteur.porteeMaximale }}</td>
+                <td>{{ capteur.precisionCapteur }}</td>
+                <td>
+                    <a href="{{ path('app_capteur_show', {'id_c': capteur.id_c}) }}">show</a>
+                    <a href="{{ path('app_capteur_edit', {'id_c': capteur.id_c}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_capteur_new') }}">Create new</a>
+{% endblock %}

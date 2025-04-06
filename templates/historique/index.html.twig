@@ -1,0 +1,111 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Historique{% endblock %}
+
+{% block content %}
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Historique index</title>
+    <!-- Bootstrap CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Optional Bootstrap icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.0/font/bootstrap-icons.css">
+    <style>
+        .table-container {
+            margin: 20px auto;
+            padding: 20px;
+            background-color: white;
+            border-radius: 8px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .page-header {
+            border-bottom: 1px solid #eee;
+            padding-bottom: 15px;
+            margin-bottom: 20px;
+        }
+        .action-buttons a {
+            margin-right: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div class="container-fluid py-4">
+        <div class="table-container">
+            <div class="page-header d-flex justify-content-between align-items-center">
+                <h1 class="h3">Historique des événements</h1>
+                <a href="{{ path('app_historique_new') }}" class="btn btn-primary">
+                    <i class="bi bi-plus-circle"></i> Nouvel événement
+                </a>
+            </div>
+
+            <div class="table-responsive">
+                <table class="table table-striped table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Date</th>
+                            <th>Type</th>
+                            <th>Description</th>
+                            <th>Quantité déchets</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                    {% if historiques|length > 0 %}
+                        {% for historique in historiques %}
+                            <tr>
+                                <td>{{ historique.id }}</td>
+                                <td>{{ historique.dateEvenement ? historique.dateEvenement|date('Y-m-d H:i:s') : '' }}</td>
+                                <td>
+                                    <span class="badge 
+                                        {% if historique.typeEvenement == 'Collecte' %}bg-success
+                                        {% elseif historique.typeEvenement == 'Traitement' %}bg-info
+                                        {% elseif historique.typeEvenement == 'Recyclage' %}bg-primary
+                                        {% else %}bg-secondary{% endif %}">
+                                        {{ historique.typeEvenement }}
+                                    </span>
+                                </td>
+                                <td>{{ historique.description }}</td>
+                                <td>
+                                    {% if historique.quantiteDechets %}
+                                        <span class="badge bg-warning text-dark">{{ historique.quantiteDechets }} kg</span>
+                                    {% else %}
+                                        <span class="text-muted">N/A</span>
+                                    {% endif %}
+                                </td>
+                                <td class="action-buttons">
+                                    <a href="{{ path('app_historique_show', {'id': historique.id}) }}" 
+                                       class="btn btn-sm btn-outline-primary" 
+                                       title="Voir">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_historique_edit', {'id': historique.id}) }}" 
+                                       class="btn btn-sm btn-outline-secondary" 
+                                       title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                </td>
+                            </tr>
+                        {% endfor %}
+                    {% else %}
+                        <tr>
+                            <td colspan="6" class="text-center text-muted py-4">
+                                <i class="bi bi-exclamation-circle fs-4"></i><br>
+                                Aucun enregistrement trouvé
+                            </td>
+                        </tr>
+                    {% endif %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle with Popper -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
+{% endblock %}

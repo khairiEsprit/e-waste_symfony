@@ -4,59 +4,8 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "f63def1e1e9f02e079e7eb625e02c774",
+    "content-hash": "61759990c261cc5adde9eb93beaeec03",
     "packages": [
-        {
-            "name": "appaydin/pd-user",
-            "version": "3.0.4",
-            "source": {
-                "type": "git",
-                "url": "https://github.com/cesurapp/pd-user.git",
-                "reference": "bb830275ae295aa6e094b3559a7a834e3d260926"
-            },
-            "dist": {
-                "type": "zip",
-                "url": "https://api.github.com/repos/cesurapp/pd-user/zipball/bb830275ae295aa6e094b3559a7a834e3d260926",
-                "reference": "bb830275ae295aa6e094b3559a7a834e3d260926",
-                "shasum": ""
-            },
-            "require": {
-                "php": ">=8.0.0",
-                "symfony/event-dispatcher": "*",
-                "symfony/mailer": "*",
-                "twig/twig": "*"
-            },
-            "type": "symfony-bundle",
-            "autoload": {
-                "psr-4": {
-                    "Pd\\UserBundle\\": ""
-                }
-            },
-            "notification-url": "https://packagist.org/downloads/",
-            "license": [
-                "MIT"
-            ],
-            "authors": [
-                {
-                    "name": "Ramazan APAYDIN",
-                    "homepage": "https://github.com/appaydin"
-                }
-            ],
-            "description": "Symfony Simple User Bundle",
-            "homepage": "https://github.com/appaydin/pd-user",
-            "keywords": [
-                "account",
-                "pd-admin",
-                "pd-user",
-                "symfony-user",
-                "user-management"
-            ],
-            "support": {
-                "issues": "https://github.com/cesurapp/pd-user/issues",
-                "source": "https://github.com/cesurapp/pd-user/tree/3.0.4"
-            },
-            "time": "2021-06-03T21:35:14+00:00"
-        },
         {
             "name": "composer/semver",
             "version": "3.4.3",

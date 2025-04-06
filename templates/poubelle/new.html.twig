@@ -1,0 +1,11 @@
+<!DOCTYPE html>
+
+<title>New Poubelle</title>
+
+{% block body %}
+    <h1>Create new Poubelle</h1>
+
+    {{ include('poubelle/_form.html.twig') }}
+
+    <a href="{{ path('app_poubelle_index') }}">back to list</a>
+{% endblock %}

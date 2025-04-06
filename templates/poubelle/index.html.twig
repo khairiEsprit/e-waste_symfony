@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+
+<title>Poubelle index</title>
+
+{% block body %}
+    <h1>Poubelle index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Id</th>
+                <th>Adresse</th>
+                <th>Niveau</th>
+                <th>Etat</th>
+                <th>Date_installation</th>
+                <th>Hauteur_totale</th>
+                <th>actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for poubelle in poubelles %}
+            <tr>
+                <td>{{ poubelle.id }}</td>
+                <td>{{ poubelle.adresse }}</td>
+                <td>{{ poubelle.niveau }}</td>
+                <td>{{ poubelle.etat }}</td>
+                <td>{{ poubelle.dateInstallation ? poubelle.dateInstallation|date('Y-m-d') : '' }}</td>
+                <td>{{ poubelle.hauteurTotale }}</td>
+                <td>
+                    <a href="{{ path('app_poubelle_show', {'id': poubelle.id}) }}">show</a>
+                    <a href="{{ path('app_poubelle_edit', {'id': poubelle.id}) }}">edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="7">no records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+
+    <a href="{{ path('app_poubelle_new') }}">Create new</a>
+{% endblock %}
