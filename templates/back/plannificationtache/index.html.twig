@@ -1,0 +1,116 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Plannification{% endblock %}
+
+{% block content %}
+    {% block body %}
+    <div class="container mt-4">
+        <div class="d-flex justify-content-between align-items-center mb-4">
+            <h1>Liste des Tâches Planifiées</h1>
+            <a href="{{ path('app_plannificationtache_new') }}" class="btn btn-success">
+                <i class="bi bi-plus-circle"></i> Nouvelle tâche
+            </a>
+        </div>
+
+        <!-- Modal de confirmation -->
+        <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+            <div class="modal-dialog">
+                <div class="modal-content">
+                    <div class="modal-header bg-danger text-white">
+                        <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation de suppression</h5>
+                        <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                    </div>
+                    <div class="modal-body">
+                        <p>Êtes-vous sûr de vouloir supprimer cette tâche ?</p>
+                        <p class="text-muted"><small>Cette action est irréversible.</small></p>
+                    </div>
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                        <form id="deleteForm" method="post" action="">
+                            <input type="hidden" name="_token" value="">
+                            <button type="submit" class="btn btn-danger">
+                                <i class="bi bi-trash"></i> Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card mb-4">
+            <div class="card-header">
+                <h3 class="card-title">Tâches Planifiées</h3>
+            </div>
+            <div class="card-body p-0">
+                <table class="table table-bordered table-hover">
+                    <thead class="table-light">
+                        <tr>
+                            <th>ID</th>
+                            <th>Priorité</th>
+                            <th>Date Limite</th>
+                            <th>Actions</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plannificationtache in plannificationtaches %}
+                        <tr class="align-middle">
+                            <td>{{ plannificationtache.id }}</td>
+                            <td>
+                                {% if plannificationtache.priorite == 'Haute' %}
+                                    <span class="badge text-bg-danger">{{ plannificationtache.priorite }}</span>
+                                {% elseif plannificationtache.priorite == 'Moyenne' %}
+                                    <span class="badge text-bg-warning">{{ plannificationtache.priorite }}</span>
+                                {% else %}
+                                    <span class="badge text-bg-success">{{ plannificationtache.priorite }}</span>
+                                {% endif %}
+                            </td>
+                            <td>{{ plannificationtache.dateLimite ? plannificationtache.dateLimite|date('Y-m-d') : 'Non définie' }}</td>
+                            <td>
+                                <div class="btn-group" role="group">
+                                    <a href="{{ path('app_plannificationtache_show', {'id': plannificationtache.id}) }}" class="btn btn-sm btn-info" title="Voir">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_plannificationtache_edit', {'id': plannificationtache.id}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger delete-btn" 
+                                            title="Supprimer" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteConfirmationModal"
+                                            data-url="{{ path('app_plannificationtache_delete', {'id': plannificationtache.id}) }}"
+                                            data-token="{{ csrf_token('delete' ~ plannificationtache.id) }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="text-center">Aucune tâche trouvée</td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    {% endblock %}
+
+    <!-- Bootstrap JS et script personnalisé -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
+    <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const deleteButtons = document.querySelectorAll('.delete-btn');
+        const deleteForm = document.getElementById('deleteForm');
+        
+        deleteButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                deleteForm.action = this.dataset.url;
+                deleteForm.querySelector('input[name="_token"]').value = this.dataset.token;
+            });
+        });
+    });
+    </script>
+</body>
+</html>
+{% endblock %}

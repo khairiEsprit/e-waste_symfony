@@ -1,0 +1,12 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Ajouter Plannification{% endblock %}
+
+{% block content %}
+
+    <h1>Create new Plannificationtache</h1>
+
+    {{ include('back/plannificationtache/_form.html.twig') }}
+
+    <a href="{{ path('app_plannificationtache_index') }}">back to list</a>
+{% endblock %}

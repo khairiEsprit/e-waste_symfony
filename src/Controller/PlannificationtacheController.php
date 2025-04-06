@@ -17,7 +17,7 @@ final class PlannificationtacheController extends AbstractController
     #[Route(name: 'app_plannificationtache_index', methods: ['GET'])]
     public function index(PlannificationtacheRepository $plannificationtacheRepository): Response
     {
-        return $this->render('plannificationtache/index.html.twig', [
+        return $this->render('back/plannificationtache/index.html.twig', [
             'plannificationtaches' => $plannificationtacheRepository->findAll(),
         ]);
     }
@@ -36,7 +36,7 @@ final class PlannificationtacheController extends AbstractController
             return $this->redirectToRoute('app_plannificationtache_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('plannificationtache/new.html.twig', [
+        return $this->render('back/plannificationtache/new.html.twig', [
             'plannificationtache' => $plannificationtache,
             'form' => $form,
         ]);
@@ -45,7 +45,7 @@ final class PlannificationtacheController extends AbstractController
     #[Route('/{id}', name: 'app_plannificationtache_show', methods: ['GET'])]
     public function show(Plannificationtache $plannificationtache): Response
     {
-        return $this->render('plannificationtache/show.html.twig', [
+        return $this->render('back/plannificationtache/show.html.twig', [
             'plannificationtache' => $plannificationtache,
         ]);
     }
@@ -62,7 +62,7 @@ final class PlannificationtacheController extends AbstractController
             return $this->redirectToRoute('app_plannificationtache_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('plannificationtache/edit.html.twig', [
+        return $this->render('back/plannificationtache/edit.html.twig', [
             'plannificationtache' => $plannificationtache,
             'form' => $form,
         ]);
