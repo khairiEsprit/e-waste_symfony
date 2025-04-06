@@ -1,0 +1,96 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Demande index{% endblock %}
+
+{% block body %}
+    <h1>Demande index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Adresse</th>
+                <th>Email_utilisateur</th>
+                <th>Message</th>
+                <th>Type</th>
+                <th>Etat</th>
+                <th>Traitement</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for demande in demandes %}
+            <tr>
+                <td>{{ demande.adresse }}</td>
+                <td>{{ demande.emailUtilisateur }}</td>
+                <td>{{ demande.message }}</td>
+                <td>{{ demande.type }}</td>
+                <td>
+                    {% if demande.type == 'Traité' %}
+                        <span class="badge bg-success">Traité</span>
+                    {% elseif demande.type == 'Refusé' %}
+                        <span class="badge bg-danger">Refusé</span>
+                    {% else %}
+                        <span class="badge bg-warning">En cours de traitement</span>
+                    {% endif %}
+                </td>
+                <td>
+                    {% if demande.type != 'Traité' and demande.type != 'Refusé' %}
+                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#commentModal-{{ demande.id }}">
+                            Traiter
+                        </button>
+
+                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#refuseModal-{{ demande.id }}">
+                            Refuser
+                        </button>
+
+                        <!-- Traiter Modal -->
+                        <div class="modal fade" id="commentModal-{{ demande.id }}" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="commentModalLabel">Ajouter un commentaire</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="{{ path('app_demande_traiter', {'id': demande.id}) }}">
+                                            <div class="mb-3">
+                                                <label for="commentaire" class="form-label">Commentaire</label>
+                                                <textarea class="form-control" id="commentaire" name="commentaire" rows="3" required></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-primary">Soumettre</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Refuser Modal -->
+                        <div class="modal fade" id="refuseModal-{{ demande.id }}" tabindex="-1" aria-labelledby="refuseModalLabel" aria-hidden="true">
+                            <div class="modal-dialog">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="refuseModalLabel">Ajouter un commentaire</h5>
+                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                    </div>
+                                    <div class="modal-body">
+                                        <form method="POST" action="{{ path('app_demande_refuser', {'id': demande.id}) }}">
+                                            <div class="mb-3">
+                                                <label for="commentaire" class="form-label">Commentaire</label>
+                                                <textarea class="form-control" id="commentaire" name="commentaire" rows="3" required></textarea>
+                                            </div>
+                                            <button type="submit" class="btn btn-danger">Soumettre</button>
+                                        </form>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="6">No records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

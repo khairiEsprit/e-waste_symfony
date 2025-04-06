@@ -1,0 +1,21 @@
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{{ form_start(form) }}
+    {{ form_widget(form) }}
+    <div class="d-flex justify-content-between">
+        <button class="btn btn-save">{{ button_label|default('Save') }}</button>
+        <a href="{{ path('app_demande_index') }}" class="btn btn-secondary btn-sm">Retour à la liste</a>
+    </div>
+{{ form_end(form) }}
+
+{% block stylesheets %}
+    <style>
+    
+        .btn-save {
+            background-color: white;
+            color: white; 
+            border: 1px solid #ccc;
+        }
+
+    </style>
+{% endblock %}

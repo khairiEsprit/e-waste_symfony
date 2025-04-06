@@ -1,0 +1,35 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Traitement index{% endblock %}
+
+{% block body %}
+    <h1>Traitement index</h1>
+
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Status</th>
+                <th>Date_traitement</th>
+                <th>Commentaire</th>
+                <th>Actions</th>
+            </tr>
+        </thead>
+        <tbody>
+        {% for traitement in traitements %}
+            <tr>
+                <td>{{ traitement.status }}</td>
+                <td>{{ traitement.dateTraitement ? traitement.dateTraitement|date('Y-m-d') : '' }}</td>
+                <td>{{ traitement.commentaire }}</td>
+                <td>
+                    <a href="{{ path('app_traitement_show', {'id': traitement.id}) }}" class="btn btn-secondary">Show</a>
+                    <a href="{{ path('app_traitement_edit', {'id': traitement.id}) }}" class="btn btn-primary">Edit</a>
+                </td>
+            </tr>
+        {% else %}
+            <tr>
+                <td colspan="5">No records found</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock %}

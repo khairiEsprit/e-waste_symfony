@@ -1,0 +1,49 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Edit Demande{% endblock %}
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .shadow-gray {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .text-arial {
+            font-family: Arial, sans-serif;
+            color: black;
+        }
+
+        /* Custom card size */
+        .custom-card-size {
+            width: 40%;  /* Card width */
+            margin: 0 auto;  /* Center card */
+            max-width: 900px;  /* Max width limit */
+        }
+        /* Ensure buttons are block elements for consistent sizing */
+        .button-container button,
+        .delete-button-container button {
+            display: inline-block;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+
+<br>
+<br>
+<br>
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center">Modifier la Demande</h1>
+
+        <div class="card shadow-gray bg-light custom-card-size">
+            <div class="card-body text-center">
+                {{ include('front/demande/_form.html.twig', {'button_label': 'Update'}) }}
+                <br>
+                <div class="delete-button-container">
+                    {{ include('front/demande/_delete_form.html.twig') }}
+                </div>
+            </div>
+
+        </div>
+    </div>
+{% endblock %}

@@ -1,0 +1,60 @@
+{% extends 'front/base.html.twig' %}
+
+
+{% block title %}Liste des Demandes{% endblock %}
+
+{% block body %}
+
+<br>
+<br>
+<div class="container mt-5">
+
+    <h1 class="mb-4 text-center">Liste des Demandes</h1>
+
+    <div class="d-flex justify-content-end mb-4">
+        <a href="{{ path('app_demande_new') }}" class="btn btn-success">
+            <i class="bi bi-plus-circle"></i> Nouvelle demande
+        </a>
+    </div>
+
+    {% if demandes is empty %}
+        <div class="alert alert-info text-center">Aucune demande trouvée.</div>
+    {% else %}
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for demande in demandes %}
+                <div class="col">
+                    <div class="card h-100 shadow-gray bg-light">
+                        <div class="card-body">
+                            <h5 class="card-title">{{ demande.type }}</h5>
+                            <p class="card-text">
+                                <strong class="text-arial">Adresse :</strong> {{ demande.adresse }}<br>
+                                <strong class="text-arial">Email :</strong> {{ demande.emailUtilisateur }}<br>
+                                <strong class="text-arial">Message :</strong> {{ demande.message }}
+                            </p>
+                        </div>
+                        <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
+                            <a href="{{ path('app_demande_show', {'id': demande.id}) }}" class="btn btn-secondary btn-sm">Voir</a>
+                            <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .shadow-gray {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+        
+        .text-arial {
+            font-family: Arial, sans-serif ;
+            color: black;
+        }
+    </style>
+{% endblock %}

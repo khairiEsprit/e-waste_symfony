@@ -1,0 +1,52 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}New Demande{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .shadow-gray {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+        }
+
+        .text-arial {
+            font-family: Arial, sans-serif;
+            color: black;
+        }
+
+        /* Custom card size */
+        .custom-card-size {
+            width: 40%;  /* Card width */
+            margin: 0 auto;  /* Center card */
+            max-width: 900px;  /* Max width limit */
+        }
+
+        /* White Save button */
+        .btn-save {
+            background-color: white; 
+            color: black;
+            border: 1px solid #ccc;
+        }
+
+        .btn-save:hover {
+            background-color: #f8f9fa;
+            border-color: #ddd;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<br>
+<br>
+<br>
+    <div class="container mt-5">
+        <h1 class="mb-4 text-center">Créer une Nouvelle Demande</h1>
+
+        <div class="card shadow-gray bg-light custom-card-size">
+            <div class="card-body text-center">
+                {{ include('front/demande/_form.html.twig') }}
+            </div>
+
+        </div>
+    </div>
+{% endblock %}
