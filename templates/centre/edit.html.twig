@@ -1,0 +1,13 @@
+<!DOCTYPE html>
+
+<title>Edit Centre</title>
+
+{% block body %}
+    <h1>Edit Centre</h1>
+
+    {{ include('centre/_form.html.twig', {'button_label': 'Update'}) }}
+
+   
+
+    {{ include('centre/_delete_form.html.twig') }}
+{% endblock %}
