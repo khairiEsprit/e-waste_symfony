@@ -1,0 +1,351 @@
+{% extends 'back/base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .chatbot-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            z-index: 1000;
+        }
+
+        .chat-button {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #4F46E5;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            cursor: pointer;
+            transition: transform 0.3s ease;
+        }
+
+        .chat-button:hover {
+            transform: scale(1.1);
+        }
+
+        .chat-window {
+            position: absolute;
+            bottom: 80px;
+            right: 0;
+            width: 380px;
+            height: 500px;
+            background: white;
+            border-radius: 12px;
+            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            display: none;
+            flex-direction: column;
+            overflow: hidden;
+        }
+
+        .chat-window.active {
+            display: flex;
+            animation: slideUp 0.3s ease;
+        }
+
+        .chat-header {
+            padding: 1rem;
+            background: #4F46E5;
+            color: white;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .chat-messages {
+            flex: 1;
+            overflow-y: auto;
+            padding: 1rem;
+        }
+
+        .message {
+            margin-bottom: 1rem;
+            max-width: 80%;
+        }
+
+        .message.user {
+            margin-left: auto;
+            background: #4F46E5;
+            color: white;
+            border-radius: 12px 12px 0 12px;
+            padding: 0.75rem;
+        }
+
+        .message.bot {
+            background: #F3F4F6;
+            border-radius: 12px 12px 12px 0;
+            padding: 0.75rem;
+        }
+
+        .chat-input {
+            padding: 1rem;
+            border-top: 1px solid #E5E7EB;
+            display: flex;
+            gap: 0.5rem;
+        }
+
+        .chat-input input {
+            flex: 1;
+            padding: 0.5rem;
+            border: 1px solid #E5E7EB;
+            border-radius: 6px;
+        }
+
+        .chat-input button {
+            padding: 0.5rem 1rem;
+            background: #4F46E5;
+            color: white;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+        }
+
+        @keyframes slideUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .file-upload {
+            position: relative;
+            overflow: hidden;
+            display: inline-block;
+        }
+
+        .file-upload input[type=file] {
+            position: absolute;
+            left: 0;
+            top: 0;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-upload button {
+            background: #4F46E5;
+            color: white;
+            padding: 0.5rem;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            gap: 0.25rem;
+        }
+
+        .file-upload button:hover {
+            background: #4338CA;
+        }
+
+        .file-upload svg {
+            width: 1.25rem;
+            height: 1.25rem;
+        }
+
+           .chat-header button {
+               background: transparent;
+               border: none;
+               cursor: pointer;
+               padding: 0.25rem;
+               transition: transform 0.2s ease;
+           }
+   
+           .chat-header button:hover {
+               transform: scale(1.1);
+           }
+
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="chatbot-container">
+        <div class="chat-button" id="chatButton">
+            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 m-auto mt-4" fill="none" viewBox="0 0 24 24" stroke="white">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            </svg>
+        </div>
+
+        <div class="chat-window" id="chatWindow">
+            <div class="chat-header">
+                <h3>Chat Assistant</h3>
+                <button id="closeChat" class="text-white">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                </button>
+            </div>
+
+            <div class="chat-messages" id="chatMessages">
+                <div class="message bot">
+                    Hello! How can I help you today?
+                </div>
+            </div>
+
+         
+
+         
+   <div class="chat-input">
+        <input type="text" id="messageInput" placeholder="Type your message...">
+        <div class="file-upload">
+            <button title="Upload image">
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16" />
+                </svg>
+                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+            </button>
+            <input type="file" id="fileInput" accept="image/*">
+        </div>
+        <button>Send</button>
+    </div>
+        </div>
+    </div>
+    {% endblock %}
+{% block javascripts %}
+<script>
+class Chatbot {
+    constructor() {
+        this.chatWindow = document.getElementById('chatWindow');
+        this.chatButton = document.getElementById('chatButton');
+        this.messageInput = document.getElementById('messageInput');
+        this.messagesContainer = document.getElementById('chatMessages');
+        this.fileInput = document.getElementById('fileInput');
+        this.sendButton = this.chatWindow.querySelector('.chat-input button:last-child');
+
+        this.isChatOpen = false;
+        this.uploadedImageUrl = null;
+
+        this.toggleChat = this.toggleChat.bind(this);
+        this.sendMessage = this.sendMessage.bind(this);
+        this.handleFileUpload = this.handleFileUpload.bind(this);
+        this.handleKeyPress = this.handleKeyPress.bind(this);
+
+        this.initEventListeners();
+    }
+
+    initEventListeners() {
+        this.chatButton.addEventListener('click', this.toggleChat);
+        this.messageInput.addEventListener('keypress', this.handleKeyPress);
+        this.sendButton.addEventListener('click', this.sendMessage);
+        if (this.fileInput) {
+            this.fileInput.addEventListener('change', this.handleFileUpload);
+        } else {
+            console.warn('File input element not found.');
+        }
+    }
+
+    toggleChat() {
+        this.isChatOpen = !this.isChatOpen;
+        this.chatWindow.classList.toggle('active', this.isChatOpen);
+        if (this.isChatOpen) {
+            this.messageInput.focus();
+        }
+    }
+
+   async sendMessage() {
+    const message = this.messageInput.value.trim();
+    if (!message) return;
+
+    this.addMessage(message, 'user', this.uploadedImageUrl);
+    this.messageInput.value = '';
+
+    try {
+        const response = await fetch('/admin/chatbot/message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ 
+                message,
+                imageUrl: this.uploadedImageUrl // Send the image URL if it exists
+            })
+        });
+        const data = await response.json();
+
+        this.addMessage(
+            data.success ? data.response : 'Sorry, there was an error processing your request.',
+            'bot'
+        );
+        this.uploadedImageUrl = null; // Reset after successful send
+    } catch (error) {
+        console.error('Error:', error);
+        this.addMessage('Sorry, there was an error processing your request.', 'bot');
+        this.uploadedImageUrl = null; // Reset on error too
+    }
+}
+
+    async handleFileUpload(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+
+        const formData = new FormData();
+        formData.append('file', file);
+
+        try {
+            const uploadResponse = await fetch('/admin/upload', {
+                method: 'POST',
+                body: formData
+            });
+            const uploadData = await uploadResponse.json();
+
+            if (uploadData.success) {
+                this.uploadedImageUrl = uploadData.url;
+                this.addMessage(`Uploaded image: ${file.name}`, 'user', this.uploadedImageUrl);
+
+                const chatResponse = await fetch('/admin/chatbot/message', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        message: 'What is in this image?',
+                        imageUrl: this.uploadedImageUrl
+                    })
+                });
+                const chatData = await chatResponse.json();
+
+                this.addMessage(
+                    chatData.success ? chatData.response : 'Sorry, there was an error processing your image.',
+                    'bot'
+                );
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            this.addMessage('Sorry, there was an error processing your image.', 'bot');
+        }
+    }
+
+    addMessage(message, type, imageUrl = null) {
+        const messageElement = document.createElement('div');
+        messageElement.classList.add('message', type);
+
+        const textElement = document.createElement('span');
+        textElement.textContent = message;
+        messageElement.appendChild(textElement);
+
+        if (imageUrl) {
+            const imgElement = document.createElement('img');
+            imgElement.src = imageUrl;
+            imgElement.alt = 'Uploaded image';
+            imgElement.style.maxWidth = '200px';
+            messageElement.appendChild(imgElement);
+        }
+
+        this.messagesContainer.appendChild(messageElement);
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    }
+
+    handleKeyPress(event) {
+        if (event.key === 'Enter') {
+            this.sendMessage();
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    const chatbot = new Chatbot();
+});
+</script>
+    {% endblock %}

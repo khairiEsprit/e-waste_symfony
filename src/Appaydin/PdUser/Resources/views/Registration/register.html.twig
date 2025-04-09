@@ -1,12 +1,34 @@
 {% extends "@PdUser/base.html.twig" %}
 
 {% block body %}
+
     {% form_theme form 'bootstrap_4_layout.html.twig' %}
     <div class="login">
         <img src="{{ asset('assets/front/auth/bg-image.png') }}" alt="register image" class="login__img">
 
-        {{ form_start(form, {'attr': {'class': 'login__form'}}) }}
+        {{ form_start(form, {'attr': {'class': 'login__form', 'novalidate': 'novalidate'}}) }}
             <h1 class="login__title">{{ 'security.register_title'|trans }}</h1>
+            
+            {% if form_errors(form) %}
+            <div class="login__alert">
+                <i class="ri-error-warning-line login__alert-icon"></i>
+                <div class="login__alert-text">{{ form_errors(form) }}</div>
+            </div>
+            {% endif %}
+            
+            {% if app.session.flashBag.has('error') %}
+            <div class="login__alert">
+                <i class="ri-error-warning-line login__alert-icon"></i>
+                <div class="login__alert-text">{{ app.session.flashBag.get('error')[0] }}</div>
+            </div>
+            {% endif %}
+            
+            {% if app.session.flashBag.has('modal_error') %}
+            <div class="login__alert">
+                <i class="ri-error-warning-line login__alert-icon"></i>
+                <div class="login__alert-text">{{ app.session.flashBag.get('modal_error')[0] }}</div>
+            </div>
+            {% endif %}
 
             <div class="login__content">
                 <div class="login__column">
@@ -18,18 +40,28 @@
                             <span class="error-text">{{ form_errors(form.firstName) }}</span>
                         </div>
                     </div>
-                   <div class="login__box login__box-datepicker">
-    <div class="login__box-input">
-        <i class="ri-calendar-line login__icon"></i>
-        {{ form_widget(form.birthdate, {'attr': {
-            'class': 'login__input js-datepicker',
-          
-        }}) }}
-        <label for="register-birthdate" class="login__label">Birthdate</label>
-       
-        <span class="error-text">{{ form_errors(form.birthdate) }}</span>
-    </div>
-</div>
+                    <div class="login__box">
+                        <i class="ri-calendar-line login__icon"></i>
+                        <div class="login__box-input birthdate-container">
+                            {{ form_widget(form.birthdate, {'attr': {
+                                'class': 'login__input js-datepicker',
+                                'id': 'register-birthdate',
+                                'placeholder': ' ',
+                                'oninvalid': 'this.setCustomValidity(\'\')',
+                                'oninput': 'validateBirthdate(this)',
+                                'autocomplete': 'off'
+                            }}) }}
+                            <label for="register-birthdate" class="login__label">Birthdate</label>
+                            <div class="login__error" id="birthdate-error"></div>
+                            {% if form.birthdate.vars.errors|length > 0 %}
+                                <div class="error-text" style="color: #ff4444 !important; display: block !important;">
+                                    {% for error in form.birthdate.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
                     <div class="login__box">
                         <i class="ri-image-line login__icon"></i>
                         <div class="login__box-input">
@@ -38,18 +70,26 @@
                                     'class': 'login__input file-input',
                                     'id': 'register-image',
                                     'type': 'file',
-                                    'accept': 'image/jpeg, image/png, image/gif'
+                                    'accept': 'image/jpeg, image/png, image/gif',
+                                    'onchange': 'handleFileSelect(this)'
                                 }
                             }) }}
-                            <label for="register-image" class="file-label">
+                            <label for="register-image" class="file-label" id="file-label">
                                 <i class="ri-upload-cloud-line"></i> Choose File
-                                <span class="file-name">No file chosen</span>
+                                <span class="file-name" id="file-name">No file chosen</span>
                             </label>
                             <div class="progress-container" id="progress-container" style="display: none;">
                                 <div class="progress-bar" id="progress-bar"></div>
                                 <span class="progress-text" id="progress-text">0%</span>
                             </div>
-                            <span class="error-text">{{ form_errors(form.profileImageFile) }}</span>
+                            <div class="login__error" id="image-error"></div>
+                            {% if form.profileImageFile.vars.errors|length > 0 %}
+                                <div class="error-text" style="color: #ff4444 !important; display: block !important;">
+                                    {% for error in form.profileImageFile.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
                         </div>
                     </div>
                 </div>
@@ -99,6 +139,17 @@
             </p>
         {{ form_end(form) }}
     </div>
+    
+    {# Modal for user already exists #}
+    {% if app.session.flashBag.has('modal_error') %}
+        <div class="modal-overlay" id="errorModal">
+            <div class="modal-content">
+                <h2>Error</h2>
+                <p>{{ app.session.flashBag.get('modal_error')[0] }}</p>
+                <button onclick="closeModal()">OK</button>
+            </div>
+        </div>
+    {% endif %}
 
     <style>
     /* Ensure the container is a flexbox to align items properly */
@@ -132,13 +183,29 @@
 
 
 /* Style the datepicker trigger button */
+.ui-datepicker-trigger {
+    background: none;
+    border: none;
+    color: white;
+    position: absolute;
+    right: 0;
+    top: 50%;
+    transform: translateY(-50%);
+    cursor: pointer;
+    z-index: 2;
+}
+
+.birthdate-container {
+    position: relative;
+}
 
 /* Ensure the datepicker calendar appears below the input */
 
         /* Your original styles remain unchanged */
-        .login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label {
-            top: -12px;
-            font-size: var(--small-font-size);
+        .login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label,
+        .active-label {
+            top: -12px !important;
+            font-size: var(--small-font-size) !important;
         }
         .login__input:focus + .login__label {
             top: -12px;
@@ -231,6 +298,11 @@
         .file-label:hover {
             background-color: rgba(255, 255, 255, 0.3);
         }
+        
+        .file-selected {
+            background-color: rgba(76, 175, 80, 0.3);
+            border-color: #4CAF50;
+        }
 
         .file-name {
             font-size: 0.9rem;
@@ -266,6 +338,26 @@
             font-size: 12px;
             font-weight: bold;
         }
+        
+        .login__error {
+            position: absolute;
+            bottom: -1.25rem;
+            left: 0;
+            font-size: 0.7rem;
+            color: #ff4444;
+            margin-top: 0.2rem;
+        }
+        
+        .login__input.has-error {
+            border-bottom-color: #ff4444;
+        }
+        
+        .error-text {
+            color: #ff4444;
+            font-size: 0.7rem;
+            display: block;
+            margin-top: 0.2rem;
+        }
     </style>
 
     {% block javascripts %}
@@ -276,30 +368,176 @@
         <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
 
         <script>
- $(document).ready(function() {
-        // Initialize datepicker
-        $('.js-datepicker').datepicker({
-            changeMonth: true,
-            changeYear: true,
-            yearRange: "-100:+0",
-            maxDate: "-18y",
-            dateFormat: 'yy-mm-dd',
-            showOn: 'button', // Show datepicker on button click only
-            buttonText: '<i class="ri-calendar-line"></i>',
-            onSelect: function(dateText) {
-                $(this).trigger('change');
-                $(this).addClass('has-value');
-                $(this).val(dateText); // Ensure the selected date appears in the input
+        $(document).ready(function() {
+            // Initialize datepicker
+            $('.js-datepicker').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-100:+0",
+                maxDate: "-18y",
+                dateFormat: 'yy-mm-dd',
+                showOn: 'both', // Show datepicker on input focus and button click
+                buttonText: '<i class="ri-calendar-line"></i>',
+                beforeShow: function(input, inst) {
+                    // Position the datepicker below the input
+                    setTimeout(function() {
+                        inst.dpDiv.css({
+                            top: $(input).offset().top + $(input).outerHeight() + 10,
+                            left: $(input).offset().left
+                        });
+                    }, 0);
+                },
+                onSelect: function(dateText) {
+                    $(this).trigger('change');
+                    $(this).addClass('has-value');
+                    $(this).val(dateText); // Ensure the selected date appears in the input
+                    
+                    // Force the label to stay in the "active" position
+                    $(this).parent().find('.login__label').addClass('active-label');
+                    
+                    validateBirthdate(this);
+                }
+            });
+            
+            // Check if the birthdate field already has a value on page load
+            if ($('#register-birthdate').val()) {
+                $('#register-birthdate').parent().find('.login__label').addClass('active-label');
             }
+
+            // Form validation on submit
+            $('.login__form').on('submit', function(e) {
+                const birthdateInput = document.getElementById('register-birthdate');
+                const fileInput = document.getElementById('register-image');
+                
+                const isBirthdateValid = validateBirthdate(birthdateInput);
+                const isFileValid = validateFile(fileInput);
+                
+                if (!isBirthdateValid || !isFileValid) {
+                    e.preventDefault();
+                }
+            });
+
+            // Password eye toggle
+            $('#register-eye').on('click', function() {
+                const passwordInput = document.getElementById('register-password');
+                if (passwordInput.type === 'password') {
+                    passwordInput.type = 'text';
+                    $(this).removeClass('ri-eye-off-line').addClass('ri-eye-line');
+                } else {
+                    passwordInput.type = 'password';
+                    $(this).removeClass('ri-eye-line').addClass('ri-eye-off-line');
+                }
+            });
         });
 
-        
-     
-       
+        // Validate birthdate
+        function validateBirthdate(input) {
+            const errorDiv = document.getElementById('birthdate-error');
+            
+            if (!input.value) {
+                errorDiv.textContent = 'Birthdate is required';
+                input.classList.add('has-error');
+                $(input).parent().find('.login__label').removeClass('active-label');
+                return false;
+            } else {
+                // Check if the user is at least 18 years old
+                const birthDate = new Date(input.value);
+                const today = new Date();
+                const age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                // Keep the label in the active position
+                $(input).parent().find('.login__label').addClass('active-label');
+                
+                if (age < 18 || (age === 18 && monthDiff < 0) || (age === 18 && monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    errorDiv.textContent = 'You must be at least 18 years old';
+                    input.classList.add('has-error');
+                    return false;
+                } else {
+                    errorDiv.textContent = '';
+                    input.classList.remove('has-error');
+                    return true;
+                }
+            }
+        }
 
-      
-    });
-                    // Your existing functionality
+        // Handle file selection
+        function handleFileSelect(input) {
+            const fileName = input.files.length > 0 ? input.files[0].name : 'No file chosen';
+            const fileNameElement = document.getElementById('file-name');
+            const fileLabel = document.getElementById('file-label');
+            const errorDiv = document.getElementById('image-error');
+            
+            if (input.files.length > 0) {
+                // Update file name display
+                fileNameElement.textContent = fileName;
+                fileLabel.classList.add('file-selected');
+                
+                // Validate file type and size
+                const file = input.files[0];
+                const fileType = file.type;
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                
+                if (!validTypes.includes(fileType)) {
+                    errorDiv.textContent = 'Please select a valid image file (JPEG, PNG, GIF)';
+                    input.classList.add('has-error');
+                    return false;
+                } else if (file.size > maxSize) {
+                    errorDiv.textContent = 'File size must be less than 5MB';
+                    input.classList.add('has-error');
+                    return false;
+                } else {
+                    errorDiv.textContent = '';
+                    input.classList.remove('has-error');
+                    
+                    // Show upload progress simulation
+                    simulateUploadProgress();
+                    return true;
+                }
+            } else {
+                fileNameElement.textContent = 'No file chosen';
+                fileLabel.classList.remove('file-selected');
+                return true;
+            }
+        }
+
+        // Validate file on form submission
+        function validateFile(input) {
+            if (input.files.length === 0) {
+                return true; // File is optional
+            }
+            return handleFileSelect(input);
+        }
+
+        // Simulate upload progress
+        function simulateUploadProgress() {
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            progressContainer.style.display = 'block';
+            let progress = 0;
+            
+            const interval = setInterval(function() {
+                progress += 5;
+                progressBar.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(function() {
+                        progressContainer.style.display = 'none';
+                    }, 1000);
+                }
+            }, 100);
+        }
         </script>
     {% endblock %}
+    
+    <script>
+        function closeModal() {
+            document.getElementById('errorModal').style.display = 'none';
+        }
+    </script>
 {% endblock %}

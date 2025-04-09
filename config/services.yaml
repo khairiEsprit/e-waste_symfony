@@ -5,9 +5,19 @@ parameters:
     app.user_class: 'App\Entity\User'
     profile_images_directory: '%kernel.project_dir%/public/uploads/profile_images'
     upload_directory: '%kernel.project_dir%/public/uploads/waste_classification'
-
+    openrouter_api_url: '%env(OPENROUTER_API_URL)%'
+    openrouter_api_key: '%env(OPENROUTER_API_KEY)%'
+    cloudinary_url: '%env(CLOUDINARY_URL)%'
 
 services:
+
+    App\Controller\Back\ChatbotController:
+        autowire: true
+        tags: ['controller.service_arguments']
+
+    Cloudinary\Cloudinary:
+        arguments:
+            - '%cloudinary_url%'
     # config/services.yaml
     # config/services.yaml
 
