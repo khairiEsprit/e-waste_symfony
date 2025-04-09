@@ -4,7 +4,7 @@
         <div class="col-md-6">
             <div class="form-group">
                 {{ form_label(field, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                {{ form_widget(field, {'attr': {'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : '')}}) }}
+                {{ form_widget(field, {'attr': {'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : ''), 'required': 'required'}}) }}
                 <div class="invalid-feedback">
                     {{ form_errors(field) }}
                 </div>
@@ -16,9 +16,20 @@
     {% endfor %}
 </div>
 <div class="mt-4 text-center">
-    <button class="btn btn-primary">{{ button_label|default('Save') }}</button>
+    <button class="btn btn-primary" type="submit" id="submitBtn">
+        {{ button_label|default('Save') }}
+    </button>
 </div>
 {{ form_end(form) }}
+
+{# Loading Overlay #}
+<div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="z-index: 9999; background-color: rgba(255,255,255,0.5); backdrop-filter: blur(4px);">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
 
 {# Notification Toast #}
 <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
@@ -33,10 +44,8 @@
     </div>
 </div>
 
-{# JavaScript pour la validation et les notifications #}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Initialisation du toast Bootstrap
     const toastEl = document.getElementById('formToast');
     const toastMessage = document.getElementById('toastMessage');
     const toast = new bootstrap.Toast(toastEl, {
@@ -44,49 +53,51 @@ document.addEventListener('DOMContentLoaded', function() {
         delay: 5000
     });
 
-    // Validation des champs lors de la soumission
-    const forms = document.querySelectorAll('.needs-validation');
-    
-    Array.prototype.slice.call(forms).forEach(function(form) {
-        form.addEventListener('submit', function(event) {
-            if (!form.checkValidity()) {
-                event.preventDefault();
-                event.stopPropagation();
-                
-                // Trouver le premier champ invalide
-                const invalidField = form.querySelector('.is-invalid');
-                if (invalidField) {
-                    toastMessage.textContent = invalidField.validationMessage;
-                    toast.show();
-                    
-                    // Scroll vers le champ invalide
-                    invalidField.scrollIntoView({ behavior: 'smooth', block: 'center' });
-                    invalidField.focus();
-                }
-            }
-            
-            form.classList.add('was-validated');
-        }, false);
-    });
+    const form = document.querySelector('.needs-validation');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
 
-    // Validation en temps réel
+    // Real-time required field validation
     document.querySelectorAll('.form-control').forEach(function(input) {
         input.addEventListener('input', function() {
-            if (input.checkValidity()) {
+            if (input.value.trim() !== '') {
                 input.classList.remove('is-invalid');
                 input.classList.add('is-valid');
             } else {
                 input.classList.remove('is-valid');
             }
         });
-        
+
         input.addEventListener('blur', function() {
-            if (!input.checkValidity()) {
+            if (input.value.trim() === '') {
                 input.classList.add('is-invalid');
-                toastMessage.textContent = input.validationMessage;
+                toastMessage.textContent = 'Ce champ est requis';
                 toast.show();
             }
         });
+    });
+
+    // Form submission with loading state
+    form.addEventListener('submit', function(event) {
+        // Check if all required fields are filled
+        let allFilled = true;
+        document.querySelectorAll('.form-control[required]').forEach(input => {
+            if (input.value.trim() === '') {
+                allFilled = false;
+                input.classList.add('is-invalid');
+            }
+        });
+
+        if (!allFilled) {
+            event.preventDefault();
+            toastMessage.textContent = 'Veuillez remplir tous les champs requis';
+            toast.show();
+            return;
+        }
+
+        // Show loading overlay
+        submitBtn.disabled = true;
+        loadingOverlay.classList.remove('d-none');
     });
 });
 </script>
@@ -105,5 +116,21 @@ document.addEventListener('DOMContentLoaded', function() {
     .toast {
         box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
         border-radius: 0.5rem;
+    }
+
+    /* Animation for the spinner */
+    @keyframes spinner-border {
+        to { transform: rotate(360deg); }
+    }
+    
+    .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: text-bottom;
+        border: 0.25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spinner-border .75s linear infinite;
     }
 </style>
