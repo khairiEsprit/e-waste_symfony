@@ -16,6 +16,9 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\CallbackTransformer;
+use Symfony\Component\Form\Exception\TransformationFailedException;
+use DateTime;
 
 class RegisterType extends AbstractType
 {
@@ -69,17 +72,25 @@ class RegisterType extends AbstractType
                 'multiple' => false, // Single selection
                 'mapped' => false,   // Not directly mapped to the User entity
                 'required' => true,  // Ensures a role is selected
+                'constraints' => [
+                    new Assert\NotBlank(['message' => 'Please select a role.']),
+                ],
             ])
 
             ->add('birthdate', DateType::class, [
                 'widget' => 'single_text',
                 'html5' => false,
-                'required' => false,
-
+                'format' => 'MM/dd/yyyy',
+                'attr' => [
+                    'class' => 'js-datepicker',
+                    'placeholder' => 'MM/DD/YYYY'
+                ],
+                'required' => true,
                 'constraints' => [
-                    new Assert\LessThan([
+                    new Assert\NotBlank(['message' => 'Please enter your birthdate.']),
+                    new Assert\LessThanOrEqual([
                         'value' => '-18 years',
-                        'message' => 'You must be at least 18 years old'
+                        'message' => 'You must be at least 18 years old.'
                     ])
                 ]
             ])
@@ -96,21 +107,6 @@ class RegisterType extends AbstractType
                         'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'],
                         'mimeTypesMessage' => 'Please upload a valid image (JPEG, PNG, GIF).',
                     ]),
-                ],
-            ])
-
-            ->add('selectedRole', ChoiceType::class, [
-                'label' => 'security.role',
-                'choices' => [
-                    'security.role_citoyen' => 'ROLE_CITOYEN',
-                    'security.role_employee' => 'ROLE_EMPLOYEE',
-                ],
-                'expanded' => false,
-                'multiple' => false,
-                'mapped' => false,
-                'required' => true,
-                'constraints' => [
-                    new Assert\NotBlank(['message' => 'Please select a role.']),
                 ],
             ]);
 

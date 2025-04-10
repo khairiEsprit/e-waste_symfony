@@ -48,12 +48,22 @@ security:
                 oauth_user_provider:
                     service: App\Security\MyOAuthUserProvider
                 default_target_path: back_dashboard
+            access_denied_handler: App\Controller\SecurityExceptionController
     access_control:
-        # - { path: ^/auth/login$, role: PUBLIC_ACCESS }
-        # - { path: ^/auth/register, role: PUBLIC_ACCESS }
-        # - { path: ^/auth/resetting, role: PUBLIC_ACCESS }
-        # - { path: ^/admin/dashboard, roles: ROLE_ADMIN }
-        # - { path: ^/citoyen/dashboard, roles: ROLE_CITOYEN }
-        # - { path: ^/employee/dashboard, roles: ROLE_EMPLOYEE }
-        # - { path: ^/, roles: PUBLIC_ACCESS }
-        # - { path: ^/, role: ROLE_USER }
+        # Public access routes
+        - { path: ^/auth/login$, role: PUBLIC_ACCESS }
+        - { path: ^/auth/register, role: PUBLIC_ACCESS }
+        - { path: ^/auth/resetting, role: PUBLIC_ACCESS }
+        - { path: ^/login, role: PUBLIC_ACCESS }
+        - { path: ^/$, role: PUBLIC_ACCESS }
+        
+        # Admin routes
+        - { path: ^/admin, roles: ROLE_ADMIN }
+        - { path: ^/back, roles: ROLE_ADMIN }
+        
+        # Citoyen routes
+        - { path: ^/front, roles: ROLE_CITOYEN }
+        - { path: ^/profile, roles: [ROLE_CITOYEN, ROLE_ADMIN, ROLE_EMPLOYEE] }
+        
+        # Employee routes
+        - { path: ^/employee, roles: ROLE_EMPLOYEE }

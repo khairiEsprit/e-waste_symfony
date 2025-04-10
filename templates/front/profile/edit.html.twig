@@ -1,0 +1,507 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Edit Profile{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    <style>
+        .profile-edit-section {
+            padding: 120px 0 60px;
+            background: linear-gradient(rgba(0, 105, 62, 0.9), rgba(1, 50, 32, 0.9)), url('{{ asset('assets/front/assets/img/hero-bg.jpg') }}') fixed center center;
+            background-size: cover;
+            position: relative;
+        }
+        
+        .profile-edit-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        
+        .profile-edit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .profile-edit-header {
+            background: #013220;
+            padding: 30px;
+            text-align: center;
+            color: #fff;
+        }
+        
+        .profile-edit-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .profile-edit-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .profile-edit-body {
+            padding: 30px;
+        }
+        
+        .form-section {
+            margin-bottom: 30px;
+        }
+        
+        .section-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #013220;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #29AB87;
+        }
+        
+        .form-group {
+            margin-bottom: 25px;
+        }
+        
+        .form-control {
+            height: 50px;
+            border-radius: 8px;
+            border: 1px solid #ced4da;
+            padding: 10px 15px;
+            font-size: 16px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: #29AB87;
+            box-shadow: 0 0 0 0.2rem rgba(41, 171, 135, 0.25);
+        }
+        
+        .form-control-file {
+            padding: 10px 0;
+        }
+        
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 14px;
+            margin-top: 5px;
+        }
+        
+        .btn-submit {
+            background: #013220;
+            color: #fff;
+            border: 2px solid #013220;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .btn-submit:hover {
+            background: #00693E;
+            border-color: #00693E;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-cancel {
+            background: transparent;
+            color: #6c757d;
+            border: 2px solid #6c757d;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-right: 10px;
+        }
+        
+        .btn-cancel:hover {
+            background: #6c757d;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .profile-preview {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .profile-preview-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .profile-preview-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .profile-preview-name {
+            font-size: 20px;
+            font-weight: 600;
+            color: #013220;
+            margin-bottom: 5px;
+        }
+        
+        .profile-preview-email {
+            font-size: 16px;
+            color: #6c757d;
+        }
+        
+        .ui-datepicker {
+            padding: 10px;
+            border-radius: 8px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .ui-datepicker .ui-datepicker-header {
+            background: #013220;
+            color: #fff;
+            border: none;
+            border-radius: 5px 5px 0 0;
+        }
+        
+        .ui-datepicker .ui-datepicker-title {
+            font-weight: 600;
+        }
+        
+        .ui-datepicker .ui-datepicker-prev, 
+        .ui-datepicker .ui-datepicker-next {
+            background: transparent;
+            border: none;
+            color: #fff;
+        }
+        
+        .ui-datepicker .ui-datepicker-prev:hover, 
+        .ui-datepicker .ui-datepicker-next:hover {
+            background: rgba(255, 255, 255, 0.2);
+            border: none;
+        }
+        
+        .ui-datepicker table {
+            margin: 0.2em 0;
+        }
+        
+        .ui-datepicker th {
+            padding: 0.7em 0.3em;
+            color: #013220;
+            font-weight: 600;
+        }
+        
+        .ui-datepicker td span, 
+        .ui-datepicker td a {
+            text-align: center;
+            padding: 0.5em;
+            border-radius: 4px;
+        }
+        
+        .ui-datepicker td a.ui-state-default {
+            background: transparent;
+            border: none;
+            color: #333;
+        }
+        
+        .ui-datepicker td a.ui-state-default:hover {
+            background: #ACE1AF;
+        }
+        
+        .ui-datepicker td a.ui-state-active {
+            background: #013220;
+            color: #fff;
+        }
+        
+        .ui-datepicker td a.ui-state-highlight {
+            background: #ACE1AF;
+            border: 1px solid #29AB87;
+        }
+        
+        .form-actions {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 30px;
+        }
+        
+        .form-group label {
+            font-weight: 600;
+            color: #013220;
+            margin-bottom: 8px;
+            display: block;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        .fade-in {
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        .form-section {
+            animation: fadeIn 0.5s ease-in-out;
+            animation-fill-mode: both;
+        }
+        
+        .form-section:nth-child(1) { animation-delay: 0.1s; }
+        .form-section:nth-child(2) { animation-delay: 0.2s; }
+        .form-section:nth-child(3) { animation-delay: 0.3s; }
+        
+        .file-upload-wrapper {
+            position: relative;
+            margin-top: 10px;
+        }
+        
+        .file-upload-btn {
+            background: #ACE1AF;
+            color: #013220;
+            border: 2px dashed #29AB87;
+            padding: 15px;
+            border-radius: 8px;
+            text-align: center;
+            transition: all 0.3s ease;
+            cursor: pointer;
+            width: 100%;
+            display: block;
+        }
+        
+        .file-upload-btn:hover {
+            background: #29AB87;
+            color: #fff;
+        }
+        
+        .file-upload-btn i {
+            font-size: 24px;
+            margin-bottom: 10px;
+            display: block;
+        }
+        
+        input[type="file"] {
+            opacity: 0;
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            cursor: pointer;
+        }
+        
+        .file-name {
+            margin-top: 10px;
+            font-size: 14px;
+            color: #6c757d;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<section class="profile-edit-section">
+    <div class="container" data-aos="fade-up">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="profile-edit-card">
+                    <div class="profile-edit-header">
+                        <h2 class="profile-edit-title">Edit Profile</h2>
+                        <p class="profile-edit-subtitle">Update your personal information</p>
+                    </div>
+                    <div class="profile-edit-body">
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="profile-preview" data-aos="fade-right" data-aos-delay="100">
+                                    {% if user.profileImage %}
+                                        <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}" alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
+                                    {% else %}
+                                        <img src="{{ asset('assets/front/assets/img/default-avatar.png') }}" alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
+                                    {% endif %}
+                                    <h3 class="profile-preview-name">{{ user.fullName }}</h3>
+                                    <p class="profile-preview-email">{{ user.email }}</p>
+                                </div>
+                            </div>
+                            <div class="col-md-8">
+                                {{ form_start(form, {'attr': {'class': 'profile-edit-form', 'novalidate': 'novalidate'}}) }}
+                                    <div class="form-section" data-aos="fade-up" data-aos-delay="200">
+                                        <h3 class="section-title">Personal Information</h3>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.firstName) }}
+                                                    {{ form_widget(form.firstName) }}
+                                                    {{ form_errors(form.firstName) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.lastName) }}
+                                                    {{ form_widget(form.lastName) }}
+                                                    {{ form_errors(form.lastName) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.email) }}
+                                                    {{ form_widget(form.email) }}
+                                                    {{ form_errors(form.email) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.phone) }}
+                                                    {{ form_widget(form.phone) }}
+                                                    {{ form_errors(form.phone) }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="form-group">
+                                            {{ form_label(form.birthdate) }}
+                                            {{ form_widget(form.birthdate) }}
+                                            {{ form_errors(form.birthdate) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section" data-aos="fade-up" data-aos-delay="300">
+                                        <h3 class="section-title">Profile Image</h3>
+                                        <div class="form-group">
+                                            <div class="file-upload-wrapper">
+                                                <label for="{{ form.profileImageFile.vars.id }}" class="file-upload-btn">
+                                                    <i class="bi bi-cloud-upload"></i>
+                                                    <span>Click to upload a profile image</span>
+                                                </label>
+                                                {{ form_widget(form.profileImageFile, {'attr': {'class': 'profile-image-input'}}) }}
+                                                <div class="file-name" id="file-name">No file selected</div>
+                                            </div>
+                                            {{ form_errors(form.profileImageFile) }}
+                                            <small class="form-text text-muted">
+                                                Allowed formats: JPEG, PNG, GIF. Max size: 5MB
+                                            </small>
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-section" data-aos="fade-up" data-aos-delay="400">
+                                        <h3 class="section-title">Change Password</h3>
+                                        <p class="text-muted mb-4">Leave these fields empty if you don't want to change your password</p>
+                                        <div class="form-group">
+                                            {{ form_label(form.plainPassword.first) }}
+                                            {{ form_widget(form.plainPassword.first) }}
+                                            {{ form_errors(form.plainPassword.first) }}
+                                        </div>
+                                        <div class="form-group">
+                                            {{ form_label(form.plainPassword.second) }}
+                                            {{ form_widget(form.plainPassword.second) }}
+                                            {{ form_errors(form.plainPassword.second) }}
+                                        </div>
+                                    </div>
+                                    
+                                    <div class="form-actions">
+                                        <div>
+                                            <a href="{{ path('app_profile') }}" class="btn-cancel">
+                                                <i class="bi bi-arrow-left"></i> Cancel
+                                            </a>
+                                        </div>
+                                        <button type="submit" class="btn-submit">
+                                            <i class="bi bi-check-lg"></i> Save Changes
+                                        </button>
+                                    </div>
+                                {{ form_end(form) }}
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-in-out',
+            once: true,
+            mirror: false
+        });
+        
+        $(document).ready(function() {
+            // Initialize datepicker
+            $('.js-datepicker').datepicker({
+                dateFormat: 'mm/dd/yy',
+                changeMonth: true,
+                changeYear: true,
+                yearRange: '-100:+0',
+                showAnim: 'fadeIn'
+            });
+            
+            // Profile image preview
+            $('.profile-image-input').change(function() {
+                const file = this.files[0];
+                if (file) {
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        $('#profile-image-preview').attr('src', e.target.result);
+                        $('#profile-image-preview').addClass('pulse-animation');
+                        setTimeout(function() {
+                            $('#profile-image-preview').removeClass('pulse-animation');
+                        }, 1000);
+                    }
+                    reader.readAsDataURL(file);
+                    $('#file-name').text(file.name);
+                }
+            });
+            
+            // Real-time name preview update
+            $('#{{ form.firstName.vars.id }}').on('input', function() {
+                updatePreviewName();
+            });
+            
+            $('#{{ form.lastName.vars.id }}').on('input', function() {
+                updatePreviewName();
+            });
+            
+            function updatePreviewName() {
+                const firstName = $('#{{ form.firstName.vars.id }}').val();
+                const lastName = $('#{{ form.lastName.vars.id }}').val();
+                $('.profile-preview-name').text(firstName + ' ' + lastName);
+            }
+            
+            // Real-time email preview update
+            $('#{{ form.email.vars.id }}').on('input', function() {
+                const email = $(this).val();
+                $('.profile-preview-email').text(email);
+            });
+            
+            // Form validation animation
+            $('.profile-edit-form').on('submit', function(e) {
+                const form = this;
+                if (!form.checkValidity()) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                    
+                    // Highlight invalid fields with animation
+                    $('.is-invalid').each(function() {
+                        $(this).parent().effect('shake', { times: 2, distance: 5 }, 500);
+                    });
+                }
+                
+                $(form).addClass('was-validated');
+            });
+        });
+    </script>
+{% endblock %}

@@ -247,7 +247,7 @@
         }
         .login__button {
             width: 100%;
-            padding: 1rem;
+            padding: 0.5rem;
             border-radius: 0.5rem;
             background-color: var(--white-color);
             font-weight: var(--font-medium);
@@ -375,7 +375,7 @@
                 changeYear: true,
                 yearRange: "-100:+0",
                 maxDate: "-18y",
-                dateFormat: 'yy-mm-dd',
+                dateFormat: 'mm/dd/yy',
                 showOn: 'both', // Show datepicker on input focus and button click
                 buttonText: '<i class="ri-calendar-line"></i>',
                 beforeShow: function(input, inst) {
@@ -390,10 +390,23 @@
                 onSelect: function(dateText) {
                     $(this).trigger('change');
                     $(this).addClass('has-value');
-                    $(this).val(dateText); // Ensure the selected date appears in the input
+                    
+                    // Ensure the date is in the correct format for Symfony (MM/DD/YYYY)
+                    var date = $(this).datepicker('getDate');
+                    if (date) {
+                        var month = ('0' + (date.getMonth() + 1)).slice(-2);
+                        var day = ('0' + date.getDate()).slice(-2);
+                        var year = date.getFullYear();
+                        var formattedDate = month + '/' + day + '/' + year;
+                        $(this).val(formattedDate);
+                    }
                     
                     // Force the label to stay in the "active" position
                     $(this).parent().find('.login__label').addClass('active-label');
+                    
+                    // Clear any previous error
+                    document.getElementById('birthdate-error').textContent = '';
+                    $(this).removeClass('has-error');
                     
                     validateBirthdate(this);
                 }
@@ -441,7 +454,26 @@
                 return false;
             } else {
                 // Check if the user is at least 18 years old
-                const birthDate = new Date(input.value);
+                // Parse date in MM/dd/yyyy format
+                const parts = input.value.split('/');
+                if (parts.length !== 3) {
+                    errorDiv.textContent = 'Please enter a valid date (MM/DD/YYYY)';
+                    input.classList.add('has-error');
+                    return false;
+                }
+                
+                const month = parseInt(parts[0], 10) - 1; // Months are 0-indexed in JS
+                const day = parseInt(parts[1], 10);
+                const year = parseInt(parts[2], 10);
+                
+                if (isNaN(month) || isNaN(day) || isNaN(year) || 
+                    month < 0 || month > 11 || day < 1 || day > 31 || year < 1900) {
+                    errorDiv.textContent = 'Please enter a valid date (MM/DD/YYYY)';
+                    input.classList.add('has-error');
+                    return false;
+                }
+                
+                const birthDate = new Date(year, month, day);
                 const today = new Date();
                 const age = today.getFullYear() - birthDate.getFullYear();
                 const monthDiff = today.getMonth() - birthDate.getMonth();
