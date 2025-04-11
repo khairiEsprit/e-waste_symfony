@@ -1,4 +1,3 @@
-# config/packages/security.yaml
 security:
     enable_authenticator_manager: true
     password_hashers:
@@ -27,7 +26,7 @@ security:
             provider: chain_provider
             lazy: true
             user_checker: App\Appaydin\PdUser\Security\UserChecker
-            entry_point: form_login # Set form_login as the entry point
+            entry_point: form_login
             form_login:
                 use_referer: true
                 login_path: security_login
@@ -48,6 +47,7 @@ security:
                 oauth_user_provider:
                     service: App\Security\MyOAuthUserProvider
                 default_target_path: back_dashboard
+                failure_handler: security.authentication.failure_handler
             access_denied_handler: App\Controller\SecurityExceptionController
     access_control:
         # Public access routes

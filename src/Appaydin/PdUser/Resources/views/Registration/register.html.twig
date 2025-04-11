@@ -133,6 +133,15 @@
 
             <button type="submit" class="login__button">{{ 'security.register_btn'|trans }}</button>
 
+            {# Google Registration Button #}
+          <div class="login__social">
+    <p class="login__social-text">Or register with:</p>
+    <a href="{{ path('set_oauth_flow', {'flow': 'register'}) }}" class="login__button login__button--social">
+        <i class="ri-google-fill login__icon--social"></i>
+        <span>Register with Google</span>
+    </a>
+</div>
+
             <p class="login__register">
                 Already have an account?
                 <a href="{{ path('security_login') }}">{{ 'security.login_title'|trans }}</a>

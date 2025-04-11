@@ -19,21 +19,21 @@ services:
         arguments:
             - '%cloudinary_url%'
     # config/services.yaml
-    # config/services.yaml
 
     App\Security\MyOAuthUserProvider:
-        class: App\Security\MyOAuthUserProvider
         arguments:
             $em: '@doctrine.orm.entity_manager'
             $logger: '@logger'
-            $session: '@Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface'
-
-    Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface:
-        factory: ['@session.factory', 'createSession']
+            $session: '@request_stack'
             
     App\Security\AuthenticationSuccessHandler:
         arguments:
             $router: '@router'
+            
+    App\Controller\OAuthFlowController:
+        arguments:
+            $oauthUtils: '@hwi_oauth.security.oauth_utils'
+            $googleResourceOwner: '@hwi_oauth.resource_owner.google'
 
     App\EventListener\SecurityRedirectListener:
         tags:

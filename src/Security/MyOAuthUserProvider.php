@@ -3,24 +3,24 @@ namespace App\Security;
 
 use Psr\Log\LoggerInterface;
 use HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface;
-use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface; // Add this import
+use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\User\UserInterface;
 use App\Entity\User;
 use Doctrine\ORM\EntityManagerInterface;
-use Symfony\Component\HttpFoundation\Session\FlashBagAwareSessionInterface;
+use Symfony\Component\HttpFoundation\RequestStack;
 
-class MyOAuthUserProvider implements OAuthAwareUserProviderInterface // Implement the interface
+class MyOAuthUserProvider implements OAuthAwareUserProviderInterface
 {
     private $em;
     private $logger;
-    private $session;
+    private $requestStack;
 
-    public function __construct(EntityManagerInterface $em, LoggerInterface $logger, FlashBagAwareSessionInterface $session)
+    public function __construct(EntityManagerInterface $em, LoggerInterface $logger, RequestStack $requestStack)
     {
         $this->em = $em;
         $this->logger = $logger;
-        $this->session = $session;
+        $this->requestStack = $requestStack;
     }
 
     public function loadUserByOAuthUserResponse(UserResponseInterface $response): UserInterface
@@ -35,15 +35,37 @@ class MyOAuthUserProvider implements OAuthAwareUserProviderInterface // Implemen
         $this->logger->info('Checking for existing user with email: ' . $email);
         $this->logger->info('User found: ' . ($user ? 'Yes' : 'No'));
 
+        // Get the flow from session (default to login if not set)
+        $session = $this->requestStack->getSession();
+        $flow = $session->get('oauth_flow', 'login');
+        $this->logger->info('OAuth flow: ' . $flow);
+
+        if ($flow === 'login') {
+            // Login flow: authenticate existing user
+            if (!$user) {
+                $this->logger->info('Login flow - user does not exist');
+                $this->requestStack->getSession()->getFlashBag()->add(
+                    'modal_error',
+                    'No account found with this email. Please register first.'
+                );
+                throw new AuthenticationException('user_not_found');
+            }
+
+            $this->logger->info('Login flow - authenticating existing user');
+            return $user;
+        }
+
+        // Registration flow
         if ($user) {
-            $this->logger->info('User already exists with email: ' . $email);
-            $this->session->getFlashBag()->add(
+            $this->logger->info('Registration flow - user already exists');
+            $this->requestStack->getSession()->getFlashBag()->add(
                 'modal_error',
                 'A user with this email already exists. Please log in with your existing account.'
             );
             throw new AuthenticationException('user_already_exists');
         }
 
+        // Create new user
         $this->logger->info('Creating new user with email: ' . $email);
 
         $user = new User();
@@ -54,7 +76,7 @@ class MyOAuthUserProvider implements OAuthAwareUserProviderInterface // Implemen
         $user->setPassword(bin2hex(random_bytes(10)));
         $user->setActive(true);
         $user->setFreeze(false);
-        $user->setRoles([User::ROLE_DEFAULT, "ROLE_CITOYEN"]);
+        $user->setRoles([User::ROLE_DEFAULT, 'ROLE_CITOYEN']);
         $user->setCreatedAt(new \DateTime());
         $user->setLanguage('en');
 
@@ -64,7 +86,6 @@ class MyOAuthUserProvider implements OAuthAwareUserProviderInterface // Implemen
         return $user;
     }
 
-    // If you have these methods from previous implementations, keep them
     public function loadUserByIdentifier(string $identifier): UserInterface
     {
         $user = $this->em->getRepository(User::class)->findOneBy(['email' => $identifier]);

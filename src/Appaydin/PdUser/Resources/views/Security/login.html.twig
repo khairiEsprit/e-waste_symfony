@@ -67,13 +67,13 @@
         <button type="submit" class="login__button">{{ 'security.login_btn'|trans }}</button>
 
         {# Refactored Google Login Button #}
-        <div class="login__social">
-            <p class="login__social-text">Or sign in with:</p>
-            <a href="{{ path('hwi_oauth_redirect_to_service') }}" class="login__button login__button--social">
-                <i class="ri-google-fill login__icon--social"></i>
-                <span>Login with Google</span>
-            </a>
-        </div>
+     <div class="login__social">
+    <p class="login__social-text">Or sign in with:</p>
+    <a href="{{ path('set_oauth_flow', {'flow': 'login'}) }}" class="login__button login__button--social">
+        <i class="ri-google-fill login__icon--social"></i>
+        <span>Login with Google</span>
+    </a>
+</div>
 
         <p class="login__register">
             Don’t have an account?
@@ -92,7 +92,6 @@
             <button onclick="closeModal()">OK</button>
         </div>
     </div>
-   
 {% endif %}
 
 
