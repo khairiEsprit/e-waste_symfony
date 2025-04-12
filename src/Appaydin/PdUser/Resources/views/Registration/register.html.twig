@@ -116,6 +116,7 @@
                         <div class="login__box-input">
                             {{ form_widget(form.plainPassword.second, {'attr': {'class': 'login__input', 'id': 'register-pass-confirm'}}) }}
                             <label for="register-pass-confirm" class="login__label">Confirm Password</label>
+                            <i class="ri-eye-off-line login__eye" id="register-eye-confirm"></i>
                             <span class="error-text">{{ form_errors(form.plainPassword.second) }}</span>
                         </div>
                     </div>
@@ -159,66 +160,137 @@
             </div>
         </div>
     {% endif %}
+<style>
+        /* Reduce form padding */
+        .login__form {
+            position: relative;
+            background-color: hsla(0, 0%, 10%, 0.1);
+            border: 2px solid var(--white-color);
+            margin-inline: 1.5rem;
+            padding: 1rem 2rem 0.5rem; /* Reduced padding */
+            border-radius: 1rem;
+            width: 800px;
+            backdrop-filter: blur(8px);
+        }
 
-    <style>
-    /* Ensure the container is a flexbox to align items properly */
+        /* Reduce input field height */
+        .login__input {
+            height: 50px; /* Reduced from 80px */
+            padding-left: 40px;
+            padding-right: 40px;
+            width: 100%;
+            background: transparent;
+            color: var(--white-color);
+            border-radius: 8px;
+        }
 
+        /* Adjust datepicker input specifically */
+        .login__box-datepicker .login__input {
+            height: 50px; /* Reduced from 80px */
+            padding-left: 40px;
+            padding-right: 40px;
+        }
 
-/* Style the input container */
-.login__box-datepicker .login__box-input {
-    position: relative;
-    width: 100%;
+        /* Reduce spacing between form elements */
+        .login__box {
+            margin-bottom: 0.5rem; /* Reduced from 1rem */
+        }
+
+        /* Reduce button padding and margin */
+        .login__button {
+            width: 100%;
+            padding: 0.3rem; /* Reduced from 0.5rem */
+            border-radius: 0.5rem;
+            background-color: var(--white-color);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            margin-bottom: 1rem; /* Reduced from 2rem */
+            text-align: center;
+        }
+
+        /* Adjust Google button section */
+        .login__social {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.5rem; /* Reduced gap */
+            margin-bottom: 0.5rem; /* Reduced from 1rem */
+        }
+
+       .login__button--social {
     display: flex;
     align-items: center;
+    justify-content: center; /* Centers content horizontally */
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--white-color);
+    color: var(--black-color);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    width: 100%; /* Ensures it takes full width for centering */
+    text-align: center; /* Fallback for text alignment */
 }
 
-/* Align the icon and input */
-
-
-/* Style the input field */
-.login__box-datepicker .login__input {
-    padding-left: 40px; /* Space for the icon on the left */
-    padding-right: 40px; /* Space for the datepicker trigger on the right */
-    width: 100%;
-    background: transparent;
-    color: var(--white-color);
-    border-radius: 8px;
-    height: 80px;
-}
-
-/* Style the label */
-
-
-
-
-/* Style the datepicker trigger button */
-.ui-datepicker-trigger {
-    background: none;
-    border: none;
-    color: white;
-    position: absolute;
-    right: 0;
-    top: 50%;
-    transform: translateY(-50%);
-    cursor: pointer;
-    z-index: 2;
-}
-
-.birthdate-container {
-    position: relative;
-}
-
-/* Ensure the datepicker calendar appears below the input */
-
-        /* Your original styles remain unchanged */
+        /* Adjust label positioning for smaller inputs */
         .login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label,
         .active-label {
-            top: -12px !important;
+            top: -10px !important; /* Adjusted for smaller input height */
             font-size: var(--small-font-size) !important;
         }
         .login__input:focus + .login__label {
-            top: -12px;
+            top: -10px;
             font-size: var(--small-font-size);
+        }
+
+        /* Adjust file input label */
+        .file-label {
+            padding: 5px 10px; /* Reduced padding */
+            gap: 5px; /* Reduced gap */
+        }
+
+        /* Other unchanged styles */
+        .login__social-text {
+            font-size: var(--small-font-size);
+            color: var(--white-color);
+        }
+
+        .login__button--social {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: var(--white-color);
+            color: var(--black-color);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .login__icon--social {
+            font-size: 1.2rem;
+        }
+
+        .login__box-datepicker .login__box-input {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .ui-datepicker-trigger {
+            background: none;
+            border: none;
+            color: white;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .birthdate-container {
+            position: relative;
         }
 
         .login__register {
@@ -240,40 +312,18 @@
             outline: none;
         }
 
-        .login__form {
-            position: relative;
-            background-color: hsla(0, 0%, 10%, 0.1);
-            border: 2px solid var(--white-color);
-            margin-inline: 1.5rem;
-            padding: 1.5rem 3rem 1rem;
-            border-radius: 1rem;
-            width: 800px;
-            backdrop-filter: blur(8px);
-        }
         .login__box-select .login__select option {
             color: var(--black-color);
             background: var(--white-color);
         }
-        .login__button {
-            width: 100%;
-            padding: 0.5rem;
-            border-radius: 0.5rem;
-            background-color: var(--white-color);
-            font-weight: var(--font-medium);
-            cursor: pointer;
-            margin-bottom: 2rem;
-            text-align: center;
-        }
+
         .login__content {
             display: flex;
             justify-content: space-between;
-            gap: 1.5rem;
+            gap: 1rem; /* Reduced from 1.5rem */
         }
         .login__column {
             width: 48%;
-        }
-        .login__box {
-            margin-bottom: 1rem;
         }
         
         .file-input {
@@ -288,8 +338,6 @@
             display: flex;
             align-items: center;
             justify-content: center;
-            gap: 10px;
-            padding: 10px 15px;
             background-color: rgba(255, 255, 255, 0.2);
             border: 2px solid white;
             border-radius: 8px;
@@ -323,11 +371,11 @@
         
         .progress-container {
             width: 100%;
-            margin-top: 10px;
+            margin-top: 5px; /* Reduced from 10px */
             background-color: rgba(255, 255, 255, 0.2);
             border-radius: 5px;
             position: relative;
-            height: 20px;
+            height: 15px; /* Reduced from 20px */
         }
         
         .progress-bar {
@@ -344,13 +392,13 @@
             left: 50%;
             transform: translate(-50%, -50%);
             color: white;
-            font-size: 12px;
+            font-size: 10px; /* Reduced from 12px */
             font-weight: bold;
         }
         
         .login__error {
             position: absolute;
-            bottom: -1.25rem;
+            bottom: -1rem; /* Adjusted for smaller spacing */
             left: 0;
             font-size: 0.7rem;
             color: #ff4444;
@@ -367,7 +415,7 @@
             display: block;
             margin-top: 0.2rem;
         }
-    </style>
+</style>
 
     {% block javascripts %}
         {{ parent() }}
@@ -439,17 +487,8 @@
                 }
             });
 
-            // Password eye toggle
-            $('#register-eye').on('click', function() {
-                const passwordInput = document.getElementById('register-password');
-                if (passwordInput.type === 'password') {
-                    passwordInput.type = 'text';
-                    $(this).removeClass('ri-eye-off-line').addClass('ri-eye-line');
-                } else {
-                    passwordInput.type = 'password';
-                    $(this).removeClass('ri-eye-line').addClass('ri-eye-off-line');
-                }
-            });
+            // Remove custom password eye toggle as it's handled by login.js
+            // The login.js script already handles the eye icon functionality for both login and register pages
         });
 
         // Validate birthdate
