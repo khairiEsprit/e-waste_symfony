@@ -1,16 +1,17 @@
 <?php
-namespace App\Controller\Back;
+namespace App\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 
-#[Route('/admin')]
 class DashboardController extends AbstractController
 {
-    #[Route('/', name: 'back_dashboard')]
+    /**
+     * @Route("/dashboard", name="dashboard")
+     */
     public function index(): Response
     {
-        return $this->render('back/index.html.twig');
+        return $this->render('dashboard/index.html.twig');
     }
 }

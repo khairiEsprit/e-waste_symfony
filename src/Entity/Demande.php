@@ -6,6 +6,7 @@ use App\Repository\DemandeRepository;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: DemandeRepository::class)]
 class Demande
@@ -16,32 +17,56 @@ class Demande
     private ?int $id = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L'adresse ne peut pas être vide.")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "L'adresse ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $adresse = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L'email ne peut pas être vide.")]
+    #[Assert\Email(message: "L'email {{ value }} n'est pas valide.")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "L'email ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $email_utilisateur = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le message ne peut pas être vide.")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Le message ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $message = null;
 
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "Le type ne peut pas être vide.")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Le type ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $type = null;
 
-    #[ORM\ManyToOne(inversedBy: 'demande')]
+
+    #[ORM\ManyToOne(inversedBy: 'demandes')]
+    #[ORM\JoinColumn(name: "id_utilisateur", referencedColumnName: "id", nullable: true)]
     private ?User $utilisateur = null;
 
     /**
      * @var Collection<int, Traitement>
      */
-    #[ORM\OneToMany(targetEntity: Traitement::class, mappedBy: 'demande', cascade: ['remove'])]
-    private Collection $traitement;
+    #[ORM\OneToMany(mappedBy: 'demande', targetEntity: Traitement::class, cascade: ['remove'], orphanRemoval: true)]
+    private Collection $traitements;
 
-    #[ORM\ManyToOne(inversedBy: 'demande')]
+    #[ORM\ManyToOne(inversedBy: 'demandes')]
+    #[ORM\JoinColumn(name: "id_centre", referencedColumnName: "id", nullable: true)]
     private ?Center $center = null;
 
     public function __construct()
     {
-        $this->traitement = new ArrayCollection();
+        $this->traitements = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -112,15 +137,15 @@ class Demande
     /**
      * @return Collection<int, Traitement>
      */
-    public function getTraitement(): Collection
+    public function getTraitements(): Collection
     {
-        return $this->traitement;
+        return $this->traitements;
     }
 
     public function addTraitement(Traitement $traitement): static
     {
-        if (!$this->traitement->contains($traitement)) {
-            $this->traitement->add($traitement);
+        if (!$this->traitements->contains($traitement)) {
+            $this->traitements->add($traitement);
             $traitement->setDemande($this);
         }
 
@@ -129,8 +154,7 @@ class Demande
 
     public function removeTraitement(Traitement $traitement): static
     {
-        if ($this->traitement->removeElement($traitement)) {
-            // set the owning side to null (unless already changed)
+        if ($this->traitements->removeElement($traitement)) {
             if ($traitement->getDemande() === $this) {
                 $traitement->setDemande(null);
             }

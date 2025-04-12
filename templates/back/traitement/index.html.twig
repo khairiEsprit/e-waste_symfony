@@ -1,35 +1,113 @@
 {% extends 'back/base.html.twig' %}
 
-{% block title %}Traitement index{% endblock %}
+{% block title %}Liste des Traitement{% endblock %}
 
-{% block body %}
-    <h1>Traitement index</h1>
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Liste des Traitement</h1>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Status</th>
-                <th>Date_traitement</th>
-                <th>Commentaire</th>
-                <th>Actions</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for traitement in traitements %}
-            <tr>
-                <td>{{ traitement.status }}</td>
-                <td>{{ traitement.dateTraitement ? traitement.dateTraitement|date('Y-m-d') : '' }}</td>
-                <td>{{ traitement.commentaire }}</td>
-                <td>
-                    <a href="{{ path('app_traitement_show', {'id': traitement.id}) }}" class="btn btn-secondary">Show</a>
-                    <a href="{{ path('app_traitement_edit', {'id': traitement.id}) }}" class="btn btn-primary">Edit</a>
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="5">No records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    <!-- Modal de confirmation -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation de suppression</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer cette tâche ?</p>
+                    <p class="text-muted"><small>Cette action est irréversible.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form id="deleteForm" method="post" action="">
+                        <input type="hidden" name="_token" value="">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Traitements</h3>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Status</th>
+                        <th>Date de traitement</th>
+                        <th>Commentaire</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for traitement in traitements %}
+                        <tr>
+                            <td>{{ traitement.status }}</td>
+                            <td>{{ traitement.dateTraitement ? traitement.dateTraitement|date('Y-m-d') : '' }}</td>
+                            <td>{{ traitement.commentaire }}</td>
+                            <td>
+                                <a href="{{ path('app_traitement_show', {'id': traitement.id}) }}" class="btn btn-secondary">Show</a>
+                                <a href="{{ path('app_traitement_edit', {'id': traitement.id}) }}" class="btn btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                    <tr>
+                        <td colspan="7" class="text-center">Aucune tâche trouvée</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Suivant</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion de la suppression
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const deleteForm = document.getElementById('deleteForm');
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Mise à jour du formulaire avec les données du bouton cliqué
+            deleteForm.action = this.dataset.url;
+            deleteForm.querySelector('input[name="_token"]').value = this.dataset.token;
+        });
+    });
+    
+    // Optionnel: Affichage d'un toast après suppression réussie
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('deleted')) {
+        const toast = new bootstrap.Toast(document.getElementById('successToast'));
+        document.getElementById('toastMessage').textContent = 'La tâche a été supprimée avec succès';
+        toast.show();
+    }
+});
+</script>
 {% endblock %}

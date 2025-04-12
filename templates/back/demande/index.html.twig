@@ -1,96 +1,271 @@
 {% extends 'back/base.html.twig' %}
 
-{% block title %}Demande index{% endblock %}
+{% block title %}Liste des Demandes{% endblock %}
 
-{% block body %}
-    <h1>Demande index</h1>
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Liste des Demandes</h1>
+    </div>
 
-    <table class="table">
-        <thead>
-            <tr>
-                <th>Adresse</th>
-                <th>Email_utilisateur</th>
-                <th>Message</th>
-                <th>Type</th>
-                <th>Etat</th>
-                <th>Traitement</th>
-            </tr>
-        </thead>
-        <tbody>
-        {% for demande in demandes %}
-            <tr>
-                <td>{{ demande.adresse }}</td>
-                <td>{{ demande.emailUtilisateur }}</td>
-                <td>{{ demande.message }}</td>
-                <td>{{ demande.type }}</td>
-                <td>
-                    {% if demande.type == 'Traité' %}
-                        <span class="badge bg-success">Traité</span>
-                    {% elseif demande.type == 'Refusé' %}
-                        <span class="badge bg-danger">Refusé</span>
+    <!-- Modal de confirmation -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation de suppression</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer cette Demandes ?</p>
+                    <p class="text-muted"><small>Cette action est irréversible.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form id="deleteForm" method="post" action="">
+                        <input type="hidden" name="_token" value="">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header">
+            <h3 class="card-title">Demandes</h3>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Adresse</th>
+                        <th>Email_utilisateur</th>
+                        <th>Message</th>
+                        <th>Type</th>
+                        <th>Etat</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for demande in demandes %}
+                        {% set dernierTraitement = demande.traitements|last %}
+                        <tr>
+                            <td>{{ demande.adresse }}</td>
+                            <td>{{ demande.emailUtilisateur }}</td>
+                            <td>{{ demande.message }}</td>
+                            <td>{{ demande.type }}</td>
+                            <td>
+                                {% if dernierTraitement and dernierTraitement.status == 'Traité' %}
+                                    <span class="badge bg-success">Traité</span>
+                                {% elseif dernierTraitement and dernierTraitement.status == 'Refusé' %}
+                                    <span class="badge bg-danger">Refusé</span>
+                                {% else %}
+                                    <span class="badge bg-warning">En cours de traitement</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                {% if not dernierTraitement or (dernierTraitement.status != 'Traité' and dernierTraitement.status != 'Refusé') %}
+                                    <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#commentModal-{{ demande.id }}">
+                                        Traiter
+                                    </button>
+
+                                    <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#refuseModal-{{ demande.id }}">
+                                        Refuser
+                                    </button>
+
+                                    <!-- Traiter Modal -->
+                                    <div class="modal fade" id="commentModal-{{ demande.id }}" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="commentModalLabel">Ajouter un commentaire</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method="POST" action="{{ path('app_demande_traiter', {'id': demande.id}) }}" id="traiterForm-{{ demande.id }}" onsubmit="return validateForm('traiterForm-{{ demande.id }}')" novalidate>
+                                                        <div class="mb-3">
+                                                            <label for="commentaire-traiter-{{ demande.id }}" class="form-label">Commentaire</label>
+                                                            <textarea class="form-control" id="commentaire-traiter-{{ demande.id }}" name="commentaire" rows="3" required></textarea>
+                                                            <div class="invalid-feedback">
+                                                                Le commentaire ne peut pas être vide
+                                                            </div>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-primary">Soumettre</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Refuser Modal -->
+                                    <div class="modal fade" id="refuseModal-{{ demande.id }}" tabindex="-1" aria-labelledby="refuseModalLabel" aria-hidden="true">
+                                        <div class="modal-dialog">
+                                            <div class="modal-content">
+                                                <div class="modal-header">
+                                                    <h5 class="modal-title" id="refuseModalLabel">Ajouter un commentaire</h5>
+                                                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                                                </div>
+                                                <div class="modal-body">
+                                                    <form method="POST" action="{{ path('app_demande_refuser', {'id': demande.id}) }}" id="refuserForm-{{ demande.id }}" onsubmit="return validateForm('refuserForm-{{ demande.id }}')" novalidate>
+                                                        <div class="mb-3">
+                                                            <label for="commentaire-refuser-{{ demande.id }}" class="form-label">Commentaire</label>
+                                                            <textarea class="form-control" id="commentaire-refuser-{{ demande.id }}" name="commentaire" rows="3" required></textarea>
+                                                            <div class="invalid-feedback">
+                                                                Le commentaire ne peut pas être vide.
+                                                            </div>
+                                                        </div>
+                                                        <button type="submit" class="btn btn-danger">Soumettre</button>
+                                                    </form>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                {% endif %}
+                            </td>
+                        </tr>
                     {% else %}
-                        <span class="badge bg-warning">En cours de traitement</span>
-                    {% endif %}
-                </td>
-                <td>
-                    {% if demande.type != 'Traité' and demande.type != 'Refusé' %}
-                        <button type="button" class="btn btn-primary" data-bs-toggle="modal" data-bs-target="#commentModal-{{ demande.id }}">
-                            Traiter
-                        </button>
+                        <tr>
+                            <td colspan="7" class="text-center">Aucune Demandes trouvée</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Suivant</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+</div>
+{% endblock %}
 
-                        <button type="button" class="btn btn-danger" data-bs-toggle="modal" data-bs-target="#refuseModal-{{ demande.id }}">
-                            Refuser
-                        </button>
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Gestion de la suppression
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const deleteForm = document.getElementById('deleteForm');
 
-                        <!-- Traiter Modal -->
-                        <div class="modal fade" id="commentModal-{{ demande.id }}" tabindex="-1" aria-labelledby="commentModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="commentModalLabel">Ajouter un commentaire</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form method="POST" action="{{ path('app_demande_traiter', {'id': demande.id}) }}">
-                                            <div class="mb-3">
-                                                <label for="commentaire" class="form-label">Commentaire</label>
-                                                <textarea class="form-control" id="commentaire" name="commentaire" rows="3" required></textarea>
-                                            </div>
-                                            <button type="submit" class="btn btn-primary">Soumettre</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Mise à jour du formulaire avec les données du bouton cliqué
+            deleteForm.action = this.dataset.url;
+            deleteForm.querySelector('input[name="_token"]').value = this.dataset.token;
+        });
+    });
 
-                        <!-- Refuser Modal -->
-                        <div class="modal fade" id="refuseModal-{{ demande.id }}" tabindex="-1" aria-labelledby="refuseModalLabel" aria-hidden="true">
-                            <div class="modal-dialog">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="refuseModalLabel">Ajouter un commentaire</h5>
-                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                    </div>
-                                    <div class="modal-body">
-                                        <form method="POST" action="{{ path('app_demande_refuser', {'id': demande.id}) }}">
-                                            <div class="mb-3">
-                                                <label for="commentaire" class="form-label">Commentaire</label>
-                                                <textarea class="form-control" id="commentaire" name="commentaire" rows="3" required></textarea>
-                                            </div>
-                                            <button type="submit" class="btn btn-danger">Soumettre</button>
-                                        </form>
-                                    </div>
-                                </div>
-                            </div>
-                        </div>
-                    {% endif %}
-                </td>
-            </tr>
-        {% else %}
-            <tr>
-                <td colspan="6">No records found</td>
-            </tr>
-        {% endfor %}
-        </tbody>
-    </table>
+    // Initialisation des validations pour les champs de commentaire
+    const commentaireTextareas = document.querySelectorAll('textarea[name="commentaire"]');
+    commentaireTextareas.forEach(textarea => {
+        textarea.addEventListener('input', function() {
+            updateCharCount(this);
+        });
+
+        // Initialiser le compteur au chargement
+        updateCharCount(textarea);
+    });
+
+    // Optionnel: Affichage d'un toast après suppression réussie
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('deleted')) {
+        const toast = new bootstrap.Toast(document.getElementById('successToast'));
+        document.getElementById('toastMessage').textContent = 'La Demandes a été supprimée avec succès';
+        toast.show();
+    }
+});
+
+// Fonction pour mettre à jour le compteur de caractères
+function updateCharCount(textarea) {
+    const maxLength = 255;
+    const currentLength = textarea.value.length;
+    const id = textarea.id;
+    const type = id.includes('traiter') ? 'traiter' : 'refuser';
+    const demandeId = id.split('-').pop();
+    const charCountElement = document.getElementById(`charCount-${type}-${demandeId}`);
+
+    if (charCountElement) {
+        // Mettre à jour le compteur
+        charCountElement.textContent = `${currentLength}/${maxLength} caractères`;
+
+        // Gestion visuelle
+        if (currentLength === 0 || currentLength > maxLength) {
+            textarea.classList.add('is-invalid');
+            charCountElement.classList.add('text-danger');
+            charCountElement.classList.remove('text-muted');
+        } else {
+            textarea.classList.remove('is-invalid');
+            charCountElement.classList.remove('text-danger');
+            charCountElement.classList.add('text-muted');
+        }
+    }
+}
+
+// Fonction de validation du formulaire avant soumission
+function validateForm(formId) {
+    const form = document.getElementById(formId);
+    if (!form) return true;
+
+    const textarea = form.querySelector('textarea[name="commentaire"]');
+    if (!textarea) return true;
+
+    const currentLength = textarea.value.trim().length;
+    const maxLength = 255;
+
+    // Réinitialiser l'état de validation
+    textarea.classList.remove('is-invalid');
+
+    // Vérification si vide
+    if (currentLength === 0) {
+        textarea.classList.add('is-invalid');
+        return false;
+    }
+
+    // Vérification de la longueur maximum
+    if (currentLength > maxLength) {
+        textarea.classList.add('is-invalid');
+        return false;
+    }
+
+    return true;
+}
+
+// Ajouter ce code dans votre addEventListener DOMContentLoaded
+document.addEventListener('DOMContentLoaded', function() {
+    // Code existant...
+
+    // Cacher initialement tous les messages d'erreur
+    document.querySelectorAll('.invalid-feedback').forEach(feedback => {
+        feedback.style.display = 'none';
+    });
+
+    // Ajouter des gestionnaires d'événements aux formulaires
+    document.querySelectorAll('form[id^="traiterForm-"], form[id^="refuserForm-"]').forEach(form => {
+        form.addEventListener('submit', function(event) {
+            const textarea = this.querySelector('textarea[name="commentaire"]');
+            const feedback = textarea.nextElementSibling;
+
+            if (textarea.value.trim().length === 0) {
+                event.preventDefault();
+                textarea.classList.add('is-invalid');
+                feedback.style.display = 'block';
+            }
+        });
+    });
+});
+</script>
 {% endblock %}

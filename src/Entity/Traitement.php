@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\TraitementRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+
 
 #[ORM\Entity(repositoryClass: TraitementRepository::class)]
 class Traitement
@@ -14,16 +16,22 @@ class Traitement
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(length: 50)]
     private ?string $status = null;
 
-    #[ORM\Column(type: Types::DATE_MUTABLE)]
+    #[ORM\Column(type: Types::DATETIME_MUTABLE, options: ['default' => 'CURRENT_TIMESTAMP'])]
     private ?\DateTimeInterface $date_traitement = null;
 
-    #[ORM\Column(length: 255)]
+    #[ORM\Column(type: Types::TEXT, nullable: true)]
+    #[Assert\NotBlank(message: "Le commentaire ne peut pas être vide.")]
+    #[Assert\Length(
+        max: 255,
+        maxMessage: "Le type ne peut pas dépasser {{ limit }} caractères."
+    )]
     private ?string $commentaire = null;
 
-    #[ORM\ManyToOne(inversedBy: 'traitement')]
+    #[ORM\ManyToOne(inversedBy: 'traitements')]
+    #[ORM\JoinColumn(name: "demande_id", referencedColumnName: "id", nullable: false, onDelete: "CASCADE")]
     private ?Demande $demande = null;
 
     public function getId(): ?int
@@ -60,7 +68,7 @@ class Traitement
         return $this->commentaire;
     }
 
-    public function setCommentaire(string $commentaire): static
+    public function setCommentaire(?string $commentaire): static
     {
         $this->commentaire = $commentaire;
 

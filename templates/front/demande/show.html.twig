@@ -8,13 +8,37 @@
     <h1 class="mb-4 text-center">Détails de la Demande</h1>
 
     <div class="card shadow-gray bg-light custom-card-size">
-        <div class="card-body text-center">
+        <div class="card-body">
             <h5 class="card-title">{{ demande.type }}</h5>
-            <p class="card-text">
-                <strong class="text-arial">Adresse :</strong> {{ demande.adresse }}<br>
-                <strong class="text-arial">Email utilisateur :</strong> {{ demande.emailUtilisateur }}<br>
-                <strong class="text-arial">Message :</strong> {{ demande.message }}<br>
-            </p>
+            <table class="table table-borderless">
+                <tbody>
+                    <tr>
+                        <th class="text-arial">Adresse :</th>
+                        <td>{{ demande.adresse }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-arial">Email utilisateur :</th>
+                        <td>{{ demande.emailUtilisateur }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-arial">Message :</th>
+                        <td>{{ demande.message }}</td>
+                    </tr>
+                    <tr>
+                        <th class="text-arial">État :</th>
+                        <td>
+                            {% set dernierTraitement = demande.traitements|last %}
+                            {% if dernierTraitement and dernierTraitement.status == 'Traité' %}
+                                <span class="badge bg-success">Traité</span>
+                            {% elseif dernierTraitement and dernierTraitement.status == 'Refusé' %}
+                                <span class="badge bg-danger">Refusé</span>
+                            {% else %}
+                                <span class="badge bg-warning">En cours de traitement</span>
+                            {% endif %}
+                        </td>
+                    </tr>
+                </tbody>
+            </table>
         </div>
 
         <div class="card-footer bg-white d-flex justify-content-between">
@@ -22,27 +46,26 @@
             <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
         </div>
     </div>
-
 </div>
 {% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .shadow-gray {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-        }
+{{ parent() }}
+<style>
+    .shadow-gray {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
 
-        .text-arial {
-            font-family: Arial, sans-serif;
-            color: black;
-        }
+    .text-arial {
+        font-family: Arial, sans-serif;
+        color: black;
+    }
 
-        /* Personnalisation de la taille de la carte */
-        .custom-card-size {
-            width: 40%;  /* Largeur de la carte */
-            margin: 0 auto;  /* Centrer la carte */
-            max-width: 900px;  /* Limite la largeur maximale */
-        }
-    </style>
+    /* Personnalisation de la taille de la carte */
+    .custom-card-size {
+        width: 40%;  /* Largeur de la carte */
+        margin: 0 auto;  /* Centrer la carte */
+        max-width: 900px;  /* Limite la largeur maximale */
+    }
+</style>
 {% endblock %}

@@ -1,11 +1,11 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
 
 use App\Entity\Traitement;
 use App\Form\TraitementType;
 use App\Repository\DemandeRepository;
-use App\Repository\TraitementRepository;
+use App\Repository\TraitementRepository; 
 use Doctrine\ORM\EntityManagerInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;

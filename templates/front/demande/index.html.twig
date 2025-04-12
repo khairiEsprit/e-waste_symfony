@@ -1,14 +1,11 @@
 {% extends 'front/base.html.twig' %}
 
-
 {% block title %}Liste des Demandes{% endblock %}
 
 {% block body %}
-
 <br>
 <br>
 <div class="container mt-5">
-
     <h1 class="mb-4 text-center">Liste des Demandes</h1>
 
     <div class="d-flex justify-content-end mb-4">
@@ -22,14 +19,36 @@
     {% else %}
         <div class="row row-cols-1 row-cols-md-3 g-4">
             {% for demande in demandes %}
+                {% set dernierTraitement = demande.traitements|last %}
                 <div class="col">
                     <div class="card h-100 shadow-gray bg-light">
                         <div class="card-body">
                             <h5 class="card-title">{{ demande.type }}</h5>
                             <p class="card-text">
-                                <strong class="text-arial">Adresse :</strong> {{ demande.adresse }}<br>
-                                <strong class="text-arial">Email :</strong> {{ demande.emailUtilisateur }}<br>
-                                <strong class="text-arial">Message :</strong> {{ demande.message }}
+                                <div class="d-flex align-items-center">
+                                    <h5 class="text-arial mb-0">Adresse :</h5>
+                                    <span class="ml-2">{{ demande.adresse }}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <h5 class="text-arial mb-0">Email :</h5>
+                                    <span class="ml-2">{{ demande.emailUtilisateur }}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <h5 class="text-arial mb-0">Message :</h5>
+                                    <span class="ml-2">{{ demande.message }}</span>
+                                </div>
+                                <div class="d-flex align-items-center">
+                                    <h5 class="text-arial mb-0">État :</h5>
+                                    <span class="ml-2">
+                                        {% if dernierTraitement and dernierTraitement.status == 'Traité' %}
+                                            <span class="badge bg-success">Traité</span>
+                                        {% elseif dernierTraitement and dernierTraitement.status == 'Refusé' %}
+                                            <span class="badge bg-danger">Refusé</span>
+                                        {% else %}
+                                            <span class="badge bg-warning">En cours de traitement</span>
+                                        {% endif %}
+                                    </span>
+                                </div>
                             </p>
                         </div>
                         <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
@@ -41,20 +60,19 @@
             {% endfor %}
         </div>
     {% endif %}
-
 </div>
 {% endblock %}
 
 {% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .shadow-gray {
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
-        }
-        
-        .text-arial {
-            font-family: Arial, sans-serif ;
-            color: black;
-        }
-    </style>
+{{ parent() }}
+<style>
+    .shadow-gray {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .text-arial {
+        font-family: Arial, sans-serif;
+        color: black;
+    }
+</style>
 {% endblock %}

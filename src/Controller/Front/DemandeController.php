@@ -1,5 +1,5 @@
 <?php
-namespace App\Controller;
+namespace App\Controller\Front;
 
 use App\Entity\Demande;
 use App\Entity\Traitement;
@@ -18,54 +18,51 @@ use Symfony\Component\Routing\Annotation\Route;
 #[Route('/demande')]
 final class DemandeController extends AbstractController
 {
-    #[Route('/{id}/traiter', name: 'app_demande_traiter', methods: ['POST'])]
-    public function traiter(Demande $demande, Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $commentaire = $request->request->get('commentaire');
+    // Action pour traiter une demande
+#[Route('/{id}/traiter', name: 'app_demande_traiter', methods: ['POST'])]
+public function traiter(Demande $demande, Request $request, EntityManagerInterface $entityManager): Response
+{
+    // Récupère le commentaire depuis le formulaire
+    $commentaire = $request->request->get('commentaire');
 
-        // Automatically create a Traitement entry
-        $traitement = new Traitement();
-        $traitement->setStatus('Traité');
-        $traitement->setDateTraitement(new \DateTime()); // current date and time
-        $traitement->setCommentaire($commentaire);
-        $traitement->setDemande($demande); // associate with the given Demande
+    // Crée un nouvel objet Traitement
+    $traitement = new Traitement();
+    $traitement->setStatus('Traité');
+    $traitement->setDateTraitement(new \DateTime()); // current date and time
+    $traitement->setCommentaire($commentaire);
+    $traitement->setDemande($demande); // associate with the given Demande
 
-        // Persist the traitement entry
-        $entityManager->persist($traitement);
-        $entityManager->flush();
+    // Sauvegarder le traitement dans la base de données
+    $entityManager->persist($traitement);
+    $entityManager->flush();
 
-        // Update the Demande's type to "Traité"
-        $demande->setType('Traité');
-        $entityManager->flush();
+    // Rediriger vers la liste des demandes (back office)
+    return $this->redirectToRoute('app_demande_indexback');
+}
 
-        // Redirect back to the Demande listing page
-        return $this->redirectToRoute('app_demande_indexback');
-    }
+// Action pour refuser une demande
+#[Route('/{id}/refuser', name: 'app_demande_refuser', methods: ['POST'])]
+public function refuser(Demande $demande, Request $request, EntityManagerInterface $entityManager): Response
+{
+    $commentaire = $request->request->get('commentaire');
 
-    #[Route('/{id}/refuser', name: 'app_demande_refuser', methods: ['POST'])]
-    public function refuser(Demande $demande, Request $request, EntityManagerInterface $entityManager): Response
-    {
-        $commentaire = $request->request->get('commentaire');
+    // Automatically create a Traitement entry
+    $traitement = new Traitement();
+    $traitement->setStatus('Refusé');
+    $traitement->setDateTraitement(new \DateTime()); // current date and time
+    $traitement->setCommentaire($commentaire);
+    $traitement->setDemande($demande); // associate with the given Demande
 
-        // Automatically create a Traitement entry
-        $traitement = new Traitement();
-        $traitement->setStatus('Refusé');
-        $traitement->setDateTraitement(new \DateTime()); // current date and time
-        $traitement->setCommentaire($commentaire);
-        $traitement->setDemande($demande); // associate with the given Demande
+    // Persist the traitement entry
+    $entityManager->persist($traitement);
+    $entityManager->flush();
 
-        // Persist the traitement entry
-        $entityManager->persist($traitement);
-        $entityManager->flush();
+    // Redirect back to the Demande listing page
+    return $this->redirectToRoute('app_demande_indexback');
+}
 
-        // Update the Demande's type to "Refusé"
-        $demande->setType('Refusé');
-        $entityManager->flush();
 
-        // Redirect back to the Demande listing page
-        return $this->redirectToRoute('app_demande_indexback');
-    }
-
+    // Affiche la liste des demandes (front)
     #[Route(name: 'app_demande_index', methods: ['GET'])]
     public function index(DemandeRepository $demandeRepository): Response
     {
@@ -74,6 +71,8 @@ final class DemandeController extends AbstractController
         ]);
     }
 
+
+// Affiche la liste des demandes (back office)
     #[Route(path: '/back', name: 'app_demande_indexback', methods: ['GET'])]
     public function indexBack(DemandeRepository $demandeRepository): Response
     {
@@ -82,6 +81,9 @@ final class DemandeController extends AbstractController
         ]);
     }
 
+
+    
+// Créer une nouvelle demande
     #[Route('/new', name: 'app_demande_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, UserRepository $userRepository, CenterRepository $centerRepository): Response
     {
@@ -90,13 +92,13 @@ final class DemandeController extends AbstractController
         // Fetch the user and center with id = 1
         $user = $userRepository->find(1);
         $center = $centerRepository->find(1);
-
+// Crée le formulaire de demande
         $form = $this->createForm(DemandeType::class, $demande, [
             'current_user' => $user,
             'current_center' => $center,
         ]);
         $form->handleRequest($request);
-
+// Si le formulaire est soumis et valide, enregistrer la demande
         if ($form->isSubmitted() && $form->isValid()) {
             // Set the user and center for the demande
             $demande->setUtilisateur($user);
@@ -113,7 +115,7 @@ final class DemandeController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
+// Affiche les détails d'une demande
     #[Route('/{id}', name: 'app_demande_show', methods: ['GET'])]
     public function show(Demande $demande): Response
     {
@@ -121,7 +123,7 @@ final class DemandeController extends AbstractController
             'demande' => $demande,
         ]);
     }
-
+// Modifier une demande existante
     #[Route('/{id}/edit', name: 'app_demande_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Demande $demande, EntityManagerInterface $entityManager): Response
     {
@@ -139,7 +141,7 @@ final class DemandeController extends AbstractController
             'form' => $form->createView(),
         ]);
     }
-
+// Supprimer une demande
     #[Route('/{id}', name: 'app_demande_delete', methods: ['POST'])]
     public function delete(Request $request, Demande $demande, EntityManagerInterface $entityManager): Response
     {
