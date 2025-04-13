@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
 
 use App\Entity\Plannificationtache;
 use App\Form\PlannificationtacheType;

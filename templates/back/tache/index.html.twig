@@ -1,122 +1,567 @@
+{# templates/back/tache/index.html.twig #}
 {% extends 'back/base.html.twig' %}
 
 {% block title %}Liste des Tâches{% endblock %}
 
-{% block content %}
-<div class="container mt-4">
-    <div class="d-flex justify-content-between align-items-center mb-4">
-        <h1>Liste des Tâches</h1>
-        <a href="{{ path('app_tache_new') }}" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Nouvelle tâche
-        </a>
-    </div>
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<!-- Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<style>
+    :root {
+        --primary-green: #2E7D32;
+        --secondary-green: #81C784;
+        --light-green: #E8F5E9;
+        --off-white: #F8F9FA;
+        --background-light: #F5F5F5;
+        --font-poppins: 'Poppins', sans-serif;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
 
-    <!-- Modal de confirmation -->
-    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
-        <div class="modal-dialog">
-            <div class="modal-content">
-                <div class="modal-header bg-danger text-white">
-                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation de suppression</h5>
-                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
-                </div>
-                <div class="modal-body">
-                    <p>Êtes-vous sûr de vouloir supprimer cette tâche ?</p>
-                    <p class="text-muted"><small>Cette action est irréversible.</small></p>
-                </div>
-                <div class="modal-footer">
-                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
-                    <form id="deleteForm" method="post" action="">
-                        <input type="hidden" name="_token" value="">
-                        <button type="submit" class="btn btn-danger">
-                            <i class="bi bi-trash"></i> Supprimer
-                        </button>
-                    </form>
-                </div>
+    body {
+        background-color: var(--background-light);
+        font-family: var(--font-poppins);
+        font-weight: 500;
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+    }
+
+    .main-content {
+        flex: 1;
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    h1, h2, h3, h4, h5, h6,
+    .btn, .badge, .modal-title,
+    .table-custom th {
+        font-family: var(--font-poppins);
+        font-weight: 600;
+    }
+
+    .custom-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .custom-header h1 {
+        font-size: 1.8rem;
+        letter-spacing: -0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .custom-header p {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+
+    .stats-container {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+        gap: 1.5rem;
+        margin-bottom: 1.5rem;
+    }
+
+    .chart-card {
+        background: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        box-shadow: var(--shadow-sm);
+        transition: all 0.3s ease;
+    }
+
+    .chart-card:hover {
+        transform: translateY(-5px);
+        box-shadow: var(--shadow-lg);
+    }
+
+    .chart-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 1rem;
+    }
+
+    .chart-title {
+        font-size: 1.1rem;
+        font-weight: 600;
+        color: var(--primary-green);
+        margin: 0;
+    }
+
+    .chart-container {
+        position: relative;
+        height: 250px;
+        width: 100%;
+    }
+
+    .table-container {
+        max-height: 65vh;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+    }
+
+    .table-custom {
+        border-collapse: separate;
+        border-spacing: 0;
+        background: transparent;
+        margin-bottom: 0;
+    }
+
+    .table-custom thead {
+        background-color: var(--primary-green);
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .table-custom th {
+        border: none;
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .table-custom td {
+        background-color: white;
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+        border: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+    }
+
+    .table-custom tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-custom tr:hover td {
+        background-color: var(--light-green);
+        transform: translateY(0);
+        box-shadow: none;
+    }
+
+    .status-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .badge-terminé {
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .badge-en-cours {
+        background-color: #FFC107;
+        color: #212529;
+    }
+
+    .badge-en-attente {
+        background-color: #6C757D;
+        color: white;
+    }
+
+    .btn-custom-primary {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .btn-custom-primary:hover {
+        background-color: #1B5E20;
+        border-color: #1B5E20;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .search-container {
+        position: relative;
+        margin-bottom: 1.5rem;
+    }
+
+    .search-input {
+        border: 1px solid #e0e0e0;
+        border-radius: 6px;
+        padding: 0.65rem 1.25rem 0.65rem 2.5rem;
+        transition: all 0.3s ease;
+        font-size: 0.9rem;
+        box-shadow: var(--shadow-sm);
+    }
+
+    .search-input:focus {
+        border-color: var(--primary-green);
+        box-shadow: 0 0 0 3px rgba(46, 125, 50, 0.15);
+    }
+
+    .search-icon {
+        position: absolute;
+        left: 1rem;
+        top: 50%;
+        transform: translateY(-50%);
+        color: #6c757d;
+    }
+
+    .action-buttons .btn {
+        margin: 0 2px;
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .no-results {
+        background-color: white;
+        color: var(--primary-green);
+        padding: 2rem;
+        text-align: center;
+        border-radius: 8px;
+        font-size: 1rem;
+        box-shadow: var(--shadow-sm);
+        margin: 1rem 0;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .pagination-info {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .pagination-custom .page-item.active .page-link {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+    }
+
+    .pagination-custom .page-link {
+        color: var(--primary-green);
+        border-radius: 6px;
+        margin: 0 2px;
+        font-size: 0.85rem;
+        min-width: 36px;
+        text-align: center;
+        border: none;
+    }
+
+    .pagination-custom .page-link:hover {
+        background-color: #f8f9fa;
+    }
+
+    .modal-header {
+        background-color: var(--primary-green);
+        color: white;
+        border-bottom: none;
+        padding: 1.25rem;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 1rem 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .table-custom td:nth-child(3),
+        .table-custom th:nth-child(3) {
+            display: none;
+        }
+        
+        .custom-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .action-buttons .btn {
+            width: 28px;
+            height: 28px;
+            font-size: 0.8rem;
+        }
+        
+        .pagination-container {
+            flex-direction: column;
+            gap: 1rem;
+        }
+        
+        .stats-container {
+            grid-template-columns: 1fr;
+        }
+    }
+
+    /* Animation pour les lignes du tableau */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .table-custom tbody tr {
+        animation: fadeIn 0.3s ease forwards;
+    }
+
+    .table-custom tbody tr:nth-child(odd) {
+        animation-delay: 0.05s;
+    }
+    .table-custom tbody tr:nth-child(even) {
+        animation-delay: 0.1s;
+    }
+
+    /* Custom scrollbar */
+    .table-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 main-content">
+    <div class="custom-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+            <div class="mb-3 mb-md-0">
+                <h1 class="mb-1"><i class="bi bi-list-task me-2"></i>GESTION DES TÂCHES</h1>
+                <p class="mb-0">Liste complète des tâches enregistrées</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_tache_new') }}" class="btn btn-custom-primary">
+                    <i class="bi bi-plus-lg me-1"></i>NOUVELLE TÂCHE
+                </a>
+                <a href="{{ path('app_tache_export_csv') }}" class="btn btn-outline-light" title="Exporter en CSV">
+                    <i class="bi bi-file-earmark-spreadsheet"></i>
+                </a>
             </div>
         </div>
     </div>
 
-    <div class="card mb-4">
-        <div class="card-header">
-            <h3 class="card-title">Tâches</h3>
+    {# Statistiques et graphiques #}
+    <div class="stats-container">
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">Répartition des tâches par état</h3>
+                <div class="dropdown">
+                    <button class="btn btn-sm btn-outline-secondary dropdown-toggle" type="button" id="chartDropdown" data-bs-toggle="dropdown" aria-expanded="false">
+                        <i class="bi bi-gear"></i>
+                    </button>
+                    <ul class="dropdown-menu" aria-labelledby="chartDropdown">
+                        <li><a class="dropdown-item" href="#" id="showPieChart">Diagramme circulaire</a></li>
+                        <li><a class="dropdown-item" href="#" id="showBarChart">Diagramme à barres</a></li>
+                        <li><a class="dropdown-item" href="#" id="showDoughnutChart">Diagramme en anneau</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="chart-container">
+                <canvas id="taskStatusChart"></canvas>
+            </div>
         </div>
-        <div class="card-body p-0">
-            <table class="table table-bordered table-hover">
-                <thead class="table-light">
-                    <tr>
-                        <th>ID</th>
-                        <th>ID Centre</th>
-                        <th>ID Employé</th>
-                        <th>Localisation</th>
-                        <th>Message</th>
-                        <th>État</th>
-                        <th>Actions</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for tache in taches %}
-                    <tr class="align-middle">
-                        <td>{{ tache.id }}</td>
-                        <td>{{ tache.idCentre }}</td>
-                        <td>{{ tache.idEmploye }}</td>
-                        <td>
-                            <small>Lat: {{ tache.altitude }}</small><br>
-                            <small>Lng: {{ tache.longitude }}</small>
-                        </td>
-                        <td>{{ tache.message|slice(0, 30) }}{% if tache.message|length > 30 %}...{% endif %}</td>
-                        <td>
-                            {% if tache.etat == 'Terminé' %}
-                                <span class="badge text-bg-success">{{ tache.etat }}</span>
-                            {% elseif tache.etat == 'En cours' %}
-                                <span class="badge text-bg-warning">{{ tache.etat }}</span>
-                            {% elseif tache.etat == 'En attente' %}
-                                <span class="badge text-bg-secondary">{{ tache.etat }}</span>
-                            {% else %}
-                                <span class="badge text-bg-primary">{{ tache.etat }}</span>
-                            {% endif %}
-                        </td>
-                        <td>
-                            <div class="btn-group" role="group">
-                                <a href="{{ path('app_tache_show', {'id': tache.id}) }}" class="btn btn-sm btn-info" title="Voir">
-                                    <i class="bi bi-eye"></i>
-                                </a>
-                                <a href="{{ path('app_tache_edit', {'id': tache.id}) }}" class="btn btn-sm btn-primary" title="Modifier">
-                                    <i class="bi bi-pencil"></i>
-                                </a>
-                                <button type="button" class="btn btn-sm btn-danger delete-btn" 
-                                        title="Supprimer" 
-                                        data-bs-toggle="modal" 
-                                        data-bs-target="#deleteConfirmationModal"
-                                        data-url="{{ path('app_tache_delete', {'id': tache.id}) }}"
-                                        data-token="{{ csrf_token('delete' ~ tache.id) }}">
-                                    <i class="bi bi-trash"></i>
-                                </button>
-                            </div>
-                        </td>
-                    </tr>
-                    {% else %}
-                    <tr>
-                        <td colspan="7" class="text-center">Aucune tâche trouvée</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
+
+        <div class="chart-card">
+            <div class="chart-header">
+                <h3 class="chart-title">Évolution des tâches</h3>
+                <span class="badge bg-primary">7 jours</span>
+            </div>
+            <div class="chart-container">
+                <canvas id="taskEvolutionChart"></canvas>
+            </div>
         </div>
-        <div class="card-footer">
-            <nav aria-label="Pagination">
-                <ul class="pagination justify-content-center mb-0">
-                    <li class="page-item disabled">
-                        <a class="page-link" href="#" tabindex="-1">Précédent</a>
-                    </li>
-                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
-                    <li class="page-item"><a class="page-link" href="#">2</a></li>
-                    <li class="page-item"><a class="page-link" href="#">3</a></li>
-                    <li class="page-item">
-                        <a class="page-link" href="#">Suivant</a>
-                    </li>
-                </ul>
-            </nav>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-3 p-md-4">
+            <div class="search-container">
+                <i class="bi bi-search search-icon"></i>
+                <input type="text" id="searchInput" class="form-control search-input" 
+                       placeholder="Rechercher par message, état, centre...">
+            </div>
+
+            <div class="table-container">
+                <table class="table table-custom" id="tasksTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>ID CENTRE</th>
+                            <th>ID EMPLOYÉ</th>
+                            <th>LOCALISATION</th>
+                            <th>MESSAGE</th>
+                            <th>ÉTAT</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for tache in taches %}
+                        <tr class="task-row" data-id="{{ tache.id }}">
+                            <td>{{ tache.id }}</td>
+                            <td>{{ tache.idCentre }}</td>
+                            <td>{{ tache.idEmploye }}</td>
+                            <td>
+                                <div class="d-flex flex-column">
+                                    <small class="text-muted">Lat: {{ tache.altitude }}</small>
+                                    <small class="text-muted">Lng: {{ tache.longitude }}</small>
+                                </div>
+                            </td>
+                            <td>
+                                <span class="d-inline-block text-truncate" style="max-width: 200px;" 
+                                      title="{{ tache.message }}">
+                                    {{ tache.message }}
+                                </span>
+                            </td>
+                            <td>
+                                {% if tache.etat == 'Terminé' %}
+                                    <span class="badge badge-terminé status-badge">{{ tache.etat }}</span>
+                                {% elseif tache.etat == 'En cours' %}
+                                    <span class="badge badge-en-cours status-badge">{{ tache.etat }}</span>
+                                {% elseif tache.etat == 'En attente' %}
+                                    <span class="badge badge-en-attente status-badge">{{ tache.etat }}</span>
+                                {% else %}
+                                    <span class="badge bg-primary status-badge">{{ tache.etat }}</span>
+                                {% endif %}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ path('app_tache_show', {'id': tache.id}) }}" class="btn btn-sm btn-info" title="Voir">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_tache_edit', {'id': tache.id}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <a href="{{ path('app_plannificationtache_index') }}" class="btn btn-sm btn-warning" title="Planifier">
+                                        <i class="bi bi-calendar"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger delete-btn" 
+                                            title="Supprimer" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteConfirmationModal"
+                                            data-url="{{ path('app_tache_delete', {'id': tache.id}) }}"
+                                            data-token="{{ csrf_token('delete' ~ tache.id) }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            {% if taches|length == 0 %}
+                <div class="no-results">
+                    <i class="bi bi-exclamation-circle fs-3"></i>
+                    <p class="mt-2 mb-0">AUCUNE TÂCHE DISPONIBLE</p>
+                </div>
+            {% endif %}
+
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Affichage de <span class="fw-bold">{{ taches|length }}</span> tâches
+                </div>
+                <nav>
+                    <ul class="pagination pagination-custom mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
         </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">CONFIRMATION DE SUPPRESSION</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette tâche ?</p>
+                <p class="text-muted"><small>Cette action est irréversible.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" method="post" action="">
+                    <input type="hidden" name="_token" value="">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
     </div>
 </div>
 {% endblock %}
@@ -125,25 +570,548 @@
 {{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestion de la suppression
+    // Initialisation des tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            trigger: 'hover'
+        });
+    });
+
+    // Fonction pour afficher les notifications toast
+    function showToast(message, type = 'success') {
+        const toastEl = document.getElementById('liveToast');
+        const toastHeader = toastEl.querySelector('.toast-header');
+        const toastBody = toastEl.querySelector('.toast-body');
+        
+        // Mise à jour du contenu et du style
+        toastHeader.className = 'toast-header text-white';
+        toastHeader.classList.add(`bg-${type}`);
+        toastBody.textContent = message;
+        
+        // Création d'une nouvelle instance avec durée de 3 secondes
+        const toast = new bootstrap.Toast(toastEl, {
+            delay: 3000,
+            autohide: true
+        });
+        
+        // Affichage du toast
+        toast.show();
+    }
+
+    // Afficher un toast au chargement de la page
+    showToast('Page chargée avec succès');
+
+    // Gestion de la suppression avec confirmation
     const deleteButtons = document.querySelectorAll('.delete-btn');
     const deleteForm = document.getElementById('deleteForm');
     
     deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Mise à jour du formulaire avec les données du bouton cliqué
+            const taskId = this.closest('tr').dataset.id;
             deleteForm.action = this.dataset.url;
             deleteForm.querySelector('input[name="_token"]').value = this.dataset.token;
+            
+            // Mise à jour du message de confirmation
+            const modalBody = document.querySelector('.modal-body p:first-child');
+            modalBody.textContent = `Êtes-vous sûr de vouloir supprimer la tâche #${taskId} ?`;
         });
     });
-    
-    // Optionnel: Affichage d'un toast après suppression réussie
-    const urlParams = new URLSearchParams(window.location.search);
-    if (urlParams.has('deleted')) {
-        const toast = new bootstrap.Toast(document.getElementById('successToast'));
-        document.getElementById('toastMessage').textContent = 'La tâche a été supprimée avec succès';
-        toast.show();
+
+    // Gestion de la recherche avancée
+    const searchInput = document.getElementById('searchInput');
+    const table = document.getElementById('tasksTable');
+    const tbody = table.querySelector('tbody');
+    const rows = table.querySelectorAll('tbody tr.task-row');
+    const noResultsDiv = document.querySelector('.no-results');
+
+    // Fonction de filtrage
+    function filterTable(searchTerm) {
+        let hasVisibleRows = false;
+        const term = searchTerm.toLowerCase().trim();
+        
+        rows.forEach(row => {
+            const cells = row.querySelectorAll('td');
+            let rowText = '';
+            
+            cells.forEach(cell => {
+                if (cell !== cells[cells.length - 1]) { // Exclure la colonne Actions
+                    rowText += ' ' + cell.textContent.toLowerCase();
+                }
+            });
+            
+            const isVisible = term === '' || rowText.includes(term);
+            row.style.display = isVisible ? '' : 'none';
+            
+            if (isVisible) {
+                hasVisibleRows = true;
+                // Mise en évidence des correspondances
+                if (term !== '') {
+                    highlightText(row, term);
+                } else {
+                    removeHighlights(row);
+                }
+            }
+        });
+
+        // Affiche un message si aucun résultat
+        if (!hasVisibleRows && rows.length > 0) {
+            if (!noResultsDiv) {
+                const newNoResults = document.createElement('div');
+                newNoResults.className = 'no-results my-4';
+                newNoResults.innerHTML = `
+                    <i class="bi bi-exclamation-circle fs-3"></i>
+                    <p class="mt-2 mb-0">AUCUNE TÂCHE NE CORRESPOND À VOTRE RECHERCHE</p>
+                `;
+                tbody.parentNode.insertBefore(newNoResults, tbody.nextSibling);
+            }
+        } else if (noResultsDiv && hasVisibleRows) {
+            noResultsDiv.remove();
+        }
     }
+
+    // Fonction pour mettre en évidence le texte
+    function highlightText(row, term) {
+        const cells = row.querySelectorAll('td');
+        const regex = new RegExp(term, 'gi');
+        
+        cells.forEach(cell => {
+            if (cell !== cells[cells.length - 1]) { // Exclure la colonne Actions
+                const originalText = cell.textContent;
+                const highlightedText = originalText.replace(regex, match => 
+                    `<span class="highlight">${match}</span>`);
+                
+                // Ne pas appliquer sur les éléments qui contiennent déjà du HTML
+                if (cell.innerHTML === cell.textContent) {
+                    cell.innerHTML = highlightedText;
+                }
+            }
+        });
+    }
+
+    // Fonction pour supprimer les surlignages
+    function removeHighlights(row) {
+        const highlights = row.querySelectorAll('.highlight');
+        highlights.forEach(highlight => {
+            highlight.outerHTML = highlight.textContent;
+        });
+    }
+
+    // Écouteur d'événement pour la recherche
+    searchInput.addEventListener('input', function() {
+        filterTable(this.value);
+    });
+
+    // Tri des colonnes
+    const headers = table.querySelectorAll('th');
+    headers.forEach((header, index) => {
+        if (index !== headers.length - 1) { // Exclure la colonne Actions
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', () => {
+                sortTable(index);
+            });
+        }
+    });
+
+    function sortTable(columnIndex) {
+        const rowsArray = Array.from(rows);
+        const isAsc = !table.querySelector('th').classList.contains('sorted-asc');
+        
+        rowsArray.sort((a, b) => {
+            const aText = a.querySelectorAll('td')[columnIndex].textContent.trim();
+            const bText = b.querySelectorAll('td')[columnIndex].textContent.trim();
+            
+            // Pour les colonnes numériques
+            if (columnIndex === 0) {
+                return isAsc ? aText - bText : bText - aText;
+            }
+            
+            // Pour les autres colonnes
+            return isAsc 
+                ? aText.localeCompare(bText) 
+                : bText.localeCompare(aText);
+        });
+
+        // Supprimer les anciennes lignes
+        rowsArray.forEach(row => tbody.removeChild(row));
+        
+        // Ajouter les lignes triées
+        rowsArray.forEach(row => tbody.appendChild(row));
+        
+        // Mettre à jour les classes de tri
+        headers.forEach(header => {
+            header.classList.remove('sorted-asc', 'sorted-desc');
+        });
+        
+        const sortClass = isAsc ? 'sorted-asc' : 'sorted-desc';
+        headers[columnIndex].classList.add(sortClass);
+        
+        // Afficher une notification
+        showToast(`Tableau trié par ${headers[columnIndex].textContent.trim()} (${isAsc ? 'croissant' : 'décroissant'})`);
+    }
+
+    // Animation au survol des lignes
+    rows.forEach(row => {
+        row.addEventListener('mouseenter', () => {
+            row.style.transform = 'translateX(5px)';
+            row.style.transition = 'transform 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', () => {
+            row.style.transform = '';
+        });
+    });
+
+    // Détection du scroll pour l'en-tête fixe
+    const tableContainer = document.querySelector('.table-container');
+    if (tableContainer) {
+        tableContainer.addEventListener('scroll', function() {
+            const scrollTop = this.scrollTop;
+            const thead = this.querySelector('thead');
+            
+            if (scrollTop > 0) {
+                thead.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            } else {
+                thead.style.boxShadow = 'none';
+            }
+        });
+    }
+
+    // Fonction pour rafraîchir les données
+    function refreshData() {
+        fetch(window.location.href, {
+            headers: {
+                'X-Requested-With': 'XMLHttpRequest'
+            }
+        })
+        .then(response => response.text())
+        .then(html => {
+            const parser = new DOMParser();
+            const doc = parser.parseFromString(html, 'text/html');
+            const newTable = doc.getElementById('tasksTable');
+            
+            if (newTable) {
+                table.innerHTML = newTable.innerHTML;
+                showToast('Données mises à jour avec succès');
+                
+                // Réinitialiser les écouteurs d'événements après rafraîchissement
+                initializeEventListeners();
+            }
+        })
+        .catch(error => {
+            console.error('Error:', error);
+            showToast('Erreur lors de la mise à jour', 'danger');
+        });
+    }
+
+    // Fonction pour réinitialiser les écouteurs d'événements
+    function initializeEventListeners() {
+        // Réinitialiser les écouteurs nécessaires ici
+        // (comme les écouteurs de suppression, etc.)
+    }
+
+    // Rafraîchissement automatique toutes les 30 secondes
+    setInterval(refreshData, 30000);
+
+    // =============================================
+    // GESTION DES GRAPHIQUES
+    // =============================================
+
+    // Compter les tâches par état
+    function countTasksByStatus() {
+        const counts = {
+            'Terminé': 0,
+            'En cours': 0,
+            'En attente': 0,
+            'Autre': 0
+        };
+
+        document.querySelectorAll('.status-badge').forEach(badge => {
+            const status = badge.textContent.trim();
+            if (status === 'Terminé') counts['Terminé']++;
+            else if (status === 'En cours') counts['En cours']++;
+            else if (status === 'En attente') counts['En attente']++;
+            else counts['Autre']++;
+        });
+
+        return counts;
+    }
+
+    // Données pour les graphiques
+    const taskStatusCounts = countTasksByStatus();
+    const statusLabels = Object.keys(taskStatusCounts);
+    const statusData = Object.values(taskStatusCounts);
+    const statusColors = ['#4CAF50', '#FFC107', '#6C757D', '#2196F3'];
+    const hoverColors = ['#388E3C', '#FFA000', '#5A6268', '#1976D2'];
+
+    // Création du graphique principal (camembert par défaut)
+    const taskStatusCtx = document.getElementById('taskStatusChart').getContext('2d');
+    let taskStatusChart = new Chart(taskStatusCtx, {
+        type: 'pie',
+        data: {
+            labels: statusLabels,
+            datasets: [{
+                data: statusData,
+                backgroundColor: statusColors,
+                hoverBackgroundColor: hoverColors,
+                borderWidth: 1,
+                borderColor: '#fff'
+            }]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'right',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            family: 'Poppins',
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleFont: {
+                        family: 'Poppins',
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        family: 'Poppins',
+                        size: 12
+                    },
+                    callbacks: {
+                        label: function(context) {
+                            const label = context.label || '';
+                            const value = context.raw || 0;
+                            const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                            const percentage = Math.round((value / total) * 100);
+                            return `${label}: ${value} (${percentage}%)`;
+                        }
+                    }
+                }
+            },
+            animation: {
+                animateScale: true,
+                animateRotate: true
+            },
+            cutout: '70%', // Pour le diagramme en anneau
+            onHover: (event, chartElement) => {
+                if (event.native) {
+                    const target = event.native.target;
+                    target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                }
+            },
+            onClick: (event, elements) => {
+                if (elements && elements.length > 0) {
+                    const index = elements[0].index;
+                    const status = statusLabels[index];
+                    searchInput.value = status;
+                    filterTable(status);
+                }
+            }
+        }
+    });
+
+    // Graphique d'évolution (exemple avec des données factices)
+    const taskEvolutionCtx = document.getElementById('taskEvolutionChart').getContext('2d');
+    const taskEvolutionChart = new Chart(taskEvolutionCtx, {
+        type: 'line',
+        data: {
+            labels: ['Lun', 'Mar', 'Mer', 'Jeu', 'Ven', 'Sam', 'Dim'],
+            datasets: [
+                {
+                    label: 'Terminé',
+                    data: [12, 19, 8, 15, 22, 10, 5],
+                    borderColor: '#4CAF50',
+                    backgroundColor: 'rgba(76, 175, 80, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'En cours',
+                    data: [5, 10, 15, 8, 12, 18, 10],
+                    borderColor: '#FFC107',
+                    backgroundColor: 'rgba(255, 193, 7, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                },
+                {
+                    label: 'En attente',
+                    data: [8, 5, 12, 6, 10, 5, 15],
+                    borderColor: '#6C757D',
+                    backgroundColor: 'rgba(108, 117, 125, 0.1)',
+                    tension: 0.3,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    position: 'top',
+                    labels: {
+                        usePointStyle: true,
+                        padding: 20,
+                        font: {
+                            family: 'Poppins',
+                            size: 12
+                        }
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(0,0,0,0.8)',
+                    titleFont: {
+                        family: 'Poppins',
+                        size: 14,
+                        weight: 'bold'
+                    },
+                    bodyFont: {
+                        family: 'Poppins',
+                        size: 12
+                    },
+                    mode: 'index',
+                    intersect: false
+                }
+            },
+            scales: {
+                y: {
+                    beginAtZero: true,
+                    grid: {
+                        drawBorder: false
+                    }
+                },
+                x: {
+                    grid: {
+                        display: false
+                    }
+                }
+            },
+            interaction: {
+                mode: 'nearest',
+                axis: 'x',
+                intersect: false
+            },
+            onHover: (event, chartElement) => {
+                if (event.native) {
+                    const target = event.native.target;
+                    target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                }
+            }
+        }
+    });
+
+    // Changement du type de graphique
+    document.getElementById('showPieChart').addEventListener('click', function(e) {
+        e.preventDefault();
+        changeChartType('pie');
+    });
+
+    document.getElementById('showBarChart').addEventListener('click', function(e) {
+        e.preventDefault();
+        changeChartType('bar');
+    });
+
+    document.getElementById('showDoughnutChart').addEventListener('click', function(e) {
+        e.preventDefault();
+        changeChartType('doughnut');
+    });
+
+    function changeChartType(type) {
+        // Détruire l'ancien graphique
+        taskStatusChart.destroy();
+        
+        // Créer un nouveau graphique avec le type sélectionné
+        taskStatusChart = new Chart(taskStatusCtx, {
+            type: type,
+            data: {
+                labels: statusLabels,
+                datasets: [{
+                    data: statusData,
+                    backgroundColor: statusColors,
+                    hoverBackgroundColor: hoverColors,
+                    borderWidth: 1,
+                    borderColor: '#fff'
+                }]
+            },
+            options: {
+                responsive: true,
+                maintainAspectRatio: false,
+                plugins: {
+                    legend: {
+                        position: 'right',
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: {
+                                family: 'Poppins',
+                                size: 12
+                            }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(0,0,0,0.8)',
+                        titleFont: {
+                            family: 'Poppins',
+                            size: 14,
+                            weight: 'bold'
+                        },
+                        bodyFont: {
+                            family: 'Poppins',
+                            size: 12
+                        },
+                        callbacks: {
+                            label: function(context) {
+                                const label = context.label || '';
+                                const value = context.raw || 0;
+                                const total = context.dataset.data.reduce((a, b) => a + b, 0);
+                                const percentage = Math.round((value / total) * 100);
+                                return `${label}: ${value} (${percentage}%)`;
+                            }
+                        }
+                    }
+                },
+                animation: {
+                    animateScale: true,
+                    animateRotate: true
+                },
+                cutout: type === 'doughnut' ? '70%' : undefined,
+                onHover: (event, chartElement) => {
+                    if (event.native) {
+                        const target = event.native.target;
+                        target.style.cursor = chartElement[0] ? 'pointer' : 'default';
+                    }
+                },
+                onClick: (event, elements) => {
+                    if (elements && elements.length > 0) {
+                        const index = elements[0].index;
+                        const status = statusLabels[index];
+                        searchInput.value = status;
+                        filterTable(status);
+                    }
+                }
+            }
+        });
+    }
+
+    // Mise à jour des graphiques lors du rafraîchissement des données
+    function updateCharts() {
+        const newCounts = countTasksByStatus();
+        taskStatusChart.data.datasets[0].data = Object.values(newCounts);
+        taskStatusChart.update();
+        
+        // Ici vous pourriez aussi mettre à jour le graphique d'évolution
+        // avec de nouvelles données si nécessaire
+    }
+
+    // Mettre à jour les graphiques toutes les 30 secondes
+    setInterval(updateCharts, 30000);
 });
 </script>
 {% endblock %}
