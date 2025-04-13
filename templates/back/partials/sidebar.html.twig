@@ -19,11 +19,18 @@
               data-accordion="false"
             >
               <li class="nav-item">
-                <a href="#" class="nav-link">
+                <a href="{{ path('back_dashboard') }}" class="nav-link">
+                  <i class="nav-icon bi bi-speedometer"></i>
+                  <p>
+                    Dashboard
+                  </p>
+                </a>
+              </li>
+              <li class="nav-item">
+                <a href="{{ path('back_map_activity') }}" class="nav-link">
                   <i class="nav-icon bi bi-map"></i>
                   <p>
                     Maps View
-                    <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
               </li>
@@ -32,7 +39,6 @@
                   <i class="nav-icon bi bi-building"></i>
                   <p>
                     Centres
-                    <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
               </li>
@@ -41,7 +47,6 @@
                   <i class="nav-icon bi bi-trash"></i>
                   <p>
                     Poubelles
-                    <i class="nav-arrow bi bi-chevron-right"></i>
                   </p>
                 </a>
               </li>

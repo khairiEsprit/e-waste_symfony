@@ -1,0 +1,560 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Map Activity - E-Waste{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.css" rel="stylesheet">
+    <style>
+        #map {
+            width: 100%;
+            height: 600px;
+            border-radius: 8px;
+        }
+        .map-container {
+            position: relative;
+        }
+        .info-card {
+            background-color: #fff;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            height: 600px;
+            display: flex;
+            flex-direction: column;
+        }
+        .info-card h4 {
+            margin-bottom: 15px;
+            color: #333;
+            border-bottom: 2px solid #4CAF50;
+            padding-bottom: 10px;
+        }
+        .trash-item {
+            padding: 10px;
+            margin-bottom: 10px;
+            border-radius: 5px;
+            border-left: 4px solid #4CAF50;
+            background-color: #f9f9f9;
+        }
+        .trash-item.critical {
+            border-left-color: #f44336;
+        }
+        .trash-item.warning {
+            border-left-color: #ff9800;
+        }
+        .trash-item.normal {
+            border-left-color: #4CAF50;
+        }
+        .fill-level {
+            height: 8px;
+            border-radius: 4px;
+            background-color: #e0e0e0;
+            margin-top: 5px;
+            overflow: hidden;
+        }
+        .fill-level-bar {
+            height: 100%;
+            border-radius: 4px;
+        }
+        .fill-critical {
+            background-color: #f44336;
+        }
+        .fill-warning {
+            background-color: #ff9800;
+        }
+        .fill-normal {
+            background-color: #4CAF50;
+        }
+        .mapboxgl-popup {
+            max-width: 200px;
+        }
+        .mapboxgl-popup-content {
+            padding: 15px;
+        }
+        .center-marker {
+            background-color: #4285F4;
+            border: 2px solid white;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+        }
+        .trash-marker {
+            width: 30px;
+            height: 30px;
+            border-radius: 50%;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: white;
+            font-weight: bold;
+        }
+        .trash-list {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 15px;
+        }
+        .activity-log {
+            margin-top: 10px;
+            padding: 10px;
+            background-color: #f5f5f5;
+            border-radius: 5px;
+            height: 180px;
+            overflow-y: auto;
+        }
+        .log-entry {
+            padding: 5px 0;
+            border-bottom: 1px solid #e0e0e0;
+            font-size: 0.9rem;
+        }
+        .log-entry:last-child {
+            border-bottom: none;
+        }
+        .log-time {
+            color: #757575;
+            font-size: 0.8rem;
+        }
+        .order-marker {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border-radius: 50%;
+            font-weight: bold;
+            box-shadow: 0 0 0 2px white, 0 0 5px rgba(0,0,0,0.3);
+            z-index: 5;
+        }
+        .route-legend {
+            background: white;
+            padding: 10px;
+            margin-top: 10px;
+            border-radius: 4px;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+        }
+        .legend-item {
+            display: flex;
+            align-items: center;
+            margin-bottom: 5px;
+        }
+        .legend-color {
+            width: 15px;
+            height: 15px;
+            border-radius: 50%;
+            margin-right: 8px;
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://api.mapbox.com/mapbox-gl-js/v2.15.0/mapbox-gl.js"></script>
+    <script src="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.js"></script>
+    <link rel="stylesheet" href="https://api.mapbox.com/mapbox-gl-js/plugins/mapbox-gl-directions/v4.1.1/mapbox-gl-directions.css" type="text/css">
+{% endblock %}
+
+{% block content %}
+    <!--begin::App Content Header-->
+    <div class="app-content-header">
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <!--begin::Row-->
+            <div class="row">
+                <div class="col-sm-6"><h3 class="mb-0">Map Activity</h3></div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="{{ path('back_dashboard') }}">Home</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">Map Activity</li>
+                    </ol>
+                </div>
+            </div>
+            <!--end::Row-->
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::App Content Header-->
+
+    <!--begin::App Content-->
+    <div class="app-content">
+        <!--begin::Container-->
+        <div class="container-fluid">
+            <div class="row">
+                <!-- Map Column -->
+                <div class="col-lg-8 mb-4">
+                    <div class="card">
+                        <div class="card-header d-flex justify-content-between align-items-center">
+                            <h5 class="card-title">Trash Collection Map</h5>
+                            <button id="calculate-route-btn" class="btn btn-primary btn-sm">
+                                <i class="bi bi-arrow-repeat me-1"></i> Calculate Optimized Route to the Fist fill Trash
+                            </button>
+                        </div>
+                        <div class="card-body">
+                            <div id="map" class="map-container"></div>
+                            <div id="route-info" class="mt-2 p-2 bg-light rounded" style="display: none;">
+                                <div class="d-flex justify-content-between">
+                                    <div><strong>Total Distance:</strong> <span id="route-distance">0</span> km</div>
+                                    <div><strong>Estimated Time:</strong> <span id="route-duration">0</span> min</div>
+                                </div>
+                                <div class="route-legend mt-2">
+                                    <div class="legend-title"><small><strong>Route Order:</strong> Collection center to containers by fill level</small></div>
+                                    <div class="d-flex mt-1">
+                                        <div class="legend-item me-3">
+                                            <div class="legend-color" style="background-color: #4285F4;"></div>
+                                            <small>Collection Center</small>
+                                        </div>
+                                        <div class="legend-item me-3">
+                                            <div class="legend-color" style="background-color: #f44336;"></div>
+                                            <small>Critical (>75%)</small>
+                                        </div>
+                                        <div class="legend-item me-3">
+                                            <div class="legend-color" style="background-color: #ff9800;"></div>
+                                            <small>Warning (>50%)</small>
+                                        </div>
+                                        <div class="legend-item">
+                                            <div class="legend-color" style="background-color: #4CAF50;"></div>
+                                            <small>Normal (<50%)</small>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <!-- Info Column -->
+                <div class="col-lg-4">
+                    <div class="card info-card">
+                        <h4>Real-time Information</h4>
+                        <div class="trash-list">
+                            {% for trash in trashLocations %}
+                                {% set statusClass = trash.status == 'Critical' ? 'critical' : (trash.status == 'Warning' ? 'warning' : 'normal') %}
+                                {% set fillClass = trash.fillLevel > 75 ? 'fill-critical' : (trash.fillLevel > 50 ? 'fill-warning' : 'fill-normal') %}
+                                
+                                <div class="trash-item {{ statusClass }}" data-id="{{ trash.id }}">
+                                    <div class="d-flex justify-content-between">
+                                        <strong>{{ trash.name }}</strong>
+                                        <span class="badge {{ statusClass == 'critical' ? 'bg-danger' : (statusClass == 'warning' ? 'bg-warning' : 'bg-success') }}">{{ trash.status }}</span>
+                                    </div>
+                                    <div class="mt-2">Fill Level: {{ trash.fillLevel }}%</div>
+                                    <div class="fill-level">
+                                        <div class="fill-level-bar {{ fillClass }}" style="width: {{ trash.fillLevel }}%"></div>
+                                    </div>
+                                </div>
+                            {% endfor %}
+                        </div>
+                        
+                        <div class="activity-log">
+                            <h5>Activity Log</h5>
+                            <div class="log-entries">
+                                <div class="log-entry">
+                                    <div class="log-time">{{ "now"|date("H:i:s") }}</div>
+                                    <div>Map initialized with {{ trashLocations|length }} trash containers</div>
+                                </div>
+                                <div class="log-entry">
+                                    <div class="log-time">{{ "now"|date("H:i:s") }}</div>
+                                    <div>Routes calculated from collection center</div>
+                                </div>
+                                <div class="log-entry">
+                                    <div class="log-time">{{ "now"|date("H:i:s") }}</div>
+                                    <div>Trash container #1 is at critical level (85%)</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+        <!--end::Container-->
+    </div>
+    <!--end::App Content-->
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Mapbox
+            mapboxgl.accessToken = '{{ mapboxKey }}';
+            const map = new mapboxgl.Map({
+                container: 'map',
+                style: 'mapbox://styles/mapbox/streets-v12',
+                center: [{{ centerLocation.longitude }}, {{ centerLocation.latitude }}],
+                zoom: 13
+            });
+
+            // Add navigation controls
+            map.addControl(new mapboxgl.NavigationControl());
+
+            // Add center marker
+            const centerEl = document.createElement('div');
+            centerEl.className = 'center-marker';
+            
+            new mapboxgl.Marker({
+                element: centerEl,
+                anchor: 'center'
+            })
+            .setLngLat([{{ centerLocation.longitude }}, {{ centerLocation.latitude }}])
+            .setPopup(new mapboxgl.Popup().setHTML('<h6>{{ centerLocation.name }}</h6><p>Collection Center</p>'))
+            .addTo(map);
+
+            // Add trash markers
+            const trashLocations = {{ trashLocations|json_encode|raw }};
+            const markers = [];
+            
+            trashLocations.forEach(trash => {
+                // Create custom marker element
+                const el = document.createElement('div');
+                el.className = 'trash-marker';
+                el.style.backgroundColor = trash.fillLevel > 75 ? '#f44336' : (trash.fillLevel > 50 ? '#ff9800' : '#4CAF50');
+                el.innerHTML = '<i class="bi bi-trash"></i>';
+                
+                // Create marker
+                const marker = new mapboxgl.Marker({
+                    element: el,
+                    anchor: 'center'
+                })
+                .setLngLat([trash.longitude, trash.latitude])
+                .setPopup(new mapboxgl.Popup()
+                    .setHTML(`
+                    <h6>${trash.name}</h6>
+                    <p>Fill Level: ${trash.fillLevel}%</p>
+                    <p>Status: ${trash.status}</p>
+                `)
+                )
+                .addTo(map);
+                
+                // Store popup reference for event handling
+                const popup = marker.getPopup();
+                popup.on('open', function() {
+                    addLogEntry(`Viewing details for ${trash.name}`);
+                });
+                
+                // Store trash data with marker for reference
+                marker._trashData = trash;
+                markers.push(marker);
+                
+                // Add click event to marker (only one event listener)
+                el.addEventListener('click', () => {
+                    addLogEntry(`Clicked on ${trash.name} (${trash.fillLevel}% full)`);
+                });
+                
+                // Highlight corresponding item in the list when hovering over marker
+                el.addEventListener('mouseenter', () => {
+                    const listItem = document.querySelector(`.trash-item[data-id="${trash.id}"]`);
+                    if (listItem) {
+                        listItem.style.backgroundColor = '#e8f5e9';
+                    }
+                });
+                
+                el.addEventListener('mouseleave', () => {
+                    const listItem = document.querySelector(`.trash-item[data-id="${trash.id}"]`);
+                    if (listItem) {
+                        listItem.style.backgroundColor = '#f9f9f9';
+                    }
+                });
+            });
+
+            // Add directions control
+            const directions = new MapboxDirections({
+                accessToken: mapboxgl.accessToken,
+                unit: 'metric',
+                profile: 'mapbox/driving',
+                alternatives: false,
+                geometries: 'geojson',
+                controls: { instructions: false },
+                flyTo: false,
+                interactive: false // Disable interactive editing of the route
+            });
+            
+            // Add the directions control to the map
+            map.addControl(directions, 'top-left');
+            
+            // Clear existing static log entries
+            document.querySelector('.log-entries').innerHTML = '';
+
+            // Add map movement events to log user interactions
+            map.on('moveend', function() {
+                // Only log significant movements (zoom changes or panning)
+                if (map._zooming || map._rotating) {
+                    addLogEntry(`Map view changed - zoom level: ${Math.round(map.getZoom())}`); 
+                }
+            });
+            
+            map.on('load', function() {
+                // Clear any static entries that were added during server-side rendering
+                document.querySelector('.log-entries').innerHTML = '';
+                
+                // Add log entry for map initialization
+                addLogEntry(`Map initialized with ${trashLocations.length} trash containers`);
+                addLogEntry(`Click 'Calculate Optimized Route' to create a route from collection center to trash containers`);
+                
+                // Show the collection center and trash containers on initial load
+                // The actual route will be calculated when the user clicks the button
+                
+                // Add event listeners for trash items in the list
+                document.querySelectorAll('.trash-item').forEach(item => {
+                    item.addEventListener('click', () => {
+                        const trashId = parseInt(item.getAttribute('data-id'));
+                        const trash = trashLocations.find(t => t.id === trashId);
+                        
+                        if (trash) {
+                            // Add log entry before actions
+                            addLogEntry(`Selected ${trash.name} from list`);
+                            
+                            // Fly to the trash location
+                            map.flyTo({
+                                center: [trash.longitude, trash.latitude],
+                                zoom: 15,
+                                essential: true
+                            });
+                            
+                            // Open the popup
+                            markers.forEach(marker => {
+                                const markerTrash = marker._trashData;
+                                if (markerTrash && markerTrash.id === trashId) {
+                                    marker.togglePopup();
+                                }
+                            });
+                            
+                            // Set as destination
+                            directions.setDestination([trash.longitude, trash.latitude]);
+                            
+                            // Add log entry after actions
+                            addLogEntry(`Set ${trash.name} as route destination`);
+                        }
+                    });
+                });
+                
+                // Function to add waypoints sequentially to create a complete route
+                function addWaypointsSequentially(waypoints, index) {
+                    if (index >= waypoints.length) {
+                        // All waypoints added
+                        addLogEntry(`Complete route created with ${waypoints.length + 1} stops`);
+                        return;
+                    }
+                    
+                    // Get the current waypoint
+                    const waypoint = waypoints[index];
+                    
+                    // Add the waypoint to the route
+                    directions.addWaypoint(index, waypoint.coordinates);
+                    
+                    // Add log entry
+                    addLogEntry(`Adding stop #${index + 2}: ${waypoint.name} (${waypoint.fillLevel}% full)`);
+                    
+                    // Add visual indicator for the route order
+                    new mapboxgl.Marker({
+                        element: createOrderMarker(index + 2),
+                        anchor: 'center'
+                    })
+                    .setLngLat(waypoint.coordinates)
+                    .addTo(map);
+                    
+                    // Continue with the next waypoint after a delay
+                    setTimeout(() => {
+                        addWaypointsSequentially(waypoints, index + 1);
+                    }, 500);
+                }
+                
+                // Function to create a marker showing the order number
+                function createOrderMarker(number) {
+                    const el = document.createElement('div');
+                    el.className = 'trash-marker order-marker';
+                    el.style.backgroundColor = '#333';
+                    el.style.width = '20px';
+                    el.style.height = '20px';
+                    el.style.fontSize = '12px';
+                    el.style.zIndex = '10';
+                    el.style.border = '2px solid white';
+                    el.innerHTML = number;
+                    return el;
+                }
+            });
+
+            // Function to add log entries
+            function addLogEntry(message) {
+                const logEntries = document.querySelector('.log-entries');
+                const now = new Date();
+                const timeString = now.getHours().toString().padStart(2, '0') + ':' + 
+                                  now.getMinutes().toString().padStart(2, '0') + ':' + 
+                                  now.getSeconds().toString().padStart(2, '0');
+                
+                const entry = document.createElement('div');
+                entry.className = 'log-entry';
+                entry.innerHTML = `
+                    <div class="log-time">${timeString}</div>
+                    <div>${message}</div>
+                `;
+                
+                logEntries.prepend(entry);
+                
+                // Limit the number of log entries to prevent overflow
+                const entries = logEntries.querySelectorAll('.log-entry');
+                if (entries.length > 20) {
+                    entries[entries.length - 1].remove();
+                }
+            }
+            
+            // Add event listener for the calculate route button
+            document.getElementById('calculate-route-btn').addEventListener('click', function() {
+                // Clear any existing routes
+                directions.removeRoutes();
+                
+                // Remove any existing order markers
+                document.querySelectorAll('.order-marker').forEach(el => el.remove());
+                
+                // Set origin to collection center
+                const centerCoords = [{{ centerLocation.longitude }}, {{ centerLocation.latitude }}];
+                directions.setOrigin(centerCoords);
+                
+                // Sort trash locations by fill level (highest to lowest)
+                const sortedLocations = [...trashLocations].sort((a, b) => b.fillLevel - a.fillLevel);
+                
+                // Add log entry for route calculation
+                addLogEntry(`Calculating new optimized route based on current fill levels`);
+                
+                // Create route with waypoints in order of fill level
+                if (sortedLocations.length > 0) {
+                    // Set the first destination (highest fill level)
+                    const firstDestination = [sortedLocations[0].longitude, sortedLocations[0].latitude];
+                    directions.setDestination(firstDestination);
+                    
+                    // Add log entry for first destination
+                    addLogEntry(`Primary destination set to ${sortedLocations[0].name} (${sortedLocations[0].fillLevel}% full)`);
+                    
+                    // Create waypoints for remaining locations
+                    const waypoints = [];
+                    if (sortedLocations.length > 1) {
+                        // Create waypoints for locations 2 to end
+                        for (let i = 1; i < sortedLocations.length; i++) {
+                            waypoints.push({
+                                coordinates: [sortedLocations[i].longitude, sortedLocations[i].latitude],
+                                name: sortedLocations[i].name,
+                                fillLevel: sortedLocations[i].fillLevel
+                            });
+                        }
+                        
+                        // Add waypoints to the route
+                        setTimeout(() => {
+                            // Add waypoints one by one to create the route
+                            addWaypointsSequentially(waypoints, 0);
+                        }, 1000);
+                    }
+                    
+                    // Show the route info container
+                    document.getElementById('route-info').style.display = 'block';
+                }
+            });
+            
+            // Listen for route updates to display distance and duration
+            directions.on('route', (e) => {
+                if (e && e.route && e.route[0]) {
+                    const route = e.route[0];
+                    const distance = (route.distance / 1000).toFixed(2); // Convert to km
+                    const duration = Math.round(route.duration / 60); // Convert to minutes
+                    
+                    document.getElementById('route-distance').textContent = distance;
+                    document.getElementById('route-duration').textContent = duration;
+                    
+                    // Add log entry with route details
+                    addLogEntry(`Route updated: ${distance} km, approximately ${duration} minutes`);
+                }
+            });
+        });
+    </script>
+{% endblock %}
