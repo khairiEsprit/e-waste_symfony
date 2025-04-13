@@ -61,22 +61,6 @@ class AvisType extends AbstractType
                     'placeholder' => 'Décrivez votre expérience...'
                 ]
             ])
-            ->add('description', TextareaType::class, [
-                'label' => 'Description détaillée (optionnelle)',
-                'required' => false,
-                'constraints' => [
-                    new Length([
-                        'max' => 1000,
-                        'maxMessage' => 'La description ne doit pas dépasser {{ limit }} caractères',
-                        'groups' => ['create', 'update']
-                    ])
-                ],
-                'attr' => [
-                    'class' => 'form-control',
-                    'rows' => 4,
-                    'placeholder' => 'Ajoutez des détails supplémentaires si nécessaire...'
-                ]
-            ])
             ->add('note', IntegerType::class, [
                 
                 'constraints' => [

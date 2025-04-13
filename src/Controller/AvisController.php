@@ -141,16 +141,30 @@ class AvisController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
-            $errors = $this->validator->validate($avi, null, ['update']);
+            try {
+                // Get the note value directly from the request if it exists
+                $formData = $request->request->all();
+                if (isset($formData['avis']) && isset($formData['avis']['note']) && !empty($formData['avis']['note'])) {
+                    $noteValue = (int) $formData['avis']['note'];
+                    if ($noteValue >= 1 && $noteValue <= 5) {
+                        $avi->setNote($noteValue);
+                    }
+                }
+                
+                $errors = $this->validator->validate($avi, null, ['update']);
 
-            if ($form->isValid() && count($errors) === 0) {
-                $this->entityManager->flush();
-                $this->addFlash('success', 'L\'avis a été mis à jour avec succès !');
-                return $this->redirectToRoute('app_avis_show', ['id' => $avi->getId()]);
-            }
+                if ($form->isValid() && count($errors) === 0) {
+                    $this->entityManager->flush();
+                    $this->addFlash('success', 'L\'avis a été mis à jour avec succès !');
+                    return $this->redirectToRoute('app_avis_show', ['id' => $avi->getId()]);
+                }
 
-            foreach ($errors as $error) {
-                $this->addFlash('error', $error->getMessage());
+                foreach ($errors as $error) {
+                    $this->addFlash('error', $error->getMessage());
+                }
+                
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'avis : ' . $e->getMessage());
             }
         }
 

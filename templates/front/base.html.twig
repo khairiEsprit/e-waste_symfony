@@ -40,6 +40,11 @@
     <!-- Header -->
     {% include 'front/partials/_nav.html.twig' %}
 
+    <!-- Flash Messages -->
+    <div class="container mt-4">
+        {% include 'front/partials/_flash_messages.html.twig' %}
+    </div>
+
     <!-- Main Content -->
     {% block body %}{% endblock %}
 

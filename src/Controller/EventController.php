@@ -59,18 +59,34 @@ final class EventController extends AbstractController
     #[Route('/{id}/edit', name: 'app_event_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
+        // Store original title to display in success message
+        $originalTitle = $event->getTitle();
+        
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
 
-        if ($form->isSubmitted() && $form->isValid()) {
-            try {
-                $entityManager->flush();
+        if ($form->isSubmitted()) {
+            if ($form->isValid()) {
+                try {
+                    // Save changes to database
+                    $entityManager->flush();
 
-                $this->addFlash('success', 'L\'événement "'.$event->getTitle().'" a été mis à jour avec succès !');
-                return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+                    // Add success message
+                    $this->addFlash('success', 'L\'événement "'.$originalTitle.'" a été mis à jour avec succès !');
+                    
+                    // Redirect to show page with success message
+                    return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
 
-            } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'événement');
+                } catch (\Exception $e) {
+                    // Log the error for debugging
+                    error_log($e->getMessage());
+                    
+                    // Add error message
+                    $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'événement : ' . $e->getMessage());
+                }
+            } else {
+                // Form validation errors
+                $this->addFlash('error', 'Veuillez corriger les erreurs dans le formulaire.');
             }
         }
 

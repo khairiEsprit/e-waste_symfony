@@ -37,26 +37,6 @@
         }) }}
     </div>
 
-    {# Champ Description #}
-    <div class="mb-4">
-        {{ form_label(form.description, 'Description détaillée (optionnelle)', {
-            'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #013220;'}
-        }) }}
-        {{ form_widget(form.description, {
-            'attr': {
-                'class': 'form-control',
-                'style': 'border-color: #29AB87;',
-                'rows': 4,
-                'placeholder': 'Ajoutez des détails supplémentaires si nécessaire...',
-                'id': 'avis_description'
-            }
-        }) }}
-        <div class="error-message text-danger mt-2" id="description-error"></div>
-        {{ form_errors(form.description, {
-            'attr': {'class': 'alert alert-danger mt-2 py-2'}
-        }) }}
-    </div>
-
     {# Champ Note #}
     <div class="mb-4">
         <label class="form-label fw-bold" style="color: #013220;">

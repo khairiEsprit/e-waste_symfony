@@ -3,15 +3,7 @@
 {% block content %}
     <div class="app-content">
         <div class="container-fluid">
-            <!-- Affichage des messages flash -->
-            {% for type, messages in app.flashes %}
-                {% for message in messages %}
-                    <div class="alert alert-{{ type }} alert-dismissible fade show mb-4">
-                        {{ message }}
-                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                    </div>
-                {% endfor %}
-            {% endfor %}
+                        {# Les messages flash seront affichés via SweetAlert2 dans le script #}
 
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3 mb-0" style="color: #013220;">Modifier {{ event.title }}</h1>
@@ -94,7 +86,7 @@
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <button type="button" class="btn px-4" style="background-color: #29AB87; color: white;" id="submit-btn">
+                        <button type="submit" class="btn px-4" style="background-color: #29AB87; color: white;" id="submit-btn">
                             <i class="fas fa-save me-2"></i> Mettre à jour
                         </button>
                     </div>
@@ -136,30 +128,39 @@
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 
     <script>
-        // Validation côté client
-        (function() {
-            'use strict';
-            const forms = document.querySelectorAll('.needs-validation');
-
-            Array.from(forms).forEach(form => {
-                form.addEventListener('submit', function(event) {
-                    if (!form.checkValidity()) {
-                        event.preventDefault();
-                        event.stopPropagation();
-                    }
-                    form.classList.add('was-validated');
-                }, false);
-            });
-        })();
-
-        // Gestion de la confirmation avant mise à jour
-        document.getElementById('submit-btn').addEventListener('click', function(e) {
-            e.preventDefault();
-
+        document.addEventListener('DOMContentLoaded', function() {
             const form = document.getElementById('event-form');
-            form.classList.add('was-validated');
-
-            if (form.checkValidity()) {
+            const submitBtn = document.getElementById('submit-btn');
+            
+            // Désactiver la validation HTML5 native pour utiliser notre propre validation
+            form.setAttribute('novalidate', 'novalidate');
+            
+            form.addEventListener('submit', function(event) {
+                // Empêcher la soumission par défaut
+                event.preventDefault();
+                
+                // Validation manuelle du formulaire
+                let isValid = true;
+                const requiredFields = form.querySelectorAll('[required]');
+                
+                // Vérifier chaque champ requis
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('is-invalid');
+                    } else {
+                        field.classList.remove('is-invalid');
+                        field.classList.add('is-valid');
+                    }
+                });
+                
+                // Si le formulaire n'est pas valide, arrêter ici
+                if (!isValid) {
+                    form.classList.add('was-validated');
+                    return false;
+                }
+                
+                // Si le formulaire est valide, afficher la confirmation
                 Swal.fire({
                     title: 'Confirmer la modification',
                     text: 'Voulez-vous mettre à jour cet événement ?',
@@ -175,10 +176,28 @@
                     }
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Soumettre le formulaire directement sans événement
                         form.submit();
                     }
                 });
-            }
+                
+                return false;
+            });
+            
+            // Afficher les alertes de succès avec SweetAlert2 si présentes
+            {% for message in app.flashes('success') %}
+                Swal.fire({
+                    title: 'Succès !',
+                    text: "{{ message|e('js') }}",
+                    icon: 'success',
+                    confirmButtonColor: '#29AB87',
+                    confirmButtonText: 'OK',
+                    background: '#FEFEFA',
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+            {% endfor %}
         });
     </script>
 {% endblock %}

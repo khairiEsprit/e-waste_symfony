@@ -88,42 +88,49 @@ class ParticipationController extends AbstractController
     #[Route('/{id}/edit', name: 'app_participation_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
     {
+        // Store original values for comparison
+        $originalEmail = $participation->getEmail();
+        $originalPhone = $participation->getPhone();
+        
         $form = $this->createForm(ParticipationType::class, $participation);
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            // Vérification des doublons seulement si email ou phone ont changé
-            $emailChanged = $participation->getEmail() !== $form->get('email')->getData();
-            $phoneChanged = $participation->getPhone() !== $form->get('phone')->getData();
+            try {
+                // Vérification des doublons seulement si email ou phone ont changé
+                $emailChanged = $originalEmail !== $participation->getEmail();
+                $phoneChanged = $originalPhone !== $participation->getPhone();
+                $hasError = false;
 
-            $hasError = false;
+                if ($emailChanged) {
+                    $existingEmail = $entityManager
+                        ->getRepository(Participation::class)
+                        ->findOneBy(['email' => $participation->getEmail()]);
 
-            if ($emailChanged) {
-                $existingEmail = $entityManager
-                    ->getRepository(Participation::class)
-                    ->findOneBy(['email' => $participation->getEmail()]);
-
-                if ($existingEmail && $existingEmail->getId() !== $participation->getId()) {
-                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cet email est déjà utilisé.'));
-                    $hasError = true;
+                    if ($existingEmail && $existingEmail->getId() !== $participation->getId()) {
+                        $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cet email est déjà utilisé.'));
+                        $hasError = true;
+                    }
                 }
-            }
 
-            if ($phoneChanged) {
-                $existingPhone = $entityManager
-                    ->getRepository(Participation::class)
-                    ->findOneBy(['phone' => $participation->getPhone()]);
+                if ($phoneChanged) {
+                    $existingPhone = $entityManager
+                        ->getRepository(Participation::class)
+                        ->findOneBy(['phone' => $participation->getPhone()]);
 
-                if ($existingPhone && $existingPhone->getId() !== $participation->getId()) {
-                    $form->get('phone')->addError(new \Symfony\Component\Form\FormError('Ce numéro de téléphone est déjà utilisé.'));
-                    $hasError = true;
+                    if ($existingPhone && $existingPhone->getId() !== $participation->getId()) {
+                        $form->get('phone')->addError(new \Symfony\Component\Form\FormError('Ce numéro de téléphone est déjà utilisé.'));
+                        $hasError = true;
+                    }
                 }
-            }
 
-            if (!$hasError) {
-                $entityManager->flush();
-                $this->addFlash('success', 'La participation a été mise à jour avec succès.');
-                return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
+                if (!$hasError) {
+                    $entityManager->flush();
+                    $this->addFlash('success', 'La participation a été mise à jour avec succès !');
+                    return $this->redirectToRoute('app_participation_show', ['id' => $participation->getId()]);
+                }
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de la participation : ' . $e->getMessage());
             }
         }
 

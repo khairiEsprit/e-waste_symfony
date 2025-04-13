@@ -202,7 +202,7 @@
                             </div>
                         </div>
                         <div class="card-body">
-                            <p class="card-text mb-4">{{ avi.description }}</p>
+                            <p class="card-text mb-4">{{ avi.avis|length > 150 ? avi.avis|slice(0, 150) ~ '...' : avi.avis }}</p>
                             <div class="d-flex justify-content-between align-items-center">
                                 <small class="text-muted">
                                     <i class="far fa-calendar-alt me-1"></i> Posté le {{ avi.createdAt|date('d/m/Y') }}
