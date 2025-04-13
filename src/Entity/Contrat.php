@@ -5,6 +5,8 @@ namespace App\Entity;
 use App\Repository\ContratRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
+use Symfony\Component\Validator\Context\ExecutionContextInterface; 
 
 #[ORM\Entity(repositoryClass: ContratRepository::class)]
 class Contrat
@@ -25,6 +27,8 @@ class Contrat
     private ?\DateTimeInterface $date_fin = null;
 
     #[ORM\Column(length: 700)]
+
+    
     private ?string $signaturePath = null;
 
     #[ORM\ManyToOne]
@@ -96,4 +100,15 @@ class Contrat
 
         return $this;
     }
+    #[Assert\Callback]
+    public function validateDates(ExecutionContextInterface $context): void
+    {
+        if ($this->date_debut !== null && $this->date_fin !== null) {
+            if ($this->date_fin <= $this->date_debut) {
+                $context->buildViolation('La date de fin doit être postérieure à la date de début.')
+                    ->atPath('date_fin')
+                    ->addViolation();
+            }
+        }
+    }   
 }

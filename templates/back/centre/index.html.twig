@@ -12,7 +12,11 @@
         </a>
     </div>
 
-    <table class="table table-striped table-bordered">
+    <div class="mb-3">
+        <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un centre...">
+    </div>
+
+    <table id="centreTable" class="table table-striped table-bordered">
         <thead class="table-dark">
             <tr>
                 <th>Id</th>
@@ -50,4 +54,16 @@
         </tbody>
     </table>
 </div>
+
+<script>
+    document.getElementById('searchInput').addEventListener('keyup', function () {
+        let input = this.value.toLowerCase(); // texte tapé par l'utilisateur
+        let rows = document.querySelectorAll('#centreTable tbody tr'); // toutes les lignes du tableau
+
+        rows.forEach(function(row) {
+            let text = row.textContent.toLowerCase();// contenu de la ligne
+            row.style.display = text.includes(input) ? '' : 'none'; // on masque si pas trouvé
+        });
+    });
+</script>
 {% endblock %}

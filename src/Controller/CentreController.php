@@ -18,7 +18,7 @@ final class CentreController extends AbstractController
     #[Route(name: 'app_centre_index', methods: ['GET'])]
     public function index(CentreRepository $centreRepository): Response
     {
-        return $this->render('centre/index.html.twig', [
+        return $this->render('back/centre/index.html.twig', [
             'centres' => $centreRepository->findAll(),
         ]);
     }
@@ -35,7 +35,7 @@ final class CentreController extends AbstractController
             $errors = $validator->validate($centre);
 
             if (count($errors) > 0) {
-                return $this->render('centre/new.html.twig', [
+                return $this->render('back/centre/new.html.twig', [
                     'centre' => $centre,
                     'form' => $form,
                     'errors' => $errors,  // Affiche les erreurs dans la vue
@@ -50,7 +50,7 @@ final class CentreController extends AbstractController
             }
         }
 
-        return $this->render('centre/new.html.twig', [
+        return $this->render('back/centre/new.html.twig', [
             'centre' => $centre,
             'form' => $form,
         ]);
@@ -59,7 +59,7 @@ final class CentreController extends AbstractController
     #[Route('/{id}', name: 'app_centre_show', methods: ['GET'])]
     public function show(Centre $centre): Response
     {
-        return $this->render('centre/show.html.twig', [
+        return $this->render('back/centre/show.html.twig', [
             'centre' => $centre,
         ]);
     }
@@ -75,7 +75,7 @@ final class CentreController extends AbstractController
             $errors = $validator->validate($centre);
 
             if (count($errors) > 0) {
-                return $this->render('centre/edit.html.twig', [
+                return $this->render('back/centre/edit.html.twig', [
                     'centre' => $centre,
                     'form' => $form,
                     'errors' => $errors,  // Affiche les erreurs dans la vue
@@ -89,7 +89,7 @@ final class CentreController extends AbstractController
             }
         }
 
-        return $this->render('centre/edit.html.twig', [
+        return $this->render('back/centre/edit.html.twig', [
             'centre' => $centre,
             'form' => $form,
         ]);

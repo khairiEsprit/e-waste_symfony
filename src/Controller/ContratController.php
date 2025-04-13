@@ -16,7 +16,7 @@ final class ContratController extends AbstractController{
     #[Route(name: 'app_contrat_index', methods: ['GET'])]
     public function index(ContratRepository $contratRepository): Response
     {
-        return $this->render('contrat/index.html.twig', [
+        return $this->render('back/contrat/index.html.twig', [
             'contrats' => $contratRepository->findAll(),
         ]);
     }
@@ -35,7 +35,7 @@ final class ContratController extends AbstractController{
             return $this->redirectToRoute('app_contrat_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('contrat/new.html.twig', [
+        return $this->render('back/contrat/new.html.twig', [
             'contrat' => $contrat,
             'form' => $form,
         ]);
@@ -44,7 +44,7 @@ final class ContratController extends AbstractController{
     #[Route('/{id}', name: 'app_contrat_show', methods: ['GET'])]
     public function show(Contrat $contrat): Response
     {
-        return $this->render('contrat/show.html.twig', [
+        return $this->render('back/contrat/show.html.twig', [
             'contrat' => $contrat,
         ]);
     }
@@ -61,7 +61,7 @@ final class ContratController extends AbstractController{
             return $this->redirectToRoute('app_contrat_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('contrat/edit.html.twig', [
+        return $this->render('back/contrat/edit.html.twig', [
             'contrat' => $contrat,
             'form' => $form,
         ]);
