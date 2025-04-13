@@ -19,11 +19,11 @@ class User
      * @var Collection<int, Demande>
      */
     #[ORM\OneToMany(targetEntity: Demande::class, mappedBy: 'utilisateur')]
-    private Collection $demande;
+    private Collection $demandes;
 
     public function __construct()
     {
-        $this->demande = new ArrayCollection();
+        $this->demandes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -34,15 +34,15 @@ class User
     /**
      * @return Collection<int, Demande>
      */
-    public function getDemande(): Collection
+    public function getDemandes(): Collection
     {
-        return $this->demande;
+        return $this->demandes;
     }
 
     public function addDemande(Demande $demande): static
     {
-        if (!$this->demande->contains($demande)) {
-            $this->demande->add($demande);
+        if (!$this->demandes->contains($demande)) {
+            $this->demandes->add($demande);
             $demande->setUtilisateur($this);
         }
 
@@ -51,7 +51,7 @@ class User
 
     public function removeDemande(Demande $demande): static
     {
-        if ($this->demande->removeElement($demande)) {
+        if ($this->demandes->removeElement($demande)) {
             // set the owning side to null (unless already changed)
             if ($demande->getUtilisateur() === $this) {
                 $demande->setUtilisateur(null);

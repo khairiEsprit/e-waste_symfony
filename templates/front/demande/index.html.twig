@@ -49,6 +49,12 @@
                                         {% endif %}
                                     </span>
                                 </div>
+                                {% if dernierTraitement and dernierTraitement.commentaire %}
+                                    <div class="d-flex align-items-center">
+                                        <h5 class="text-arial mb-0">Commentaire Admin :</h5>
+                                        <span class="ml-2">{{ dernierTraitement.commentaire }}</span>
+                                    </div>
+                                {% endif %}
                             </p>
                         </div>
                         <div class="card-footer bg-white border-top-0 d-flex justify-content-between">

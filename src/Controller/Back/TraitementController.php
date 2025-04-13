@@ -53,7 +53,7 @@ final class TraitementController extends AbstractController
     }
 
 
-    #[Route('/{id}', name: 'app_traitement_show', methods: ['GET'])]
+    #[Route(path: '/{id}', name: 'app_traitement_show', methods: ['GET'])]
     public function show(Traitement $traitement): Response
     {
         return $this->render('back/traitement/show.html.twig', [

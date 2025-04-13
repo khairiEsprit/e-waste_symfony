@@ -51,7 +51,7 @@ class Demande
 
 
     #[ORM\ManyToOne(inversedBy: 'demandes')]
-    #[ORM\JoinColumn(name: "id_utilisateur", referencedColumnName: "id", nullable: true)]
+    #[ORM\JoinColumn(name: "utilisateur_id", referencedColumnName: "id", nullable: true)]
     private ?User $utilisateur = null;
 
     /**
@@ -61,7 +61,7 @@ class Demande
     private Collection $traitements;
 
     #[ORM\ManyToOne(inversedBy: 'demandes')]
-    #[ORM\JoinColumn(name: "id_centre", referencedColumnName: "id", nullable: true)]
+    #[ORM\JoinColumn(name: "center_id", referencedColumnName: "id", nullable: true)]
     private ?Center $center = null;
 
     public function __construct()

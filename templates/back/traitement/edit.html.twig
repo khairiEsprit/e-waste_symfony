@@ -2,11 +2,36 @@
 
 {% block title %}Edit Traitement{% endblock %}
 
-{% block body %}
-    <h1>Edit Traitement</h1>
-
-    <div class="d-flex justify-content-between">
-    {{ include('back/traitement/_form.html.twig', {'button_label': 'Update'}) }}
-    {{ include('back/traitement/_delete_form.html.twig') }}
+{% block content %}
+<div class="container mt-5">
+    <div class="card shadow-gray bg-light">
+        <div class="card-header bg-primary text-white">
+            <h1 class="mb-0">Edit Traitement</h1>
+        </div>
+        <div class="card-body">
+            <div class="d-flex justify-content-between">
+                {{ include('back/traitement/_form.html.twig', {'button_label': 'Update'}) }}
+                {{ include('back/traitement/_delete_form.html.twig') }}
+            </div>
+        </div>
     </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<style>
+    .shadow-gray {
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    }
+
+    .card-header.bg-primary {
+        background-color:rgb(255, 255, 255) !important;
+    }
+
+    .card-header h1 {   
+        font-size: 1.5rem;
+        color: black
+    }
+</style>
 {% endblock %}

@@ -22,11 +22,11 @@ class Center
      * @var Collection<int, Demande>
      */
     #[ORM\OneToMany(targetEntity: Demande::class, mappedBy: 'center')]
-    private Collection $demande;
+    private Collection $demandes;
 
     public function __construct()
     {
-        $this->demande = new ArrayCollection();
+        $this->demandes = new ArrayCollection();
     }
 
     public function getId(): ?int
@@ -49,15 +49,15 @@ class Center
     /**
      * @return Collection<int, Demande>
      */
-    public function getDemande(): Collection
+    public function getDemandes(): Collection
     {
-        return $this->demande;
+        return $this->demandes;
     }
 
     public function addDemande(Demande $demande): static
     {
-        if (!$this->demande->contains($demande)) {
-            $this->demande->add($demande);
+        if (!$this->demandes->contains($demande)) {
+            $this->demandes->add($demande);
             $demande->setCenter($this);
         }
 
@@ -66,7 +66,7 @@ class Center
 
     public function removeDemande(Demande $demande): static
     {
-        if ($this->demande->removeElement($demande)) {
+        if ($this->demandes->removeElement($demande)) {
             // set the owning side to null (unless already changed)
             if ($demande->getCenter() === $this) {
                 $demande->setCenter(null);
