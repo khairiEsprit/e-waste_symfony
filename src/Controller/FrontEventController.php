@@ -6,6 +6,7 @@ namespace App\Controller;
 use App\Entity\Event;
 use App\Repository\EventRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 
@@ -13,10 +14,19 @@ use Symfony\Component\Routing\Attribute\Route;
 class FrontEventController extends AbstractController
 {
     #[Route('/', name: 'app_front_event_list', methods: ['GET'])]
-    public function list(EventRepository $eventRepository): Response
+    public function list(Request $request, EventRepository $eventRepository): Response
     {
+        $searchTerm = $request->query->get('q', '');
+        
+        if ($searchTerm) {
+            $events = $eventRepository->search($searchTerm);
+        } else {
+            $events = $eventRepository->findBy([], ['date' => 'ASC']);
+        }
+
         return $this->render('list_evenements/list.html.twig', [
-            'events' => $eventRepository->findBy([], ['date' => 'ASC']),
+            'events' => $events,
+            'searchTerm' => $searchTerm
         ]);
     }
 

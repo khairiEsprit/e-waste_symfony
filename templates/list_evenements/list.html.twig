@@ -5,43 +5,356 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        /* Background gradient */
         .content-translate {
-            background-color: #29AB87;
+            background: linear-gradient(135deg, #29AB87 0%, #1E7D65 100%);
             margin-bottom: 70px;
-            margin-top: 50px;/* Pour compenser l'espace vide créé par la translation */
+            margin-top: 50px;
+            padding-bottom: 50px;
         }
 
+        /* Search bar styles */
+        .search-container {
+            margin-bottom: 40px;
+            max-width: 600px;
+            margin-left: auto;
+            margin-right: auto;
+            position: relative;
+        }
+
+        .search-input {
+            padding: 15px 25px;
+            border-radius: 50px;
+            border: none;
+            width: 100%;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            transition: all 0.3s ease;
+            background-color: rgba(255,255,255,0.95);
+            padding-right: 60px;
+        }
+
+        .search-input:focus {
+            outline: none;
+            box-shadow: 0 6px 20px rgba(41, 171, 135, 0.4);
+            background-color: white;
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            background: #29AB87;
+            border: none;
+            color: white;
+            width: 50px;
+            height: 50px;
+            border-radius: 50%;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            background: #1E7D65;
+            transform: translateY(-50%) scale(1.05);
+        }
+
+        /* Event card styles */
+        .event-card {
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: none;
+            border-radius: 12px;
+            overflow: hidden;
+            box-shadow: 0 8px 25px rgba(0,0,0,0.1);
+            background: white;
+            height: 100%;
+        }
+
+        .event-card:hover {
+            transform: translateY(-10px);
+            box-shadow: 0 15px 30px rgba(0,0,0,0.2);
+        }
+
+        .card-img-container {
+            height: 220px;
+            overflow: hidden;
+            position: relative;
+        }
+
+        .card-img-top {
+            height: 100%;
+            width: 100%;
+            object-fit: cover;
+            transition: transform 0.7s ease;
+        }
+
+        .event-card:hover .card-img-top {
+            transform: scale(1.1);
+        }
+
+        .no-image-placeholder {
+            height: 220px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: linear-gradient(135deg, #f8f9fa 0%, #e9ecef 100%);
+        }
+
+        .no-image-placeholder i {
+            font-size: 3.5rem;
+            color: #29AB87;
+            opacity: 0.5;
+        }
+
+        /* Card content styles */
+        .card-body {
+            padding: 25px;
+        }
+
+        .card-title {
+            color: #013220;
+            font-weight: 700;
+            margin-bottom: 0.8rem;
+            font-size: 1.3rem;
+        }
+
+        .card-text {
+            color: #555;
+            margin-bottom: 1.2rem;
+            line-height: 1.5;
+        }
+
+        .event-meta {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            color: #6c757d;
+            font-size: 0.9rem;
+            margin-bottom: 8px;
+        }
+
+        .event-meta i {
+            color: #29AB87;
+            width: 18px;
+            text-align: center;
+            font-size: 0.95rem;
+        }
+
+        /* Button styles */
+        .card-footer {
+            background: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding: 20px;
+            display: flex;
+            justify-content: space-between;
+            gap: 12px;
+        }
+
+        .card-btn {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            font-weight: 600;
+            padding: 10px 20px;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            font-size: 0.9rem;
+            flex: 1;
+            text-align: center;
+        }
+
+        .btn-details {
+            background: white;
+            color: #29AB87;
+            border: 2px solid #29AB87;
+            box-shadow: 0 2px 8px rgba(41, 171, 135, 0.2);
+        }
+
+        .btn-details:hover {
+            background: #29AB87;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(41, 171, 135, 0.3);
+        }
+
+        .btn-register {
+            background: linear-gradient(135deg, #29AB87 0%, #1E7D65 100%);
+            color: white;
+            box-shadow: 0 2px 8px rgba(41, 171, 135, 0.3);
+        }
+
+        .btn-register:hover {
+            background: linear-gradient(135deg, #1E7D65 0%, #29AB87 100%);
+            transform: translateY(-3px);
+            box-shadow: 0 6px 18px rgba(41, 171, 135, 0.4);
+            animation: pulse 1.5s infinite;
+        }
+
+        /* Animations */
+        @keyframes pulse {
+            0% { transform: translateY(-3px) scale(1); }
+            50% { transform: translateY(-3px) scale(1.05); }
+            100% { transform: translateY(-3px) scale(1); }
+        }
+
+        .card-btn i {
+            transition: transform 0.3s ease;
+            margin-right: 8px;
+        }
+
+        .btn-details:hover i {
+            transform: translateX(-5px);
+        }
+
+        .btn-register:hover i {
+            transform: translateX(5px);
+        }
+
+        /* No results style */
+        .no-results {
+            text-align: center;
+            padding: 60px 20px;
+            color: white;
+        }
+
+        .no-results i {
+            font-size: 3rem;
+            margin-bottom: 20px;
+            opacity: 0.7;
+        }
+
+        .no-results h4 {
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+
+        .reset-search {
+            margin-top: 20px;
+            background: white;
+            color: #29AB87;
+            border: none;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+        }
+
+        .reset-search:hover {
+            background: #29AB87;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        }
     </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const searchInput = document.querySelector('.search-input');
+            let searchTimeout;
+            
+            // Dynamic search after typing stops
+            searchInput.addEventListener('input', function() {
+                clearTimeout(searchTimeout);
+                searchTimeout = setTimeout(() => {
+                    this.form.submit();
+                }, 300);
+            });
+            
+            // Focus search field on page load
+            searchInput.focus();
+        });
+    </script>
 {% endblock %}
 
 {% block body %}
     <div class="content-translate">
         <div class="container py-5">
-            <h1 class="mb-4">Nos Événements</h1>
+            <h1 class="mb-4 text-white text-center">Nos Événements</h1>
 
+            <!-- Search Bar -->
+            <form method="get" action="{{ path('app_front_event_list') }}" class="search-container">
+                <input type="text" 
+                       name="q" 
+                       class="search-input" 
+                       placeholder="Rechercher un événement par nom ou description..." 
+                       value="{{ searchTerm }}"
+                       autocomplete="off">
+                <button type="submit" class="search-btn">
+                    <i class="fas fa-search"></i>
+                </button>
+            </form>
+
+            <!-- Events Grid -->
             <div class="row">
-                {% for event in events %}
-                    <div class="col-md-4 mb-4">
-                        <div class="card h-100">
-                            <div class="card-body">
-                                <h5 class="card-title">{{ event.title }}</h5>
-                                <p class="card-text">{{ event.description|u.truncate(100, '...') }}</p>
-                                <p class="text-muted">
-                                    <i class="fas fa-calendar-alt"></i> {{ event.date|date('d/m/Y H:i') }}
-                                </p>
-                            </div>
-                            <div class="card-footer bg-white">
-                                <a href="{{ path('app_front_event_show', {id: event.id}) }}" class="btn btn-sm btn-primary">
-                                    Voir détails
-                                </a>
+                {% if events|length > 0 %}
+                    {% for event in events %}
+                        <div class="col-lg-4 col-md-6 mb-4">
+                            <div class="event-card">
+                                <div class="card-img-container">
+                                    {% if event.imageName %}
+                                        <img src="{{ asset('uploads/events/' ~ event.imageName) }}" class="card-img-top" alt="{{ event.title }}">
+                                    {% else %}
+                                        <div class="no-image-placeholder">
+                                            <i class="fas fa-calendar-alt"></i>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                <div class="card-body">
+                                    <h5 class="card-title">{{ event.title }}</h5>
+                                    <p class="card-text">{{ event.description|u.truncate(120, '...') }}</p>
+                                    
+                                    <div class="event-meta">
+                                        <i class="fas fa-calendar-alt"></i>
+                                        <span>{{ event.date|date('d/m/Y à H:i') }}</span>
+                                    </div>
+                                    
+                                    <div class="event-meta">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>{{ event.location|u.truncate(30, '...') }}</span>
+                                    </div>
+                                    
+                                    <div class="event-meta">
+                                        <i class="fas fa-users"></i>
+                                        <span>{{ event.remainingPlaces }} places disponibles</span>
+                                    </div>
+                                </div>
+                                <div class="card-footer">
+                                    <a href="{{ path('app_front_event_show', {id: event.id}) }}" class="card-btn btn-details">
+                                        <i class="fas fa-eye"></i> Détails
+                                    </a>
+                                    <a href="{{ path('app_participation_new', {'event_id': event.id}) }}" class="card-btn btn-register">
+                                        <i class="fas fa-calendar-check"></i> S'inscrire
+                                    </a>
+                                </div>
                             </div>
                         </div>
-                    </div>
+                    {% endfor %}
                 {% else %}
                     <div class="col-12">
-                        <div class="alert alert-info">Aucun événement à afficher.</div>
+                        <div class="no-results">
+                            <i class="fas fa-calendar-times"></i>
+                            <h4>Aucun événement trouvé</h4>
+                            {% if searchTerm %}
+                                <p>Nous n'avons trouvé aucun résultat pour "{{ searchTerm }}"</p>
+                                <a href="{{ path('app_front_event_list') }}" class="reset-search">
+                                    Réinitialiser la recherche
+                                </a>
+                            {% else %}
+                                <p>Aucun événement programmé pour le moment</p>
+                            {% endif %}
+                        </div>
                     </div>
-                {% endfor %}
+                {% endif %}
             </div>
         </div>
     </div>

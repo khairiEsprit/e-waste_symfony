@@ -51,19 +51,19 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            {% if event.imageUrl %}
-                                <div class="text-center">
-                                    <img src="{{ event.imageUrl }}" alt="{{ event.title }}" class="img-fluid rounded shadow" style="max-height: 250px; border: 2px solid #29AB87;">
-                                    <p class="mt-2 small text-muted">Image de l'événement</p>
-                                </div>
-                            {% else %}
-                                <div class="text-center py-4" style="background-color: #F0F0F0; border-radius: 8px;">
-                                    <i class="fas fa-image fa-3x mb-3" style="color: #29AB87;"></i>
-                                    <p class="mb-0" style="color: #013220;">Aucune image</p>
-                                </div>
-                            {% endif %}
-                        </div>
+                       <div class="col-md-4">
+    {% if event.imageName %}
+        <div class="text-center">
+            <img src="{{ asset('uploads/events/' ~ event.imageName) }}" alt="{{ event.title }}" class="img-fluid rounded shadow" style="max-height: 250px; border: 2px solid #29AB87;">
+            <p class="mt-2 small text-muted">Image de l'événement</p>
+        </div>
+    {% else %}
+        <div class="text-center py-4" style="background-color: #F0F0F0; border-radius: 8px;">
+            <i class="fas fa-image fa-3x mb-3" style="color: #29AB87;"></i>
+            <p class="mb-0" style="color: #013220;">Aucune image</p>
+        </div>
+    {% endif %}
+</div>
                     </div>
                 </div>
             </div>

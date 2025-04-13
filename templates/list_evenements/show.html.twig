@@ -2,40 +2,218 @@
 
 {% block title %}Détails de l'événement - {{ event.title }}{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .event-image {
+            max-height: 400px;
+            object-fit: cover;
+            border-radius: 8px;
+            border: 3px solid #29AB87;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .event-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+        }
+        .event-details {
+            background-color: #F8F9FA;
+            border-radius: 10px;
+            padding: 2rem;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        }
+        .detail-icon {
+            color: #29AB87;
+            width: 24px;
+            text-align: center;
+        }
+        
+        /* Styles des boutons premium */
+        .btn-premium {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            border: none;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 50px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+        }
+        
+        .btn-back {
+            background-color: white;
+            color: #29AB87;
+            border: 2px solid #29AB87;
+            z-index: 1;
+        }
+        
+        .btn-back:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background-color: #29AB87;
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: -1;
+            border-radius: 50px;
+        }
+        
+        .btn-back:hover {
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 20px rgba(41, 171, 135, 0.3);
+        }
+        
+        .btn-back:hover:before {
+            width: 100%;
+        }
+        
+        .btn-primary {
+            background: linear-gradient(135deg, #29AB87 0%, #1E7D65 100%);
+            color: white;
+            z-index: 1;
+        }
+        
+        .btn-primary:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 0;
+            height: 100%;
+            background: linear-gradient(135deg, #1E7D65 0%, #29AB87 100%);
+            transition: all 0.4s cubic-bezier(0.165, 0.84, 0.44, 1);
+            z-index: -1;
+            border-radius: 50px;
+        }
+        
+        .btn-primary:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(41, 171, 135, 0.4);
+        }
+        
+        .btn-primary:hover:before {
+            width: 100%;
+        }
+        
+        /* Animation des icônes */
+        .btn-premium i {
+            transition: transform 0.3s ease;
+        }
+        
+        .btn-back:hover i {
+            transform: translateX(-5px);
+        }
+        
+        .btn-primary:hover i {
+            transform: translateX(5px);
+        }
+        
+        /* Effet de pulse au survol */
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .btn-primary:hover {
+            animation: pulse 1.5s infinite;
+        }
+        
+        /* Style pour le badge des places */
+        .places-badge {
+            font-size: 0.9rem;
+            padding: 8px 12px;
+            border-radius: 50px;
+            background: linear-gradient(135deg, #ACE1AF 0%, #29AB87 100%);
+            color: #013220;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
     <div style="transform: translateY(70px); margin-bottom: 70px;">
         <div class="container py-5">
-            {# Bouton de retour à la liste #}
-            <a href="{{ path('app_front_event_list') }}" class="btn btn-outline-secondary mb-4">
-                ← Retour aux événements
+            {# Bouton de retour premium #}
+            <a href="{{ path('app_front_event_list') }}" class="btn btn-premium btn-back mb-4">
+                <i class="fas fa-arrow-left me-2"></i> Retour aux événements
             </a>
 
-            {# Carte de détail de l'événement #}
-            <div class="card shadow-sm">
-                <div class="card-body">
-                    <h1 class="card-title">{{ event.title }}</h1>
-
-                    {# Date et heure #}
-                    <div class="d-flex align-items-center mb-3">
-                        <i class="far fa-calendar-alt me-2"></i>
-                        <span class="text-muted">
-                            {{ event.date|date('d/m/Y à H:i') }}
-                        </span>
-                    </div>
-
-                    {# Description #}
-                    <div class="mb-4">
-                        <h5>Description :</h5>
-                        <p class="card-text">{{ event.description }}</p>
-                    </div>
-
-                    {# Autres champs (ajustez selon votre entité Event) #}
-                    {% if event.location %}
-                        <div class="mb-3">
-                            <h5>Lieu :</h5>
-                            <p><i class="fas fa-map-marker-alt me-2"></i>{{ event.location }}</p>
+            <div class="row">
+                {# Colonne image #}
+                <div class="col-lg-5 mb-4">
+                    {% if event.imageName %}
+                        <img src="{{ asset('uploads/events/' ~ event.imageName) }}" 
+                             alt="{{ event.title }}" 
+                             class="img-fluid event-image w-100">
+                    {% else %}
+                        <div class="bg-light d-flex align-items-center justify-content-center rounded" 
+                             style="height: 300px; border: 2px dashed #29AB87;">
+                            <div class="text-center">
+                                <i class="fas fa-image fa-4x mb-3 text-muted"></i>
+                                <p class="text-muted">Aucune image disponible</p>
+                            </div>
                         </div>
                     {% endif %}
+                </div>
+
+                {# Colonne détails #}
+                <div class="col-lg-7">
+                    <div class="event-details h-100">
+                        <h1 class="mb-4" style="color: #013220;">{{ event.title }}</h1>
+
+                        {# Date #}
+                        <div class="d-flex align-items-center mb-3">
+                            <i class="far fa-calendar-alt detail-icon me-2"></i>
+                            <span class="text-muted">
+                                {{ event.date|date('d/m/Y à H:i') }}
+                            </span>
+                        </div>
+
+                        {# Lieu #}
+                        {% if event.location %}
+                            <div class="d-flex align-items-center mb-3">
+                                <i class="fas fa-map-marker-alt detail-icon me-2"></i>
+                                <span style="color: #00693E;">{{ event.location }}</span>
+                            </div>
+                        {% endif %}
+
+                        {# Places disponibles #}
+                        <div class="d-flex align-items-center mb-4">
+                            <i class="fas fa-users detail-icon me-2"></i>
+                            <span>
+                                <span class="places-badge">
+                                    {{ event.remainingPlaces }} places disponibles
+                                </span>
+                            </span>
+                        </div>
+
+                        {# Description #}
+                        <div class="mb-4">
+                            <h5 class="d-flex align-items-center" style="color: #00693E;">
+                                <i class="fas fa-info-circle detail-icon me-2"></i>
+                                <span>Description</span>
+                            </h5>
+                            <div class="ps-4" style="color: #555;">
+                                {{ event.description|nl2br }}
+                            </div>
+                        </div>
+
+                        {# Bouton d'inscription premium #}
+                        <div class="mt-4">
+                            <a href="{{ path('app_participation_new', {'event_id': event.id}) }}" 
+                               class="btn btn-premium btn-primary">
+                                <i class="fas fa-calendar-check me-2"></i> S'inscrire à l'événement
+                            </a>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>

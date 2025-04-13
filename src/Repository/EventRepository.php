@@ -107,4 +107,14 @@ class EventRepository extends ServiceEntityRepository
 
         return $queryBuilder;
     }
+
+    public function search(string $term): array
+{
+    return $this->createQueryBuilder('e')
+        ->where('e.title LIKE :term OR e.description LIKE :term')
+        ->setParameter('term', '%'.$term.'%')
+        ->orderBy('e.date', 'ASC')
+        ->getQuery()
+        ->getResult();
+}
 }
