@@ -1,5 +1,7 @@
 {% extends 'front/base.html.twig' %}
 
+{% block title %}Avis des Utilisateurs{% endblock %}
+
 {% block stylesheets %}
     {{ parent() }}
     <style>
@@ -16,6 +18,9 @@
             --medium-green: #29AB87;
             --light-green: #ACE1AF;
             --cream-white: #FEFEFA;
+            --orange: #FF6B35;
+            --blue: #3A86FF;
+            --gradient-green: linear-gradient(135deg, var(--deep-green), var(--medium-green));
         }
 
         body {
@@ -23,140 +28,403 @@
             padding-bottom: 20px;
         }
 
-        /* Barre de recherche */
+        /* Titre principal */
+        .main-title {
+            color: var(--dark-green);
+            font-weight: 700;
+            font-size: 2.5rem;
+            text-align: center;
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+            padding-bottom: 10px;
+        }
+
+        .main-title::after {
+            content: '';
+            position: absolute;
+            bottom: 0;
+            left: 50%;
+            transform: translateX(-50%);
+            width: 80px;
+            height: 4px;
+            background: var(--gradient-green);
+            border-radius: 2px;
+            animation: titleUnderline 2s ease-in-out infinite alternate;
+        }
+
+        @keyframes titleUnderline {
+            0% { width: 80px; }
+            100% { width: 120px; }
+        }
+
+        /* Barre de recherche améliorée */
         .search-container {
             max-width: 600px;
             margin: 0 auto 30px;
-        }
-        .search-container .form-control {
-            border-color: var(--medium-green);
-        }
-        .search-container .btn-primary {
-            background-color: var(--deep-green);
-            border-color: var(--dark-green);
+            position: relative;
         }
 
-        /* Alertes */
-        .alert-info {
-            background-color: var(--light-green);
-            border-color: var(--medium-green);
-            color: var(--dark-green);
+        .search-container .form-control {
+            border: 2px solid var(--medium-green);
+            border-radius: 50px;
+            padding: 15px 25px;
+            font-size: 1.1rem;
+            box-shadow: 0 4px 15px rgba(0, 105, 62, 0.1);
+            transition: all 0.4s ease;
         }
-        .alert-warning {
-            background-color: rgba(255,193,7,0.1);
-            border-color: #ffc107;
-            color: #856404;
+
+        .search-container .form-control:focus {
+            box-shadow: 0 6px 20px rgba(0, 105, 62, 0.2);
+            border-color: var(--deep-green);
+        }
+
+        .search-btn {
+            position: absolute;
+            right: 5px;
+            top: 5px;
+            height: calc(100% - 10px);
+            width: 50px;
+            background: var(--gradient-green);
+            border: none;
+            border-radius: 50px;
+            color: white;
+            transition: all 0.4s ease;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .search-btn:hover {
+            width: 100px;
+            background: var(--dark-green);
+        }
+
+        .search-btn i {
+            transition: all 0.4s ease;
+        }
+
+        .search-btn:hover i {
+            transform: rotate(360deg);
+        }
+
+        .reset-search {
+            position: absolute;
+            right: 60px;
+            top: 50%;
+            transform: translateY(-50%);
+            color: var(--medium-green);
+            cursor: pointer;
+            opacity: 0.7;
+            transition: all 0.3s ease;
+        }
+
+        .reset-search:hover {
+            opacity: 1;
+            color: var(--deep-green);
+        }
+
+        /* Bouton Nouvel Avis */
+        .btn-new-avis {
+            background: var(--gradient-green);
+            color: white;
+            border: none;
+            padding: 15px 30px;
+            border-radius: 50px;
+            font-size: 1.1rem;
+            font-weight: 600;
+            box-shadow: 0 6px 15px rgba(0, 105, 62, 0.3);
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            position: relative;
+            overflow: hidden;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-new-avis:hover {
+            transform: translateY(-3px) scale(1.05);
+            box-shadow: 0 10px 25px rgba(0, 105, 62, 0.4);
+        }
+
+        .btn-new-avis::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(90deg, transparent, rgba(255,255,255,0.3), transparent);
+            transition: 0.5s;
+        }
+
+        .btn-new-avis:hover::before {
+            left: 100%;
+        }
+
+        /* Note moyenne */
+        .average-rating {
+            background: white;
+            border-radius: 50px;
+            padding: 10px 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+            max-width: 300px;
+            margin: 0 auto 30px;
+            border: 1px solid var(--light-green);
+            transition: all 0.3s ease;
+        }
+
+        .average-rating:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 20px rgba(0, 105, 62, 0.1);
         }
 
         /* Cartes */
         .card {
-            border: 1px solid var(--light-green);
-            border-radius: 10px;
-            transition: all 0.3s ease;
-            background-color: white;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,105,62,0.1);
-        }
-        .card-header {
-            background-color: var(--deep-green) !important;
-            color: white;
-            border-bottom: 2px solid var(--medium-green);
-            font-weight: 600;
-            padding: 15px 20px;
-        }
-        .card-title {
-            color: var(--dark-green);
-            font-weight: 600;
+            border: none;
+            border-radius: 15px;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            background: white;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
         }
 
-        /* Boutons */
-        .btn-primary {
-            background-color: var(--deep-green);
-            border-color: var(--dark-green);
-            padding: 8px 20px;
-            font-weight: 500;
+        .card:hover {
+            transform: translateY(-10px) scale(1.02);
+            box-shadow: 0 15px 35px rgba(0, 105, 62, 0.15);
         }
-        .btn-primary:hover {
-            background-color: var(--dark-green);
+
+        .card-header {
+            background: var(--gradient-green) !important;
+            color: white;
+            border-bottom: none !important;
+            font-weight: 600;
+            padding: 15px 25px;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
         }
 
         /* Étoiles */
         .star-rating .star {
             font-size: 1.3rem;
             color: #e0e0e0;
+            transition: all 0.2s ease;
         }
+
         .star-rating .star.active {
             color: #ffc107;
+            text-shadow: 0 2px 5px rgba(255, 193, 7, 0.3);
         }
 
         /* Boutons d'action */
         .btn-action {
-            width: 32px;
-            height: 32px;
+            width: 36px;
+            height: 36px;
             padding: 0;
             display: inline-flex;
             align-items: center;
             justify-content: center;
             margin: 0 3px;
             border-radius: 50%;
-            transition: all 0.2s;
+            transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
         }
+
         .btn-action:hover {
-            transform: scale(1.1);
+            transform: scale(1.1) translateY(-2px);
         }
-        .btn-info {
-            background-color: var(--medium-green);
-            border-color: var(--medium-green);
+
+        .btn-view {
+            background: var(--medium-green);
+            color: white;
+            border: none;
         }
-        .btn-outline-primary {
-            color: var(--deep-green);
-            border-color: var(--deep-green);
+
+        .btn-view:hover {
+            background: var(--deep-green);
         }
-        .btn-outline-danger {
+
+        .btn-edit {
+            background: white;
+            color: var(--blue);
+            border: 2px solid var(--blue);
+        }
+
+        .btn-edit:hover {
+            background: var(--blue);
+            color: white;
+        }
+
+        .btn-delete {
+            background: white;
             color: #dc3545;
-            border-color: #dc3545;
+            border: 2px solid #dc3545;
+        }
+
+        .btn-delete:hover {
+            background: #dc3545;
+            color: white;
         }
 
         /* Texte */
-        .text-muted {
-            color: var(--medium-green) !important;
-        }
         .card-text {
             color: #555;
             line-height: 1.6;
+            font-size: 1.05rem;
+        }
+
+        .text-date {
+            color: var(--medium-green);
+            font-weight: 500;
         }
 
         /* Disposition */
         .avis-grid {
             display: grid;
             grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
-            gap: 25px;
+            gap: 30px;
+        }
+
+        /* Message vide */
+        .empty-message {
+            background: white;
+            border-radius: 15px;
+            padding: 30px;
+            text-align: center;
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.05);
+            grid-column: 1 / -1;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .main-title {
+                font-size: 2rem;
+            }
+            
+            .avis-grid {
+                grid-template-columns: 1fr;
+                gap: 20px;
+            }
+            
+            .search-container {
+                margin-bottom: 20px;
+            }
         }
     </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Gestion de la confirmation de suppression avec SweetAlert2
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const aviId = this.getAttribute('data-id');
+                    const aviName = this.getAttribute('data-name');
+                    const form = document.getElementById('delete-form-' + aviId);
+                    
+                    Swal.fire({
+                        title: 'Confirmer la suppression',
+                        html: `Voulez-vous vraiment supprimer l'avis de <strong>${aviName}</strong> ?`,
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#29AB87',
+                        confirmButtonText: 'Oui, supprimer',
+                        cancelButtonText: 'Annuler',
+                        background: '#FEFEFA',
+                        customClass: {
+                            popup: 'animated bounceIn',
+                            confirmButton: 'btn-confirm',
+                            cancelButton: 'btn-cancel'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+            
+            // Afficher les alertes de succès avec SweetAlert2 si présentes
+            {% for message in app.flashes('success') %}
+                Swal.fire({
+                    title: 'Succès !',
+                    text: "{{ message|e('js') }}",
+                    icon: 'success',
+                    confirmButtonColor: '#29AB87',
+                    confirmButtonText: 'OK',
+                    background: '#FEFEFA',
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+            {% endfor %}
+            
+            // Afficher les alertes d'erreur avec SweetAlert2 si présentes
+            {% for message in app.flashes('error') %}
+                Swal.fire({
+                    title: 'Erreur',
+                    text: "{{ message|e('js') }}",
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK',
+                    background: '#FEFEFA',
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+            {% endfor %}
+            
+            // Animation de la barre de recherche
+            const searchInput = document.querySelector('.search-container .form-control');
+            if (searchInput) {
+                searchInput.addEventListener('focus', function() {
+                    this.parentElement.querySelector('.search-btn').style.width = '100px';
+                });
+                
+                searchInput.addEventListener('blur', function() {
+                    if (this.value === '') {
+                        this.parentElement.querySelector('.search-btn').style.width = '50px';
+                    }
+                });
+            }
+        });
+    </script>
 {% endblock %}
 
 {% block body %}
     <div class="translated-content">
         <div class="container py-4">
-            <h1 class="mb-4 text-center" style="color: var(--dark-green);">Avis des Utilisateurs</h1>
+            <h1 class="main-title">Avis des Utilisateurs</h1>
 
-            <!-- Barre de recherche -->
+            <!-- Barre de recherche améliorée -->
             <div class="search-container">
-                <form method="get" action="{{ path('app_avis_index') }}" class="input-group shadow-sm">
+                <form method="get" action="{{ path('app_avis_index') }}" class="position-relative">
                     <input type="text"
                            name="search"
-                           class="form-control form-control-lg"
+                           class="form-control"
                            placeholder="Rechercher par nom..."
                            value="{{ app.request.query.get('search') }}"
-                           aria-label="Rechercher"
-                           style="border-radius: 50px 0 0 50px;">
-                    <button class="btn btn-primary" type="submit" style="border-radius: 0 50px 50px 0;">
-                        <i class="fas fa-search me-1"></i> Rechercher
+                           aria-label="Rechercher">
+                    <button class="search-btn" type="submit">
+                        <i class="fas fa-search"></i>
                     </button>
                     {% if app.request.query.get('search') %}
-                        <a href="{{ path('app_avis_index') }}" class="btn btn-outline-secondary" title="Réinitialiser">
+                        <a href="{{ path('app_avis_index') }}" class="reset-search">
                             <i class="fas fa-times"></i>
                         </a>
                     {% endif %}
@@ -165,7 +433,7 @@
 
             <!-- Note moyenne -->
             {% if average_rating is defined %}
-                <div class="alert alert-info text-center mb-4 rounded-pill shadow-sm" style="max-width: 300px; margin: 0 auto;">
+                <div class="average-rating text-center">
                     <div class="d-flex justify-content-center align-items-center">
                         <div class="me-3">
                             <h5 class="mb-0" style="color: var(--dark-green);">Note moyenne :</h5>
@@ -184,7 +452,7 @@
 
             <!-- Bouton Nouvel Avis -->
             <div class="text-center mb-5">
-                <a href="{{ path('app_avis_new') }}" class="btn btn-primary btn-lg rounded-pill px-4">
+                <a href="{{ path('app_avis_new') }}" class="btn-new-avis">
                     <i class="fas fa-plus me-2"></i> Nouvel Avis
                 </a>
             </div>
@@ -204,25 +472,26 @@
                         <div class="card-body">
                             <p class="card-text mb-4">{{ avi.avis|length > 150 ? avi.avis|slice(0, 150) ~ '...' : avi.avis }}</p>
                             <div class="d-flex justify-content-between align-items-center">
-                                <small class="text-muted">
+                                <small class="text-date">
                                     <i class="far fa-calendar-alt me-1"></i> Posté le {{ avi.createdAt|date('d/m/Y') }}
                                 </small>
                                 <div class="btn-group">
                                     <a href="{{ path('app_avis_show', {'id': avi.id}) }}"
-                                       class="btn btn-info btn-action"
+                                       class="btn btn-action btn-view"
                                        title="Voir détails">
                                         <i class="fas fa-eye"></i>
                                     </a>
                                     <a href="{{ path('app_avis_edit', {'id': avi.id}) }}"
-                                       class="btn btn-outline-primary btn-action"
+                                       class="btn btn-action btn-edit"
                                        title="Modifier">
                                         <i class="fas fa-edit"></i>
                                     </a>
-                                    <form method="post" action="{{ path('app_avis_delete', {'id': avi.id}) }}"
-                                          class="d-inline"
-                                          onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cet avis ?');">
+                                    <form method="post" action="{{ path('app_avis_delete', {'id': avi.id}) }}" class="d-inline" id="delete-form-{{ avi.id }}">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ avi.id) }}">
-                                        <button class="btn btn-outline-danger btn-action" title="Supprimer">
+                                        <button type="button" class="btn btn-action btn-delete delete-btn" 
+                                                title="Supprimer" 
+                                                data-id="{{ avi.id }}" 
+                                                data-name="{{ avi.nom ?: 'Anonyme' }}">
                                             <i class="fas fa-trash"></i>
                                         </button>
                                     </form>
@@ -231,14 +500,22 @@
                         </div>
                     </div>
                 {% else %}
-                    <div class="col-12">
-                        <div class="alert alert-warning text-center py-4">
-                            {% if app.request.query.get('search') %}
-                                <i class="fas fa-search-minus me-2"></i> Aucun avis trouvé pour "{{ app.request.query.get('search') }}"
-                            {% else %}
-                                <i class="fas fa-info-circle me-2"></i> Aucun avis disponible.
-                            {% endif %}
-                        </div>
+                    <div class="empty-message">
+                        {% if app.request.query.get('search') %}
+                            <i class="fas fa-search-minus me-2" style="font-size: 2rem; color: var(--medium-green);"></i>
+                            <h4 style="color: var(--dark-green);">Aucun avis trouvé</h4>
+                            <p class="mt-3">Aucun résultat pour "{{ app.request.query.get('search') }}"</p>
+                            <a href="{{ path('app_avis_index') }}" class="btn btn-outline-secondary mt-3">
+                                Réinitialiser la recherche
+                            </a>
+                        {% else %}
+                            <i class="fas fa-comment-slash me-2" style="font-size: 2rem; color: var(--medium-green);"></i>
+                            <h4 style="color: var(--dark-green);">Aucun avis disponible</h4>
+                            <p class="mt-3">Soyez le premier à donner votre avis !</p>
+                            <a href="{{ path('app_avis_new') }}" class="btn-new-avis mt-3">
+                                <i class="fas fa-plus me-2"></i> Créer un avis
+                            </a>
+                        {% endif %}
                     </div>
                 {% endfor %}
             </div>
