@@ -21,7 +21,7 @@ class Poubelle
     #[ORM\Column(length: 255)]
     private ?string $adresse = null;
 
-    #[ORM\Column(nullable: true)]
+    #[ORM\Column(nullable: false)]
     private ?int $niveau = 0;
 
     #[ORM\Column(length: 255)]

@@ -1,42 +1,98 @@
-<!DOCTYPE html>
+{% extends 'back/base.html.twig' %}
 
-<title>Poubelle</title>
+{% block title %}Détails de la Poubelle #{{ poubelle.id }}{% endblock %}
 
-{% block body %}
-    <h1>Poubelle</h1>
+{% block content %}
+<div class="container py-4">
+    <div class="card shadow-lg">
+        <div class="card-header bg-primary text-white">
+            <div class="d-flex justify-content-between align-items-center">
+                <h1 class="h3 mb-0">
+                    <i class="fas fa-trash-alt me-2"></i>Détails de la Poubelle
+                </h1>
+                <div>
+                    <a href="{{ path('app_poubelle_index') }}" class="btn btn-sm btn-light">
+                        <i class="fas fa-arrow-left me-1"></i> Retour à la liste
+                    </a>
+                </div>
+            </div>
+        </div>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ poubelle.id }}</td>
-            </tr>
-            <tr>
-                <th>Adresse</th>
-                <td>{{ poubelle.adresse }}</td>
-            </tr>
-            <tr>
-                <th>Niveau</th>
-                <td>{{ poubelle.niveau }}</td>
-            </tr>
-            <tr>
-                <th>Etat</th>
-                <td>{{ poubelle.etat }}</td>
-            </tr>
-            <tr>
-                <th>Date_installation</th>
-                <td>{{ poubelle.dateInstallation ? poubelle.dateInstallation|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Hauteur_totale</th>
-                <td>{{ poubelle.hauteurTotale }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="card-body">
+            <div class="row">
+                <div class="col-md-6">
+                    <div class="mb-4 p-3 border rounded">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="fas fa-info-circle me-2"></i>Informations générales
+                        </h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">ID :</dt>
+                            <dd class="col-sm-8">{{ poubelle.id }}</dd>
 
-    <a href="{{ path('app_poubelle_index') }}">back to list</a>
+                            <dt class="col-sm-4">Adresse :</dt>
+                            <dd class="col-sm-8">{{ poubelle.adresse }}</dd>
 
-    <a href="{{ path('app_poubelle_edit', {'id': poubelle.id}) }}">edit</a>
+                            <dt class="col-sm-4">Date installation :</dt>
+                            <dd class="col-sm-8">
+                                {{ poubelle.dateInstallation ? poubelle.dateInstallation|date('d/m/Y') : 'Non spécifiée' }}
+                            </dd>
+                        </dl>
+                    </div>
+                </div>
 
-    {{ include('poubelle/_delete_form.html.twig') }}
+                <div class="col-md-6">
+                    <div class="mb-4 p-3 border rounded">
+                        <h5 class="fw-bold text-primary mb-3">
+                            <i class="fas fa-chart-bar me-2"></i>Statut technique
+                        </h5>
+                        <dl class="row">
+                            <dt class="col-sm-4">Niveau :</dt>
+                            <dd class="col-sm-8">
+                                <div class="progress" style="height: 25px;">
+                                    <div class="progress-bar 
+                                        {% if poubelle.niveau > 80 %}bg-danger
+                                        {% elseif poubelle.niveau > 50 %}bg-warning
+                                        {% else %}bg-success{% endif %}" 
+                                        role="progressbar" 
+                                        style="width: {{ poubelle.niveau }}%" 
+                                        aria-valuenow="{{ poubelle.niveau }}" 
+                                        aria-valuemin="0" 
+                                        aria-valuemax="100">
+                                        <strong>{{ poubelle.niveau }}%</strong>
+                                    </div>
+                                </div>
+                            </dd>
+
+                            <dt class="col-sm-4">État :</dt>
+                            <dd class="col-sm-8">
+                                <span class="badge rounded-pill 
+                                    {% if poubelle.etat == 'Fonctionnelle' %}bg-success
+                                    {% elseif poubelle.etat == 'En panne' %}bg-danger
+                                    {% else %}bg-warning{% endif %} p-2">
+                                    <i class="fas 
+                                        {% if poubelle.etat == 'Fonctionnelle' %}fa-check-circle
+                                        {% elseif poubelle.etat == 'En panne' %}fa-exclamation-triangle
+                                        {% else %}fa-tools{% endif %} me-1"></i>
+                                    {{ poubelle.etat }}
+                                </span>
+                            </dd>
+
+                            <dt class="col-sm-4">Hauteur :</dt>
+                            <dd class="col-sm-8">{{ poubelle.hauteurTotale }} cm</dd>
+                        </dl>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="card-footer bg-light d-flex justify-content-between">
+            <a href="{{ path('app_poubelle_edit', {'id': poubelle.id}) }}" 
+               class="btn btn-warning">
+               <i class="fas fa-edit me-1"></i> Modifier
+            </a>
+            
+            {{ include('poubelle/_delete_form.html.twig') }}
+        </div>
+    </div>
+</div>
 {% endblock %}

@@ -1,11 +1,21 @@
-<!DOCTYPE html>
+{% extends 'back/base.html.twig' %}
 
-<title>New Poubelle</title>
+{% block title %}Ajouter Poubelle{% endblock %}
 
-{% block body %}
-    <h1>Create new Poubelle</h1>
+{% block content %}
+    <div class="card shadow p-4">
+        <h1 class="text-center mb-4">Créer une nouvelle Poubelle</h1>
+        
+        <div class="mb-3">
+            {{ include('poubelle/_form.html.twig') }}
+        </div>
+        
+        <div class="text-center">
+            <a href="{{ path('app_poubelle_index') }}" class="btn btn-secondary">Retour à la liste</a>
+        </div>
+    </div>
 
-    {{ include('poubelle/_form.html.twig') }}
-
-    <a href="{{ path('app_poubelle_index') }}">back to list</a>
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>
 {% endblock %}

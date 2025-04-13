@@ -17,7 +17,7 @@ final class CapteurController extends AbstractController
     #[Route(name: 'app_capteur_index', methods: ['GET'])]
     public function index(CapteurRepository $capteurRepository): Response
     {
-        return $this->render('capteur/index.html.twig', [
+        return $this->render('back/capteur/index.html.twig', [
             'capteurs' => $capteurRepository->findAll(),
         ]);
     }
@@ -36,7 +36,7 @@ final class CapteurController extends AbstractController
             return $this->redirectToRoute('app_capteur_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('capteur/new.html.twig', [
+        return $this->render('back/capteur/new.html.twig', [
             'capteur' => $capteur,
             'form' => $form,
         ]);
@@ -45,7 +45,7 @@ final class CapteurController extends AbstractController
     #[Route('/{id_c}', name: 'app_capteur_show', methods: ['GET'])]
     public function show(Capteur $capteur): Response
     {
-        return $this->render('capteur/show.html.twig', [
+        return $this->render('back/capteur/show.html.twig', [
             'capteur' => $capteur,
         ]);
     }
@@ -62,7 +62,7 @@ final class CapteurController extends AbstractController
             return $this->redirectToRoute('app_capteur_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('capteur/edit.html.twig', [
+        return $this->render('back/capteur/edit.html.twig', [
             'capteur' => $capteur,
             'form' => $form,
         ]);
@@ -71,7 +71,7 @@ final class CapteurController extends AbstractController
     #[Route('/{id_c}', name: 'app_capteur_delete', methods: ['POST'])]
     public function delete(Request $request, Capteur $capteur, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$capteur->getId_c(), $request->getPayload()->getString('_token'))) {
+        if ($this->isCsrfTokenValid('delete'.$capteur->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($capteur);
             $entityManager->flush();
         }
