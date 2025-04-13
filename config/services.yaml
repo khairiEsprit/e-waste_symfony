@@ -5,6 +5,7 @@
 # https://symfony.com/doc/current/best_practices.html#use-parameters-for-application-configuration
 parameters:
     app.openrouter_api_key: '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'
+    events_directory: '%kernel.project_dir%/public/uploads/events'
 
 services:
     # App\Security\AuthenticationSuccessHandler:

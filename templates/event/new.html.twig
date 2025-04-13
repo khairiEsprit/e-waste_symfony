@@ -96,6 +96,38 @@
                                     {{ form_errors(form.remainingPlaces) }}
                                 </div>
                             </div>
+                            
+                            <div class="mb-3">
+                                {{ form_label(form.image, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                
+                                <!-- Custom File Upload Area -->
+                                <div class="file-upload-container">
+                                    <div class="file-upload-area" id="dropzone">
+                                        <div class="file-upload-message text-center">
+                                            <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: #29AB87;"></i>
+                                            <h5 class="mb-2">Glissez et déposez votre image ici</h5>
+                                            <p class="text-muted">ou</p>
+                                            <button type="button" class="btn btn-outline-success browse-btn">
+                                                <i class="fas fa-folder-open me-2"></i> Parcourir
+                                            </button>
+                                            <p class="mt-2 small text-muted">{{ form_help(form.image) }}</p>
+                                        </div>
+                                        <div class="file-preview d-none">
+                                            <div class="position-relative">
+                                                <img src="" alt="Aperçu de l'image" class="img-fluid rounded" id="image-preview">
+                                                <button type="button" class="btn btn-sm btn-danger position-absolute top-0 end-0 m-2 remove-file">
+                                                    <i class="fas fa-times"></i>
+                                                </button>
+                                            </div>
+                                            <p class="mt-2 mb-0 file-name text-center"></p>
+                                        </div>
+                                    </div>
+                                    {{ form_widget(form.image) }}
+                                    <div class="invalid-feedback d-block">
+                                        {{ form_errors(form.image) }}
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     </div>
 
@@ -136,6 +168,78 @@
             color: #721c24;
             border-color: #f5c6cb;
         }
+        
+        /* File Upload Styles */
+        .file-upload-container {
+            margin-bottom: 1.5rem;
+        }
+        
+        .file-upload-area {
+            border: 2px dashed #29AB87;
+            border-radius: 10px;
+            padding: 2rem;
+            text-align: center;
+            background-color: rgba(41, 171, 135, 0.05);
+            transition: all 0.3s ease;
+            cursor: pointer;
+            position: relative;
+            overflow: hidden;
+        }
+        
+        .file-upload-area:hover, .file-upload-area.dragover {
+            background-color: rgba(41, 171, 135, 0.1);
+            border-color: #00693E;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 105, 62, 0.1);
+        }
+        
+        .file-upload-message {
+            transition: all 0.3s ease;
+        }
+        
+        .browse-btn {
+            color: #29AB87;
+            border-color: #29AB87;
+            border-radius: 50px;
+            padding: 0.5rem 1.5rem;
+            transition: all 0.3s ease;
+        }
+        
+        .browse-btn:hover {
+            background-color: #29AB87;
+            color: white;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(41, 171, 135, 0.2);
+        }
+        
+        .file-preview {
+            padding: 1rem;
+        }
+        
+        .file-preview img {
+            max-height: 200px;
+            width: auto;
+            margin: 0 auto;
+            display: block;
+            border: 2px solid #29AB87;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .file-name {
+            margin-top: 0.5rem;
+            font-weight: 600;
+            color: #00693E;
+        }
+        
+        .remove-file {
+            opacity: 0.8;
+            transition: all 0.3s ease;
+        }
+        
+        .remove-file:hover {
+            opacity: 1;
+            transform: scale(1.1);
+        }
     </style>
 
     <!-- Intégration de SweetAlert2 -->
@@ -157,6 +261,123 @@
                 }, false);
             });
         })();
+        
+        // Drag and drop file upload functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const dropzone = document.getElementById('dropzone');
+            const fileInput = document.querySelector('input[type="file"]');
+            const browseBtn = document.querySelector('.browse-btn');
+            const removeBtn = document.querySelector('.remove-file');
+            const filePreview = document.querySelector('.file-preview');
+            const fileUploadMessage = document.querySelector('.file-upload-message');
+            const imagePreview = document.getElementById('image-preview');
+            const fileNameDisplay = document.querySelector('.file-name');
+            
+            // Open file dialog when browse button is clicked
+            browseBtn.addEventListener('click', function(e) {
+                e.preventDefault();
+                e.stopPropagation();
+                fileInput.click();
+            });
+            
+            // Handle drag and drop events
+            ['dragenter', 'dragover', 'dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, preventDefaults, false);
+            });
+            
+            function preventDefaults(e) {
+                e.preventDefault();
+                e.stopPropagation();
+            }
+            
+            ['dragenter', 'dragover'].forEach(eventName => {
+                dropzone.addEventListener(eventName, highlight, false);
+            });
+            
+            ['dragleave', 'drop'].forEach(eventName => {
+                dropzone.addEventListener(eventName, unhighlight, false);
+            });
+            
+            function highlight() {
+                dropzone.classList.add('dragover');
+            }
+            
+            function unhighlight() {
+                dropzone.classList.remove('dragover');
+            }
+            
+            // Handle dropped files
+            dropzone.addEventListener('drop', handleDrop, false);
+            
+            function handleDrop(e) {
+                const dt = e.dataTransfer;
+                const files = dt.files;
+                
+                if (files.length) {
+                    fileInput.files = files;
+                    updateFilePreview(files[0]);
+                }
+            }
+            
+            // Handle file input change
+            fileInput.addEventListener('change', function() {
+                if (this.files.length) {
+                    updateFilePreview(this.files[0]);
+                }
+            });
+            
+            // Update file preview
+            function updateFilePreview(file) {
+                // Validate file type
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif', 'image/webp'];
+                if (!validTypes.includes(file.type)) {
+                    Swal.fire({
+                        title: 'Format non supporté',
+                        text: 'Veuillez sélectionner une image au format JPG, PNG, GIF ou WEBP.',
+                        icon: 'error',
+                        confirmButtonColor: '#29AB87'
+                    });
+                    return;
+                }
+                
+                // Validate file size (max 5MB)
+                if (file.size > 5 * 1024 * 1024) {
+                    Swal.fire({
+                        title: 'Fichier trop volumineux',
+                        text: 'La taille de l\'image ne doit pas dépasser 5 Mo.',
+                        icon: 'error',
+                        confirmButtonColor: '#29AB87'
+                    });
+                    return;
+                }
+                
+                // Show file preview
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    fileNameDisplay.textContent = file.name;
+                    fileUploadMessage.classList.add('d-none');
+                    filePreview.classList.remove('d-none');
+                }
+                reader.readAsDataURL(file);
+            }
+            
+            // Remove file
+            removeBtn.addEventListener('click', function() {
+                fileInput.value = '';
+                filePreview.classList.add('d-none');
+                fileUploadMessage.classList.remove('d-none');
+                imagePreview.src = '';
+                fileNameDisplay.textContent = '';
+            });
+            
+            // Click on dropzone to trigger file input
+            dropzone.addEventListener('click', function(e) {
+                if (e.target === dropzone || e.target === fileUploadMessage || fileUploadMessage.contains(e.target)) {
+                    fileInput.click();
+                }
+            });
+        });
 
         // Gestion de la confirmation avant enregistrement
         document.getElementById('submit-btn').addEventListener('click', function(e) {

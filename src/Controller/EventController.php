@@ -10,6 +10,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
+use Symfony\Component\HttpFoundation\File\UploadedFile;
 
 #[Route('/admin/event')]
 final class EventController extends AbstractController
@@ -31,6 +33,31 @@ final class EventController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
+                // Handle file upload
+                $imageFile = $form->get('image')->getData();
+                
+                if ($imageFile) {
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    // Generate a unique name for the file
+                    // Replace special characters and spaces with underscores
+                    $safeFilename = preg_replace('/[^a-zA-Z0-9]/', '_', $originalFilename);
+                    $safeFilename = strtolower($safeFilename);
+                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                    
+                    // Move the file to the uploads directory
+                    try {
+                        $imageFile->move(
+                            $this->getParameter('events_directory'),
+                            $newFilename
+                        );
+                    } catch (FileException $e) {
+                        $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image');
+                    }
+                    
+                    // Update the imageName property
+                    $event->setImageName($newFilename);
+                }
+                
                 $entityManager->persist($event);
                 $entityManager->flush();
 
@@ -38,7 +65,7 @@ final class EventController extends AbstractController
                 return $this->redirectToRoute('app_event_index');
 
             } catch (\Exception $e) {
-                $this->addFlash('error', 'Une erreur est survenue lors de la création de l\'événement');
+                $this->addFlash('error', 'Une erreur est survenue lors de la création de l\'événement: ' . $e->getMessage());
             }
         }
 
@@ -61,6 +88,8 @@ final class EventController extends AbstractController
     {
         // Store original title to display in success message
         $originalTitle = $event->getTitle();
+        // Store original image name
+        $originalImageName = $event->getImageName();
         
         $form = $this->createForm(EventType::class, $event);
         $form->handleRequest($request);
@@ -68,6 +97,42 @@ final class EventController extends AbstractController
         if ($form->isSubmitted()) {
             if ($form->isValid()) {
                 try {
+                    // Handle file upload
+                    $imageFile = $form->get('image')->getData();
+                    
+                    if ($imageFile) {
+                        $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                        // Generate a unique name for the file
+                        // Replace special characters and spaces with underscores
+                        $safeFilename = preg_replace('/[^a-zA-Z0-9]/', '_', $originalFilename);
+                        $safeFilename = strtolower($safeFilename);
+                        $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                        
+                        // Move the file to the uploads directory
+                        try {
+                            $imageFile->move(
+                                $this->getParameter('events_directory'),
+                                $newFilename
+                            );
+                            
+                            // Delete old image if exists
+                            if ($originalImageName) {
+                                $oldImagePath = $this->getParameter('events_directory') . '/' . $originalImageName;
+                                if (file_exists($oldImagePath)) {
+                                    unlink($oldImagePath);
+                                }
+                            }
+                            
+                            // Update the imageName property
+                            $event->setImageName($newFilename);
+                        } catch (FileException $e) {
+                            $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image');
+                        }
+                    } else {
+                        // Keep the original image if no new image is uploaded
+                        $event->setImageName($originalImageName);
+                    }
+                    
                     // Save changes to database
                     $entityManager->flush();
 

@@ -10,6 +10,7 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
@@ -50,16 +51,16 @@ class EventType extends AbstractType
                     ])
                 ]
             ])
-            ->add('imageUrl', TextType::class, [
-                'label' => 'URL de l\'image',
+            ->add('image', FileType::class, [
+                'label' => 'Image de l\'événement',
                 'required' => false,
+                'mapped' => true,
                 'attr' => [
-                    'class' => 'form-control',
-                    'placeholder' => 'https://example.com/image.jpg'
+                    'class' => 'form-control d-none', // Hidden input, we'll use custom drag & drop
+                    'accept' => 'image/jpeg, image/png, image/gif, image/webp',
+                    'data-max-file-size' => '5MB'
                 ],
-                'constraints' => [
-                    new Length(['max' => 255])
-                ]
+                'help' => 'Formats acceptés : JPG, PNG, GIF, WEBP. Taille max : 5 Mo'
             ])
             ->add('remainingPlaces', IntegerType::class, [
                 'label' => 'Places disponibles',

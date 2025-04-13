@@ -5,6 +5,7 @@ namespace App\Entity;
 use App\Repository\EventRepository;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\HttpFoundation\File\File;
 use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: EventRepository::class)]
@@ -33,8 +34,17 @@ class Event
     private ?string $description = null;
 
     #[ORM\Column(type: 'string', length: 255, nullable: true)]
-    #[Assert\Url(message: "L'URL de l'image doit être une URL valide")]
-    private ?string $imageUrl = null;
+    private ?string $imageName = null;
+    
+    /**
+     * @var File|null
+     */
+    #[Assert\Image(
+        maxSize: "5M",
+        mimeTypes: ["image/jpeg", "image/png", "image/gif", "image/webp"],
+        mimeTypesMessage: "Veuillez télécharger une image valide (JPG, PNG, GIF, WEBP)"
+    )]
+    private $image = null;
 
     #[ORM\Column(type: 'integer', options: ['default' => 0])]
     #[Assert\NotBlank(message: "Le nombre de places est obligatoire")]
@@ -86,14 +96,25 @@ class Event
         return $this;
     }
 
-    public function getImageUrl(): ?string
+    public function getImageName(): ?string
     {
-        return $this->imageUrl;
+        return $this->imageName;
     }
 
-    public function setImageUrl(?string $imageUrl): self
+    public function setImageName(?string $imageName): self
     {
-        $this->imageUrl = $imageUrl;
+        $this->imageName = $imageName;
+        return $this;
+    }
+    
+    public function getImage()
+    {
+        return $this->image;
+    }
+    
+    public function setImage($image): self
+    {
+        $this->image = $image;
         return $this;
     }
 
