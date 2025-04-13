@@ -2,125 +2,344 @@
 
 {% block title %}Modifier Participation{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        /* ANIMATIONS PERSONNALISÉES */
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(41, 171, 135, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(41, 171, 135, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(41, 171, 135, 0); }
+        }
+
+        @keyframes float {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+
+        /* STYLE DES BOUTONS */
+        .magic-btn {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-size: 14px;
+            margin: 0 5px;
+        }
+
+        /* BOUTON RETOUR */
+        .back-btn {
+            background: linear-gradient(145deg, #6c757d, #495057);
+            color: white;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        .back-btn:hover {
+            animation: pulse-glow 1.5s infinite;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+        }
+
+        /* BOUTON METTRE À JOUR */
+        .update-btn {
+            background: linear-gradient(145deg, #29AB87, #218838);
+            color: white;
+            box-shadow: 0 4px 20px rgba(41, 171, 135, 0.35);
+        }
+
+        .update-btn:hover {
+            animation: pulse-glow 1.5s infinite;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(41, 171, 135, 0.5);
+        }
+
+        /* BOUTON SUPPRIMER */
+        .delete-btn {
+            background: linear-gradient(145deg, #dc3545, #c82333);
+            color: white;
+            box-shadow: 0 4px 20px rgba(220, 53, 69, 0.3);
+        }
+
+        .delete-btn:hover {
+            animation: pulse-glow 1.5s infinite;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(220, 53, 69, 0.4);
+        }
+
+        /* EFFET DE LUMIÈRE */
+        .magic-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.13);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            pointer-events: none;
+        }
+
+        .magic-btn:hover::after {
+            left: 100%;
+            top: 100%;
+        }
+
+        /* ICÔNES ANIMÉES */
+        .btn-icon {
+            margin-right: 8px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .back-btn:hover .btn-icon {
+            transform: rotate(-20deg) scale(1.3);
+        }
+
+        .update-btn:hover .btn-icon {
+            transform: rotate(10deg) scale(1.3);
+        }
+
+        .delete-btn:hover .btn-icon {
+            transform: rotate(15deg) scale(1.3);
+        }
+
+        /* EFFET DE VAGUE */
+        .ripple-wave {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        /* FORM STYLING */
+        .edit-participation-container {
+            background: #FEFEFA;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1);
+            overflow: hidden;
+        }
+
+        .info-grid {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 25px;
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        /* Form elements styling */
+        input, select {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ACE1AF;
+            border-radius: 6px;
+            background: #FEFEFA;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        input:focus, select:focus {
+            border-color: #29AB87;
+            box-shadow: 0 0 0 3px rgba(41, 171, 135, 0.2);
+        }
+
+        label {
+            display: block;
+            color: #00693E;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        /* ZONE DE SUPPRESSION */
+        .delete-section {
+            background: #FFF8F8;
+            border-radius: 12px;
+            border: 1px solid #FFEBEE;
+            padding: 25px;
+            margin-top: 40px;
+            text-align: center;
+            box-shadow: 0 5px 25px rgba(0, 105, 62, 0.08);
+            border-top: 4px solid #d9534f;
+        }
+
+        .delete-title {
+            color: #D32F2F;
+            font-size: 1.3rem;
+            margin-bottom: 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            font-weight: 600;
+        }
+
+        .delete-warning {
+            color: #666;
+            margin-bottom: 20px;
+            line-height: 1.5;
+        }
+
+        /* RESPONSIVE */
+        @media (max-width: 768px) {
+            .edit-participation-container {
+                padding: 0 15px;
+            }
+            .info-grid {
+                grid-template-columns: 1fr;
+                gap: 15px;
+            }
+        }
+
+        /* SweetAlert2 Custom Styling */
+        .swal2-popup {
+            border-radius: 12px !important;
+            box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1) !important;
+        }
+        .swal2-title {
+            color: #00693E !important;
+            font-weight: 600 !important;
+        }
+        .swal2-content {
+            color: #333 !important;
+        }
+        .swal2-confirm.btn-success {
+            background: #00693E !important;
+            color: #FEFEFA !important;
+            border: none !important;
+            padding: 10px 24px !important;
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+        }
+        .swal2-confirm.btn-success:hover {
+            background: #013220 !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(1, 50, 32, 0.3) !important;
+        }
+        .swal2-confirm.btn-danger {
+            background: #D32F2F !important;
+            color: #FEFEFA !important;
+            border: none !important;
+            padding: 10px 24px !important;
+            border-radius: 6px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s !important;
+        }
+        .swal2-confirm.btn-danger:hover {
+            background: #B71C1C !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(211, 47, 47, 0.3) !important;
+        }
+    </style>
+{% endblock %}
+
 {% block body %}
     <!-- Début de la translation vers le bas -->
     <div style="transform: translateY(50px);">
 
         <div style="background: linear-gradient(to bottom, #FEFEFA 0%, #ACE1AF 100%); min-height: 100vh; padding: 40px 0;">
-            <div class="edit-participation-container" style="max-width: 800px; margin: 0 auto;">
+            <div class="edit-participation-container animate__animated animate__fadeIn" style="max-width: 800px; margin: 0 auto;">
                 <!-- Header Card -->
                 <div style="background: linear-gradient(135deg, #013220 0%, #00693E 100%); border-radius: 12px 12px 0 0; padding: 25px; box-shadow: 0 5px 20px rgba(1, 50, 32, 0.2);">
-                    <div style="display: flex; align-items: center; justify-content: space-between;">
+                    <div style="display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 15px;">
                         <h1 style="color: #FEFEFA; margin: 0; font-size: 1.8rem; font-weight: 600;">
                             <i class="fas fa-user-edit mr-2"></i>Modifier Participation
                         </h1>
-                        <a href="{{ path('app_participation_index') }}"
-                           style="background: rgba(254, 254, 250, 0.15); color: #FEFEFA; border: 1px solid #FEFEFA; padding: 8px 16px; border-radius: 6px; text-decoration: none; display: flex; align-items: center; transition: all 0.3s;"
-                           onmouseover="this.style.background='rgba(254, 254, 250, 0.25)';this.style.transform='translateY(-2px)'"
-                           onmouseout="this.style.background='rgba(254, 254, 250, 0.15)';this.style.transform='translateY(0)'">
-                            <i class="fas fa-arrow-left mr-2"></i> Retour
+                        <a href="{{ path('app_participation_index') }}" class="magic-btn back-btn">
+                            <i class="fas fa-arrow-left btn-icon"></i> Retour
                         </a>
                     </div>
                 </div>
 
                 <!-- Main Form Card -->
-                <div style="background: #FEFEFA; border-radius: 0 0 12px 12px; box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1); padding: 30px;">
-                    {{ form_start(form, {'attr': {'class': 'participation-form', 'style': 'margin-bottom: 25px;'}}) }}
+                <div style="background: #FEFEFA; border-radius: 0 0 12px 12px; box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1);">
+                    {{ form_start(form, {'attr': {'class': 'participation-form', 'style': 'margin-bottom: 25px;', 'id': 'participation-edit-form'}}) }}
 
-                    <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 25px; margin-bottom: 25px;">
+                    <div class="info-grid">
                         <!-- Left Column -->
                         <div>
                             <!-- First Name -->
-                            <div class="form-group" style="margin-bottom: 25px;">
-                                {{ form_label(form.firstName, 'Prénom', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
-                                {{ form_widget(form.firstName, {'attr': {
-                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
-                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
-                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
-                                }}) }}
+                            <div class="form-group">
+                                {{ form_label(form.firstName, 'Prénom') }}
+                                {{ form_widget(form.firstName) }}
                             </div>
 
                             <!-- Last Name -->
-                            <div class="form-group" style="margin-bottom: 25px;">
-                                {{ form_label(form.lastName, 'Nom', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
-                                {{ form_widget(form.lastName, {'attr': {
-                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
-                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
-                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
-                                }}) }}
+                            <div class="form-group">
+                                {{ form_label(form.lastName, 'Nom') }}
+                                {{ form_widget(form.lastName) }}
                             </div>
 
                             <!-- Email -->
-                            <div class="form-group" style="margin-bottom: 25px;">
-                                {{ form_label(form.email, 'Email', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
-                                {{ form_widget(form.email, {'attr': {
-                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
-                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
-                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
-                                }}) }}
+                            <div class="form-group">
+                                {{ form_label(form.email, 'Email') }}
+                                {{ form_widget(form.email) }}
                             </div>
                         </div>
 
                         <!-- Right Column -->
                         <div>
                             <!-- Phone -->
-                            <div class="form-group" style="margin-bottom: 25px;">
-                                {{ form_label(form.phone, 'Téléphone', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
-                                {{ form_widget(form.phone, {'attr': {
-                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
-                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
-                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
-                                }}) }}
+                            <div class="form-group">
+                                {{ form_label(form.phone, 'Téléphone') }}
+                                {{ form_widget(form.phone) }}
                             </div>
 
                             <!-- City -->
-                            <div class="form-group" style="margin-bottom: 25px;">
-                                {{ form_label(form.city, 'Ville', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
-                                {{ form_widget(form.city, {'attr': {
-                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
-                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
-                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
-                                }}) }}
+                            <div class="form-group">
+                                {{ form_label(form.city, 'Ville') }}
+                                {{ form_widget(form.city) }}
                             </div>
 
                             <!-- Zip Code -->
-                            <div class="form-group" style="margin-bottom: 25px;">
-                                {{ form_label(form.zipCode, 'Code Postal', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
-                                {{ form_widget(form.zipCode, {'attr': {
-                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
-                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
-                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
-                                }}) }}
+                            <div class="form-group">
+                                {{ form_label(form.zipCode, 'Code Postal') }}
+                                {{ form_widget(form.zipCode) }}
                             </div>
 
                             <!-- Country -->
                             <div class="form-group">
-                                {{ form_label(form.country, 'Pays', {'label_attr': {'style': 'display: block; color: #00693E; font-weight: 600; margin-bottom: 8px; font-size: 0.9rem;'}}) }}
-                                {{ form_widget(form.country, {'attr': {
-                                    'style': 'width: 100%; padding: 12px 15px; border: 1px solid #ACE1AF; border-radius: 6px; background: #FEFEFA; transition: all 0.3s;',
-                                    'onfocus': 'this.style.borderColor="#29AB87";this.style.boxShadow="0 0 0 3px rgba(41, 171, 135, 0.2)"',
-                                    'onblur': 'this.style.borderColor="#ACE1AF";this.style.boxShadow="none"'
-                                }}) }}
+                                {{ form_label(form.country, 'Pays') }}
+                                {{ form_widget(form.country) }}
                             </div>
                         </div>
                     </div>
 
                     <!-- Submit Button -->
-                    <div style="text-align: center; margin-top: 20px;">
-                        <button type="submit" class="btn" style="background: #00693E; color: #FEFEFA; border: none; padding: 12px 30px; border-radius: 6px; font-weight: 600; font-size: 1rem; transition: all 0.3s; box-shadow: 0 4px 15px rgba(0, 105, 62, 0.2);"
-                                onmouseover="this.style.background='#013220';this.style.transform='translateY(-2px)';this.style.boxShadow='0 6px 20px rgba(1, 50, 32, 0.3)'"
-                                onmouseout="this.style.background='#00693E';this.style.transform='translateY(0)';this.style.boxShadow='0 4px 15px rgba(0, 105, 62, 0.2)'">
-                            <i class="fas fa-save mr-2"></i> Mettre à jour
+                    <div style="text-align: center; margin: 20px 0;">
+                        <button type="submit" class="magic-btn update-btn">
+                            <i class="fas fa-save btn-icon"></i> Mettre à jour
                         </button>
                     </div>
                     {{ form_end(form) }}
 
                     <!-- Delete Section -->
-                    <div style="background: #FEFEFA; border-radius: 8px; border: 1px solid #FFEBEE; padding: 20px; margin-top: 40px; text-align: center;">
-                        <h3 style="color: #D32F2F; font-size: 1.2rem; margin-bottom: 15px; display: flex; align-items: center; justify-content: center;">
-                            <i class="fas fa-exclamation-circle mr-2"></i>Zone de Suppression
+                    <div class="delete-section animate__animated animate__fadeInUp">
+                        <h3 class="delete-title">
+                            <i class="fas fa-exclamation-triangle mr-2"></i>Zone de Suppression
                         </h3>
-                        <p style="color: #666; margin-bottom: 15px;">
+                        <p class="delete-warning">
                             Attention : Cette action est irréversible. Toutes les données seront définitivement supprimées.
                         </p>
                         {{ include('participation/_delete_form.html.twig') }}
@@ -131,33 +350,90 @@
 
     </div>  <!-- Fin de la div de translation -->
 
-    <style>
-        /* Responsive adjustments */
-        @media (max-width: 768px) {
-            .edit-participation-container {
-                padding: 0 15px;
-            }
-            .participation-form > div {
-                grid-template-columns: 1fr !important;
-                gap: 15px !important;
-            }
-        }
+    <!-- Include SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <!-- Include jQuery for AJAX -->
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+{% endblock %}
 
-        /* Form elements styling */
-        input, select {
-            outline: none;
-        }
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // EFFET DE VAGUE SUR TOUS LES BOUTONS
+        document.querySelectorAll('.magic-btn').forEach(btn => {
+            btn.addEventListener('click', function(e) {
+                // Créer l'effet de vague
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple-wave');
 
-        /* Delete form button styling */
-        .btn-danger {
-            background: #D32F2F !important;
-            border: none !important;
-            padding: 8px 20px !important;
-            transition: all 0.3s !important;
-        }
-        .btn-danger:hover {
-            background: #B71C1C !important;
-            transform: translateY(-2px) !important;
-        }
-    </style>
+                const rect = btn.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size/2;
+                const y = e.clientY - rect.top - size/2;
+
+                ripple.style.width = ripple.style.height = `${size}px`;
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                this.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+        });
+
+        // Handle form submission with AJAX and show SweetAlert2
+        $(document).ready(function () {
+            $('#participation-edit-form').on('submit', function (e) {
+                e.preventDefault(); // Prevent the default form submission
+
+                let formData = new FormData(this);
+
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: $(this).attr('method'),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function (response) {
+                        Swal.fire({
+                            title: 'Succès !',
+                            text: 'La participation a été mise à jour avec succès.',
+                            icon: 'success',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#00693E',
+                            background: '#FEFEFA',
+                            customClass: {
+                                popup: 'animated tada',
+                                confirmButton: 'btn btn-success'
+                            },
+                            buttonsStyling: false
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '{{ path('app_participation_index') }}';
+                            }
+                        });
+                    },
+                    error: function (xhr) {
+                        let errorMessage = 'Une erreur s\'est produite lors de la mise à jour.';
+                        if (xhr.responseJSON && xhr.responseJSON.errors) {
+                            errorMessage = xhr.responseJSON.errors.join('<br>');
+                        }
+                        Swal.fire({
+                            title: 'Erreur',
+                            html: errorMessage,
+                            icon: 'error',
+                            confirmButtonText: 'OK',
+                            confirmButtonColor: '#D32F2F',
+                            background: '#FEFEFA',
+                            customClass: {
+                                popup: 'animated shake',
+                                confirmButton: 'btn btn-danger'
+                            },
+                            buttonsStyling: false
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

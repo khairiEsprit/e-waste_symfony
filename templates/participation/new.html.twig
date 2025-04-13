@@ -2,12 +2,143 @@
 
 {% block title %}New Participation{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        /* Styles améliorés pour les boutons */
+        .btn-magnetic {
+            position: relative;
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            transform: translateY(0);
+            z-index: 1;
+            border: none;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+
+        /* Bouton Principal (Save) */
+        .btn-primary {
+            background: linear-gradient(135deg, #29AB87 0%, #218838 100%);
+            box-shadow: 0 4px 15px rgba(41, 171, 135, 0.4);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            position: relative;
+        }
+
+        .btn-primary:hover {
+            transform: translateY(-3px) scale(1.02);
+            box-shadow: 0 8px 25px rgba(41, 171, 135, 0.6);
+        }
+
+        .btn-primary::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(135deg, #218838 0%, #29AB87 100%);
+            opacity: 0;
+            transition: opacity 0.4s ease;
+            z-index: -1;
+            border-radius: 50px;
+        }
+
+        .btn-primary:hover::before {
+            opacity: 1;
+        }
+
+        /* Bouton Secondaire (Back) */
+        .btn-outline-secondary {
+            border: 2px solid #6c757d;
+            color: #6c757d;
+            padding: 10px 25px;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            background-color: transparent;
+            font-weight: 600;
+        }
+
+        .btn-outline-secondary:hover {
+            background-color: #6c757d;
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+        }
+
+        /* Effet Magnétique */
+        .btn-magnetic:hover {
+            animation: magnetic 0.5s ease;
+        }
+
+        @keyframes magnetic {
+            0%, 100% { transform: translateY(-3px) scale(1.02); }
+            50% { transform: translateY(-5px) scale(1.05); }
+        }
+
+        /* Effet de Lumière */
+        .btn-primary::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.1);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            pointer-events: none;
+        }
+
+        .btn-primary:hover::after {
+            left: 100%;
+            top: 100%;
+        }
+
+        /* Effet de Vague amélioré */
+        .ripple-effect {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.6);
+            transform: scale(0);
+            animation: ripple 0.8s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(3);
+                opacity: 0;
+            }
+        }
+
+        /* Icônes animées */
+        .btn-primary i, .btn-outline-secondary i {
+            transition: transform 0.3s ease;
+        }
+
+        .btn-primary:hover i {
+            transform: translateX(3px) rotate(5deg);
+        }
+
+        .btn-outline-secondary:hover i {
+            transform: translateX(-3px);
+        }
+
+        /* Autres styles existants... */
+    </style>
+{% endblock %}
+
 {% block body %}
     <div class="container py-5" style="transform: translateY(30px);">
-        <div class="row justify-content-center align-items-stretch gx-4"> <!-- Alignement parfait -->
-            <!-- Colonne formulaire (7 colonnes) -->
-            <div class="col-lg-7 mb-4 mb-lg-0 d-flex"> <!-- d-flex pour alignement -->
-                <div class="card shadow border-0 w-100"> <!-- w-100 pour largeur complète -->
+        <div class="row justify-content-center align-items-stretch gx-4">
+            <!-- Colonne formulaire -->
+            <div class="col-lg-7 mb-4 mb-lg-0 d-flex">
+                <div class="card shadow border-0 w-100">
                     <div class="card-header bg-success text-white py-3">
                         <h1 class="h4 mb-0">Create New Participation</h1>
                     </div>
@@ -15,81 +146,144 @@
                         {{ include('participation/_form.html.twig') }}
                     </div>
                     <div class="card-footer bg-light py-3">
-                        <a href="{{ path('app_participation_index') }}" class="btn btn-outline-secondary">
-                            <i class="fas fa-arrow-left mr-2"></i> Back to list
+                        <a href="{{ path('app_participation_index') }}"
+                           class="btn btn-outline-secondary btn-magnetic">
+                            <i class="fas fa-arrow-left me-2"></i> Back to list
                         </a>
                     </div>
                 </div>
             </div>
 
-            <!-- Colonne image (5 colonnes) - Design amélioré -->
-            <div class="col-lg-5 d-flex"> <!-- d-flex pour alignement -->
+            <!-- Colonne image (identique) -->
+            <div class="col-lg-5 d-flex">
                 <div class="card shadow border-0 w-100" style="border-left: 4px solid #29AB87;">
                     <div class="position-relative h-100">
-                        <!-- Image responsive -->
                         <img src="{{ asset('assets/front/assets/img/participation-image2.jpg') }}"
                              class="img-fluid h-100 w-100"
                              style="object-fit: cover; min-height: 300px;"
                              alt="Éco-participation">
 
-                        <!-- Overlay moderne -->
                         <div class="position-absolute bottom-0 start-0 end-0 p-4"
                              style="background: linear-gradient(to top, rgba(0,105,62,0.9), transparent);">
-
-                            <div class="d-flex align-items-center mb-3">
-                                <div class="bg-white rounded-circle p-2 me-3 flex-shrink-0">
-                                    <i class="fas fa-leaf text-success"></i>
-                                </div>
-                                <h3 class="text-white mb-0 h5">Engagement Écologique</h3>
-                            </div>
-
-                            <div class="ps-5"> <!-- Décalage pour aligner avec l'icône -->
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="fas fa-check-circle text-white me-2 small"></i>
-                                    <p class="text-white small mb-0">Suivi temps réel de votre impact</p>
-                                </div>
-
-                                <div class="d-flex align-items-center mb-2">
-                                    <i class="fas fa-check-circle text-white me-2 small"></i>
-                                    <p class="text-white small mb-0">Optimisation des collectes</p>
-                                </div>
-
-                                <div class="d-flex align-items-center">
-                                    <i class="fas fa-check-circle text-white me-2 small"></i>
-                                    <p class="text-white small mb-0">Communauté active</p>
-                                </div>
-                            </div>
+                            <h3 class="text-white mb-2">#ECO-BYTE</h3>
+                            <p class="text-white-50 mb-0">BESOIN DE NATURE<br>REJOIGNEZ L'AVENTURE</p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
 
-    <style>
-        /* Animation harmonieuse */
-        .card {
-            transition: all 0.3s ease;
-        }
-        .card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 10px 20px rgba(0,0,0,0.15) !important;
-        }
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Afficher les alertes flash
+            {% for message in app.flashes('success') %}
+            Swal.fire({
+                title: 'Succès',
+                text: '{{ message }}',
+                icon: 'success',
+                confirmButtonColor: '#29AB87',
+                background: '#f8f9fa',
+                backdrop: `
+                        rgba(41, 171, 135, 0.4)
+                        url("/images/leaf-pattern.png")
+                        center top
+                        no-repeat
+                    `,
+                timer: 3000
+            });
+            {% endfor %}
 
-        /* Effet sur les icônes */
-        .fa-check-circle {
-            transition: transform 0.3s ease;
-        }
-        .card:hover .fa-check-circle {
-            transform: scale(1.2);
-            color: #ACE1AF !important;
-        }
+            // Effet de vague amélioré
+            const buttons = document.querySelectorAll('.btn-primary, .btn-outline-secondary');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    // Effet de vague
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple-effect');
 
-        /* Adaptation responsive */
-        @media (max-width: 992px) {
-            .card {
-                margin-bottom: 20px;
+                    const rect = btn.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size/2;
+                    const y = e.clientY - rect.top - size/2;
+
+                    ripple.style.width = ripple.style.height = `${size}px`;
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+
+                    this.appendChild(ripple);
+
+                    setTimeout(() => ripple.remove(), 800);
+
+                    // Effet de rebond
+                    this.classList.add('animate__animated', 'animate__rubberBand');
+                    setTimeout(() => {
+                        this.classList.remove('animate__animated', 'animate__rubberBand');
+                    }, 1000);
+                });
+            });
+
+            // Gestion du formulaire (identique)
+            const form = document.querySelector('.needs-validation');
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    if (!form.checkValidity()) {
+                        event.stopPropagation();
+                        form.classList.add('was-validated');
+
+                        const invalidFields = form.querySelectorAll('.is-invalid');
+                        if (invalidFields.length > 0) {
+                            invalidFields[0].focus();
+                            Swal.fire({
+                                title: 'Formulaire incomplet',
+                                text: 'Veuillez corriger les erreurs dans le formulaire.',
+                                icon: 'error',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
+                        return;
+                    }
+
+                    // Confirmation avant soumission
+                    Swal.fire({
+                        title: 'Confirmer la participation',
+                        html: `
+                            <div class="text-center">
+                                <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+                                <p>Êtes-vous sûr de vouloir soumettre votre participation ?</p>
+                            </div>
+                        `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#29AB87',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="fas fa-check me-2"></i> Confirmer',
+                        cancelButtonText: '<i class="fas fa-times me-2"></i> Annuler',
+                        customClass: {
+                            confirmButton: 'btn btn-primary btn-magnetic',
+                            cancelButton: 'btn btn-outline-secondary'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.removeEventListener('submit', arguments.callee);
+                            form.submit();
+
+                            Swal.fire({
+                                title: 'Envoi en cours',
+                                html: '<div class="spinner-border text-success"></div><p class="mt-3">Traitement de votre participation...</p>',
+                                showConfirmButton: false,
+                                allowOutsideClick: false
+                            });
+                        }
+                    });
+                });
             }
-        }
-    </style>
+        });
+    </script>
 {% endblock %}

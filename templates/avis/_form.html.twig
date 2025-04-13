@@ -1,5 +1,5 @@
 <div style="transform: translateY(100px); margin-bottom: 70px;">
-    {{ form_start(form, {'attr': {'novalidate': 'novalidate'}}) }}
+    {{ form_start(form, {'attr': {'id': 'avis-form', 'novalidate': 'novalidate'}}) }}
 
     {# Champ Nom #}
     <div class="mb-4">
@@ -10,27 +10,48 @@
             'attr': {
                 'class': 'form-control',
                 'style': 'border-color: #29AB87;',
-                'placeholder': 'Votre nom complet'
+                'placeholder': 'Votre nom',
+                'id': 'avis_nom'
             }
         }) }}
-        {{ form_errors(form.nom, {
+        <div class="error-message text-danger mt-2" id="nom-error"></div>
+    </div>
+
+    {# Champ Avis #}
+    <div class="mb-4">
+        {{ form_label(form.avis, 'Votre avis', {
+            'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #013220;'}
+        }) }}
+        {{ form_widget(form.avis, {
+            'attr': {
+                'class': 'form-control',
+                'style': 'border-color: #29AB87;',
+                'rows': 5,
+                'placeholder': 'Décrivez votre expérience en détail...',
+                'id': 'avis_avis'
+            }
+        }) }}
+        <div class="error-message text-danger mt-2" id="avis-error"></div>
+        {{ form_errors(form.avis, {
             'attr': {'class': 'alert alert-danger mt-2 py-2'}
         }) }}
     </div>
 
     {# Champ Description #}
     <div class="mb-4">
-        {{ form_label(form.description, 'Votre avis', {
+        {{ form_label(form.description, 'Description détaillée (optionnelle)', {
             'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #013220;'}
         }) }}
         {{ form_widget(form.description, {
             'attr': {
                 'class': 'form-control',
                 'style': 'border-color: #29AB87;',
-                'rows': 5,
-                'placeholder': 'Décrivez votre expérience en détail...'
+                'rows': 4,
+                'placeholder': 'Ajoutez des détails supplémentaires si nécessaire...',
+                'id': 'avis_description'
             }
         }) }}
+        <div class="error-message text-danger mt-2" id="description-error"></div>
         {{ form_errors(form.description, {
             'attr': {'class': 'alert alert-danger mt-2 py-2'}
         }) }}
@@ -46,19 +67,23 @@
                 <input type="radio" id="{{ form.note.vars.id }}_{{ i }}"
                        name="{{ form.note.vars.full_name }}"
                        value="{{ i }}"
-                        {{ form.note.vars.value == i ? 'checked' : '' }}
+                       {{ form.note.vars.value == i ? 'checked' : '' }}
+                       class="star-rating-input"
                        required>
                 <label for="{{ form.note.vars.id }}_{{ i }}" title="{{ i }} étoiles">★</label>
             {% endfor %}
         </div>
-        {{ form_errors(form.note, {
-            'attr': {'class': 'alert alert-danger mt-2 py-2'}
-        }) }}
+        
+        {# Hidden field to ensure the note value is always included in the form #}
+        {{ form_widget(form.note, {'attr': {'class': 'd-none', 'id': 'avis_note_hidden'}}) }}
+       
+        <div class="error-message text-danger mt-2" id="note-error"></div>
     </div>
+    
 
     {# Bouton de soumission #}
-    <button type="submit" class="btn w-100 py-3" style="background-color: #00693E; color: white;">
-        <i class="fas fa-save me-2"></i> {{ button_label|default('Enregistrer') }}
+    <button type="submit" class="btn w-100 py-3 save-btn">
+        <i class="fas fa-save btn-icon me-2"></i> {{ button_label|default('Enregistrer') }}
     </button>
 
     {{ form_end(form) }}
@@ -123,5 +148,87 @@
     /* Indicateur de champ obligatoire */
     .text-danger {
         color: #dc3545 !important;
+    }
+
+    /* Bouton Enregistrer (aligné avec le style de new.html.twig) */
+    .save-btn {
+        position: relative;
+        overflow: hidden;
+        border: none;
+        font-weight: 600;
+        letter-spacing: 1px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.5s ease;
+        border-radius: 50px;
+        padding: 10px 24px;
+        font-size: 14px;
+        background: linear-gradient(145deg, #29AB87, #218838);
+        color: white;
+        box-shadow: 0 4px 20px rgba(41, 171, 135, 0.35);
+    }
+
+    .save-btn:hover {
+        animation: pulse-glow 1.5s infinite;
+        transform: translateY(-3px);
+        box-shadow: 0 8px 30px rgba(41, 171, 135, 0.5);
+    }
+
+    .save-btn::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -60%;
+        width: 200%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.13);
+        transform: rotate(45deg);
+        transition: all 0.6s ease;
+        pointer-events: none;
+    }
+
+    .save-btn:hover::after {
+        left: 100%;
+        top: 100%;
+    }
+
+    .save-btn .btn-icon {
+        margin-right: 8px;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .save-btn:hover .btn-icon {
+        transform: rotate(10deg) scale(1.3);
+    }
+
+    /* Effet de vague */
+    .ripple-wave {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.7);
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+        pointer-events: none;
+    }
+
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    @keyframes pulse-glow {
+        0% { box-shadow: 0 0 0 0 rgba(41, 171, 135, 0.7); }
+        70% { box-shadow: 0 0 0 12px rgba(41, 171, 135, 0); }
+        100% { box-shadow: 0 0 0 0 rgba(41, 171, 135, 0); }
+    }
+
+    /* Style pour les messages d'erreur locaux */
+    .error-message {
+        font-size: 0.9rem;
+        font-weight: 500;
     }
 </style>

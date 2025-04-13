@@ -5,7 +5,7 @@
         <div class="container-fluid">
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3 mb-0" style="color: #013220;">Gestion des Événements</h1>
-                <a href="{{ path('app_event_new') }}" class="btn" style="background-color: #29AB87; color: white;">
+                <a href="{{ path('app_event_new') }}" class="btn btn-new-event" style="background-color: #29AB87; color: white;">
                     <i class="fas fa-plus-circle me-1"></i> Nouvel Événement
                 </a>
             </div>
@@ -35,17 +35,37 @@
                                     </span>
                                     </td>
                                     <td class="text-end pe-4">
-                                        <div class="btn-group" role="group">
-                                            <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-sm" style="background-color: #ACE1AF;">
-                                                <i class="fas fa-eye" style="color: #013220;"></i>
+                                        <div class="d-flex justify-content-end action-buttons">
+                                            <!-- Bouton Voir -->
+                                            <a href="{{ path('app_event_show', {'id': event.id}) }}"
+                                               class="btn btn-action btn-view me-2"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               title="Voir détails">
+                                                <span class="btn-icon"><i class="fas fa-eye"></i></span>
+                                                <span class="btn-text">Voir</span>
                                             </a>
-                                            <a href="{{ path('app_event_edit', {'id': event.id}) }}" class="btn btn-sm" style="background-color: #29AB87; color: white;">
-                                                <i class="fas fa-edit"></i>
+
+                                            <!-- Bouton Modifier -->
+                                            <a href="{{ path('app_event_edit', {'id': event.id}) }}"
+                                               class="btn btn-action btn-edit me-2"
+                                               data-bs-toggle="tooltip"
+                                               data-bs-placement="top"
+                                               title="Modifier">
+                                                <span class="btn-icon"><i class="fas fa-edit"></i></span>
+                                                <span class="btn-text">Modifier</span>
                                             </a>
+
+                                            <!-- Bouton Supprimer -->
                                             <form method="post" action="{{ path('app_event_delete', {'id': event.id}) }}" class="d-inline">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
-                                                <button class="btn btn-sm" style="background-color: #e74c3c; color: white;">
-                                                    <i class="fas fa-trash-alt"></i>
+                                                <button class="btn btn-action btn-delete"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-placement="top"
+                                                        title="Supprimer"
+                                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')">
+                                                    <span class="btn-icon"><i class="fas fa-trash-alt"></i></span>
+                                                    <span class="btn-text">Supprimer</span>
                                                 </button>
                                             </form>
                                         </div>
@@ -70,10 +90,150 @@
     <style>
         .table-hover tbody tr:hover {
             background-color: rgba(172, 225, 175, 0.2);
+            transform: translateY(-1px);
+            transition: all 0.3s ease;
         }
         .card {
             border-radius: 10px;
             overflow: hidden;
+            transition: all 0.3s ease;
+        }
+        .btn-new-event:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(41, 171, 135, 0.3);
+        }
+        .action-buttons {
+            gap: 8px;
+        }
+        .btn-action {
+            border-radius: 6px !important;
+            padding: 6px 12px;
+            display: inline-flex;
+            align-items: center;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            font-size: 0.875rem;
+            border: 1px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+        .btn-action .btn-icon {
+            transition: all 0.3s ease;
+        }
+        .btn-action .btn-text {
+            transition: all 0.3s ease;
+        }
+        .btn-view {
+            background-color: #FEFEFA;
+            color: #29AB87;
+            border-color: #29AB87;
+        }
+        .btn-view:hover {
+            background-color: #29AB87;
+            color: white;
+        }
+        .btn-view:hover .btn-icon {
+            animation: bounce 0.6s ease;
+        }
+        .btn-edit {
+            background-color: #FEFEFA;
+            color: #29AB87;
+            border-color: #29AB87;
+        }
+        .btn-edit:hover {
+            background-color: #29AB87;
+            color: white;
+        }
+        .btn-edit:hover .btn-icon {
+            animation: spin 0.6s ease;
+        }
+        .btn-delete {
+            background-color: #FEFEFA;
+            color: #e74c3c;
+            border-color: #e74c3c;
+        }
+        .btn-delete:hover {
+            background-color: #e74c3c;
+            color: white;
+        }
+        .btn-delete:hover .btn-icon {
+            animation: shake 0.6s ease;
+        }
+        .btn-action:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+        }
+        .btn-action:active {
+            transform: translateY(1px);
+        }
+        .badge {
+            padding: 6px 10px;
+            border-radius: 12px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+        }
+        @keyframes bounce {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-5px); }
+        }
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        @keyframes shake {
+            0%, 100% { transform: translateX(0); }
+            20%, 60% { transform: translateX(-3px); }
+            40%, 80% { transform: translateX(3px); }
+        }
+        .btn-action::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: scaleX(0);
+            transform-origin: right;
+            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            z-index: 0;
+        }
+        .btn-action:hover::after {
+            transform: scaleX(1);
+            transform-origin: left;
         }
     </style>
+
+    <script>
+        // Activation des tooltips Bootstrap
+        document.addEventListener('DOMContentLoaded', function() {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl, {
+                    trigger: 'hover'
+                });
+            });
+
+            // Effet de vague au clic
+            const buttons = document.querySelectorAll('.btn-action');
+            buttons.forEach(button => {
+                button.addEventListener('click', function(e) {
+                    if(this.tagName === 'A' || this.tagName === 'BUTTON') {
+                        const x = e.pageX - this.getBoundingClientRect().left;
+                        const y = e.pageY - this.getBoundingClientRect().top;
+
+                        const ripple = document.createElement('span');
+                        ripple.classList.add('ripple-effect');
+                        ripple.style.left = `${x}px`;
+                        ripple.style.top = `${y}px`;
+                        this.appendChild(ripple);
+
+                        setTimeout(() => {
+                            ripple.remove();
+                        }, 600);
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

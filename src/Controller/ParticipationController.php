@@ -39,7 +39,7 @@ class ParticipationController extends AbstractController
     }
 
     #[Route('/new', name: 'app_participation_new', methods: ['GET', 'POST'])]
-    public function new(Request $request, EntityManagerInterface $entityManager, ValidatorInterface $validator): Response
+    public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $participation = new Participation();
         $form = $this->createForm(ParticipationType::class, $participation);
@@ -49,35 +49,31 @@ class ParticipationController extends AbstractController
             // Vérification de l'unicité du téléphone et de l'email
             $existingParticipation = $entityManager
                 ->getRepository(Participation::class)
-                ->findOneBy([
-                    'email' => $participation->getEmail(),
-                ]);
-
-            if ($existingParticipation) {
-                $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cet email est déjà utilisé.'));
-            }
+                ->findOneBy(['email' => $participation->getEmail()]);
 
             $existingPhone = $entityManager
                 ->getRepository(Participation::class)
-                ->findOneBy([
-                    'phone' => $participation->getPhone(),
-                ]);
+                ->findOneBy(['phone' => $participation->getPhone()]);
+
+            if ($existingParticipation) {
+                $form->get('email')->addError(new FormError('Cet email est déjà utilisé.'));
+            }
 
             if ($existingPhone) {
-                $form->get('phone')->addError(new \Symfony\Component\Form\FormError('Ce numéro de téléphone est déjà utilisé.'));
+                $form->get('phone')->addError(new FormError('Ce numéro de téléphone est déjà utilisé.'));
             }
 
             if (!$existingParticipation && !$existingPhone) {
                 $entityManager->persist($participation);
                 $entityManager->flush();
 
-                return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
+                $this->addFlash('success', 'Votre participation a été enregistrée avec succès!');
+                return $this->redirectToRoute('app_participation_index');
             }
         }
 
         return $this->render('participation/new.html.twig', [
-            'participation' => $participation,
-            'form' => $form,
+            'form' => $form->createView(),
         ]);
     }
 
@@ -96,28 +92,37 @@ class ParticipationController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $existingParticipation = $entityManager
-                ->getRepository(Participation::class)
-                ->findOneBy([
-                    'email' => $participation->getEmail(),
-                ]);
+            // Vérification des doublons seulement si email ou phone ont changé
+            $emailChanged = $participation->getEmail() !== $form->get('email')->getData();
+            $phoneChanged = $participation->getPhone() !== $form->get('phone')->getData();
 
-            if ($existingParticipation && $existingParticipation->getId() !== $participation->getId()) {
-                $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cet email est déjà utilisé.'));
+            $hasError = false;
+
+            if ($emailChanged) {
+                $existingEmail = $entityManager
+                    ->getRepository(Participation::class)
+                    ->findOneBy(['email' => $participation->getEmail()]);
+
+                if ($existingEmail && $existingEmail->getId() !== $participation->getId()) {
+                    $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cet email est déjà utilisé.'));
+                    $hasError = true;
+                }
             }
 
-            $existingPhone = $entityManager
-                ->getRepository(Participation::class)
-                ->findOneBy([
-                    'phone' => $participation->getPhone(),
-                ]);
+            if ($phoneChanged) {
+                $existingPhone = $entityManager
+                    ->getRepository(Participation::class)
+                    ->findOneBy(['phone' => $participation->getPhone()]);
 
-            if ($existingPhone && $existingPhone->getId() !== $participation->getId()) {
-                $form->get('phone')->addError(new \Symfony\Component\Form\FormError('Ce numéro de téléphone est déjà utilisé.'));
+                if ($existingPhone && $existingPhone->getId() !== $participation->getId()) {
+                    $form->get('phone')->addError(new \Symfony\Component\Form\FormError('Ce numéro de téléphone est déjà utilisé.'));
+                    $hasError = true;
+                }
             }
 
-            if (!$existingParticipation && !$existingPhone) {
+            if (!$hasError) {
                 $entityManager->flush();
+                $this->addFlash('success', 'La participation a été mise à jour avec succès.');
                 return $this->redirectToRoute('app_participation_index', [], Response::HTTP_SEE_OTHER);
             }
         }

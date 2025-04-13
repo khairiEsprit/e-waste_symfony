@@ -39,6 +39,9 @@ class AvisController extends AbstractController
     public function new(Request $request): Response
     {
         $avi = new Avis();
+        // Initialize createdAt to current date/time
+        $avi->setCreatedAt(new \DateTime());
+        
         $form = $this->createForm(AvisType::class, $avi, [
             'validation_groups' => ['create']
         ]);
@@ -46,19 +49,70 @@ class AvisController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted()) {
+            // Debug form data
+            $formData = $request->request->all();
+            
+            // Get the note value directly from the request if it exists
+            if (isset($formData['avis']) && isset($formData['avis']['note']) && !empty($formData['avis']['note'])) {
+                $noteValue = (int) $formData['avis']['note'];
+                if ($noteValue >= 1 && $noteValue <= 5) {
+                    $avi->setNote($noteValue);
+                }
+            }
+            
+            // Ensure note field is set
+            if (!$avi->getNote()) {
+                $form->get('note')->addError(new \Symfony\Component\Form\FormError('Veuillez sélectionner une note'));
+            }
+            
             // Validation manuelle pour vérifier l'unicité
             $errors = $this->validator->validate($avi, null, ['create']);
-
+            
             if ($form->isValid() && count($errors) === 0) {
-                $this->entityManager->persist($avi);
-                $this->entityManager->flush();
-
-                $this->addFlash('success', 'Votre avis a été publié avec succès !');
-                return $this->redirectToRoute('app_avis_index');
+                try {
+                    $this->entityManager->persist($avi);
+                    $this->entityManager->flush();
+                    
+                    $this->addFlash('success', 'Votre avis a été publié avec succès !');
+                    
+                    // If it's an AJAX request, return a JSON response
+                    if ($request->isXmlHttpRequest()) {
+                        return $this->json([
+                            'success' => true,
+                            'message' => 'Votre avis a été publié avec succès !',
+                            'redirect' => $this->generateUrl('app_avis_index')
+                        ]);
+                    }
+                    
+                    return $this->redirectToRoute('app_avis_index');
+                } catch (\Exception $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors de l\'enregistrement : ' . $e->getMessage());
+                    
+                    // If it's an AJAX request, return a JSON response
+                    if ($request->isXmlHttpRequest()) {
+                        return $this->json([
+                            'success' => false,
+                            'message' => 'Une erreur est survenue lors de l\'enregistrement : ' . $e->getMessage()
+                        ], 500);
+                    }
+                }
             }
 
             foreach ($errors as $error) {
                 $this->addFlash('error', $error->getMessage());
+            }
+            
+            // If it's an AJAX request, return form errors as JSON
+            if ($request->isXmlHttpRequest()) {
+                $formErrors = [];
+                foreach ($form->getErrors(true) as $error) {
+                    $formErrors[$error->getOrigin()->getName()] = $error->getMessage();
+                }
+                
+                return $this->json([
+                    'success' => false,
+                    'errors' => $formErrors
+                ], 400);
             }
         }
 

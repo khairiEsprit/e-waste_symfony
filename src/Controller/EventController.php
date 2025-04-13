@@ -17,7 +17,7 @@ final class EventController extends AbstractController
     #[Route('/', name: 'app_event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
-        return $this->render('event/index.html.twig', [ // Chemin corrigé
+        return $this->render('event/index.html.twig', [
             'events' => $eventRepository->findBy([], ['date' => 'ASC']),
         ]);
     }
@@ -27,18 +27,22 @@ final class EventController extends AbstractController
     {
         $event = new Event();
         $form = $this->createForm(EventType::class, $event);
-
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->persist($event);
-            $entityManager->flush();
+            try {
+                $entityManager->persist($event);
+                $entityManager->flush();
 
-            $this->addFlash('success', 'Événement créé avec succès');
-            return $this->redirectToRoute('app_event_index');
+                $this->addFlash('success', 'L\'événement "'.$event->getTitle().'" a été créé avec succès !');
+                return $this->redirectToRoute('app_event_index');
+
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la création de l\'événement');
+            }
         }
 
-        return $this->render('event/new.html.twig', [ // Chemin corrigé
+        return $this->render('event/new.html.twig', [
             'form' => $form->createView(),
             'event' => $event,
         ]);
@@ -47,7 +51,7 @@ final class EventController extends AbstractController
     #[Route('/{id}', name: 'app_event_show', methods: ['GET'])]
     public function show(Event $event): Response
     {
-        return $this->render('event/show.html.twig', [ // Chemin corrigé
+        return $this->render('event/show.html.twig', [
             'event' => $event,
         ]);
     }
@@ -59,12 +63,18 @@ final class EventController extends AbstractController
         $form->handleRequest($request);
 
         if ($form->isSubmitted() && $form->isValid()) {
-            $entityManager->flush();
-            $this->addFlash('success', 'Événement mis à jour avec succès');
-            return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+            try {
+                $entityManager->flush();
+
+                $this->addFlash('success', 'L\'événement "'.$event->getTitle().'" a été mis à jour avec succès !');
+                return $this->redirectToRoute('app_event_show', ['id' => $event->getId()]);
+
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la mise à jour de l\'événement');
+            }
         }
 
-        return $this->render('event/edit.html.twig', [ // Chemin corrigé
+        return $this->render('event/edit.html.twig', [
             'form' => $form->createView(),
             'event' => $event,
         ]);
@@ -74,9 +84,15 @@ final class EventController extends AbstractController
     public function delete(Request $request, Event $event, EntityManagerInterface $entityManager): Response
     {
         if ($this->isCsrfTokenValid('delete'.$event->getId(), $request->request->get('_token'))) {
-            $entityManager->remove($event);
-            $entityManager->flush();
-            $this->addFlash('success', 'Événement supprimé avec succès');
+            try {
+                $entityManager->remove($event);
+                $entityManager->flush();
+
+                $this->addFlash('success', 'L\'événement "'.$event->getTitle().'" a été supprimé avec succès !');
+
+            } catch (\Exception $e) {
+                $this->addFlash('error', 'Une erreur est survenue lors de la suppression de l\'événement');
+            }
         }
 
         return $this->redirectToRoute('app_event_index');

@@ -1,0 +1,312 @@
+{% extends 'back/index.html.twig' %}
+
+{% block content %}
+    <div class="app-content">
+        <div class="container-fluid">
+            <!-- Affichage des messages flash -->
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }} alert-dismissible fade show mb-4">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0" style="color: #013220;">Suggestions d'événements par IA</h1>
+                <a href="{{ path('app_event_index') }}" class="btn" style="background-color: #013220; color: #FEFEFA;">
+                    <i class="fas fa-arrow-left me-1"></i> Retour aux événements
+                </a>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body">
+                    <h5 class="card-title" style="color: #00693E;">Générer des suggestions d'événements</h5>
+                    <p class="text-muted">Utilisez l'IA pour générer des idées créatives pour vos événements de gestion des déchets électroniques.</p>
+                    
+                    <form id="suggestion-form" class="mt-3">
+                        <div class="mb-3">
+                            <label for="prompt" class="form-label fw-bold" style="color: #00693E;">Prompt pour l'IA</label>
+                            <textarea id="prompt" class="form-control" rows="3" style="border-color: #29AB87;" 
+                                placeholder="Ex: Générer 3 idées d'événements sur le recyclage des déchets électroniques pour le mois prochain">Générer 3 idées créatives d'événements de sensibilisation à la gestion des déchets électroniques</textarea>
+                        </div>
+                        <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                            <button type="submit" class="btn px-4" style="background-color: #29AB87; color: white;" id="generate-btn">
+                                <i class="fas fa-magic me-2"></i> Générer des suggestions
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div id="loading-indicator" class="text-center my-5 d-none">
+                <div class="spinner-border" style="color: #29AB87; width: 3rem; height: 3rem;" role="status">
+                    <span class="visually-hidden">Chargement...</span>
+                </div>
+                <p class="mt-3 text-muted">Génération des suggestions en cours...</p>
+            </div>
+
+            <div id="error-message" class="alert alert-danger d-none" role="alert">
+                <i class="fas fa-exclamation-triangle me-2"></i>
+                <span id="error-text"></span>
+            </div>
+
+            <div id="suggestions-container" class="row g-4 mt-2">
+                <!-- Les suggestions générées seront affichées ici -->
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-control:focus {
+            border-color: #29AB87;
+            box-shadow: 0 0 0 0.25rem rgba(41, 171, 135, 0.25);
+        }
+        .card {
+            border-radius: 10px;
+            background-color: #FEFEFA;
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+        }
+        .suggestion-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1) !important;
+            cursor: pointer;
+        }
+        .suggestion-card .card-title {
+            color: #013220;
+            font-weight: 600;
+        }
+        .suggestion-badge {
+            background-color: rgba(41, 171, 135, 0.2);
+            color: #00693E;
+            font-weight: 500;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        .alert-error, .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+        .btn-outline-success {
+            color: #29AB87;
+            border-color: #29AB87;
+        }
+        .btn-outline-success:hover {
+            background-color: #29AB87;
+            color: white;
+        }
+        .spinner-border {
+            color: #29AB87;
+        }
+    </style>
+
+    <!-- Template pour les cartes de suggestion -->
+    <template id="suggestion-card-template">
+        <div class="col-md-4 suggestion-item">
+            <div class="card suggestion-card h-100 shadow-sm border-0">
+                <div class="card-body">
+                    <h5 class="card-title suggestion-title mb-3"></h5>
+                    <p class="card-text suggestion-description mb-3"></p>
+                    <div class="d-flex mb-3">
+                        <span class="badge suggestion-badge me-2">
+                            <i class="fas fa-map-marker-alt me-1"></i> <span class="suggestion-location"></span>
+                        </span>
+                        <span class="badge suggestion-badge">
+                            <i class="fas fa-users me-1"></i> <span class="suggestion-capacity"></span> places
+                        </span>
+                    </div>
+                    <div class="d-flex justify-content-end mt-3">
+                        <button class="btn btn-sm btn-outline-success use-suggestion-btn">
+                            <i class="fas fa-check me-1"></i> Utiliser cette suggestion
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Intégration de SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const suggestionForm = document.getElementById('suggestion-form');
+            const promptInput = document.getElementById('prompt');
+            const generateBtn = document.getElementById('generate-btn');
+            const loadingIndicator = document.getElementById('loading-indicator');
+            const errorMessage = document.getElementById('error-message');
+            const errorText = document.getElementById('error-text');
+            const suggestionsContainer = document.getElementById('suggestions-container');
+            const suggestionCardTemplate = document.getElementById('suggestion-card-template');
+
+            suggestionForm.addEventListener('submit', function(e) {
+                e.preventDefault();
+                
+                // Réinitialiser l'interface
+                suggestionsContainer.innerHTML = '';
+                errorMessage.classList.add('d-none');
+                
+                // Afficher l'indicateur de chargement
+                loadingIndicator.classList.remove('d-none');
+                generateBtn.disabled = true;
+                
+                // Envoyer la requête à l'API
+                fetch('{{ path("app_event_ai_suggestions_generate") }}', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                        'X-Requested-With': 'XMLHttpRequest'
+                    },
+                    body: new URLSearchParams({
+                        'prompt': promptInput.value
+                    })
+                })
+                .then(response => response.json())
+                .then(data => {
+                    // Masquer l'indicateur de chargement
+                    loadingIndicator.classList.add('d-none');
+                    generateBtn.disabled = false;
+                    
+                    if (data.success) {
+                        displaySuggestions(data.suggestions);
+                    } else {
+                        showError(data.message || 'Une erreur est survenue lors de la génération des suggestions.');
+                    }
+                })
+                .catch(error => {
+                    // Masquer l'indicateur de chargement
+                    loadingIndicator.classList.add('d-none');
+                    generateBtn.disabled = false;
+                    
+                    showError('Erreur de connexion: ' + error.message);
+                });
+            });
+
+            function displaySuggestions(suggestions) {
+                console.log('Received suggestions:', suggestions);
+                
+                // Si suggestions est un objet avec des événements numérotés
+                if (suggestions.events) {
+                    const events = Array.isArray(suggestions.events) ? suggestions.events : Object.values(suggestions.events);
+                    console.log('Processing events array:', events);
+                    events.forEach(displaySuggestionCard);
+                } 
+                // Si suggestions est un tableau d'événements
+                else if (Array.isArray(suggestions)) {
+                    console.log('Processing array of suggestions');
+                    suggestions.forEach(displaySuggestionCard);
+                }
+                // Si suggestions est un objet avec des propriétés directes
+                else if (suggestions.title && suggestions.description) {
+                    console.log('Processing single suggestion object');
+                    displaySuggestionCard(suggestions);
+                }
+                // Si aucun format reconnu, essayer de parcourir les propriétés de l'objet
+                else {
+                    console.log('Processing unknown format, trying to extract objects');
+                    Object.entries(suggestions).forEach(([key, value]) => {
+                        console.log(`Processing key ${key}:`, value);
+                        if (typeof value === 'object' && value !== null) {
+                            if (value.title && value.description) {
+                                displaySuggestionCard(value);
+                            } else if (Array.isArray(value)) {
+                                value.forEach(item => {
+                                    if (typeof item === 'object' && item !== null) {
+                                        displaySuggestionCard(item);
+                                    }
+                                });
+                            }
+                        }
+                    });
+                }
+                
+                // Si aucune suggestion n'a été affichée, afficher un message
+                if (suggestionsContainer.children.length === 0) {
+                    suggestionsContainer.innerHTML = `
+                        <div class="col-12">
+                            <div class="alert alert-info">
+                                <i class="fas fa-info-circle me-2"></i>
+                                Aucune suggestion n'a pu être générée. Veuillez réessayer avec un prompt différent.
+                            </div>
+                        </div>
+                    `;
+                }
+            }
+
+            function displaySuggestionCard(suggestion) {
+                console.log('Displaying suggestion card:', suggestion);
+                
+                // Extraire les données de la suggestion
+                let title, description, location, capacity;
+                
+                // Essayer d'extraire les données de différentes façons
+                if (typeof suggestion === 'string') {
+                    // Si c'est une chaîne, l'utiliser comme titre
+                    title = suggestion;
+                    description = '';
+                    location = 'À déterminer';
+                    capacity = '50';
+                } else {
+                    // Extraire le titre
+                    title = suggestion.title || suggestion.name || suggestion.event_title || 'Événement sans titre';
+                    
+                    // Extraire la description
+                    description = suggestion.description || suggestion.desc || suggestion.event_description || '';
+                    if (description.length > 200) {
+                        description = description.substring(0, 200) + '...';
+                    }
+                    
+                    // Extraire le lieu
+                    location = suggestion.location || suggestion.place || suggestion.venue || 'À déterminer';
+                    
+                    // Extraire la capacité
+                    capacity = suggestion.capacity || suggestion.remainingPlaces || suggestion.places || suggestion.attendees || '50';
+                }
+                
+                // Cloner le template
+                const cardClone = suggestionCardTemplate.content.cloneNode(true);
+                
+                // Remplir les données
+                cardClone.querySelector('.suggestion-title').textContent = title;
+                cardClone.querySelector('.suggestion-description').textContent = description;
+                cardClone.querySelector('.suggestion-location').textContent = location;
+                cardClone.querySelector('.suggestion-capacity').textContent = capacity;
+                
+                // Ajouter l'événement pour utiliser cette suggestion
+                const useBtn = cardClone.querySelector('.use-suggestion-btn');
+                useBtn.addEventListener('click', function() {
+                    useSuggestion({
+                        title: title,
+                        description: description,
+                        location: location,
+                        capacity: capacity
+                    });
+                });
+                
+                // Ajouter la carte au conteneur
+                suggestionsContainer.appendChild(cardClone);
+            }
+
+            function useSuggestion(suggestion) {
+                // Rediriger vers la page de création d'événement avec les données pré-remplies
+                const url = new URL('{{ path("app_event_new") }}', window.location.origin);
+                
+                // Stocker la suggestion dans le localStorage pour la récupérer sur la page de création
+                localStorage.setItem('event_suggestion', JSON.stringify(suggestion));
+                
+                // Rediriger vers la page de création
+                window.location.href = url.toString();
+            }
+
+            function showError(message) {
+                errorText.textContent = message;
+                errorMessage.classList.remove('d-none');
+            }
+        });
+    </script>
+{% endblock %}

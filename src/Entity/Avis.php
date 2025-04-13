@@ -5,91 +5,67 @@ namespace App\Entity;
 use App\Repository\AvisRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use DateTime;
 
 #[ORM\Entity(repositoryClass: AvisRepository::class)]
-#[UniqueEntity(
-    fields: ['nom', 'description'],
-    errorPath: 'nom',
-    message: 'Un avis identique existe déjà (même nom et description).'
-)]
 class Avis
 {
     #[ORM\Id]
     #[ORM\GeneratedValue]
-    #[ORM\Column]
+    #[ORM\Column(type: 'integer')]
     private ?int $id = null;
 
-    #[ORM\Column(nullable: true)]
-    private ?int $id_utilisateur = null;
-
-    #[ORM\Column(nullable: true)]
-    private ?int $id_centre = null;
-
-    #[ORM\Column(length: 50)]
-    #[Assert\NotBlank(message: "Le nom est obligatoire")]
+    #[ORM\Column(type: 'string', length: 100)]
+    #[Assert\NotBlank(message: "Le nom est obligatoire", groups: ["create", "update"])]
     #[Assert\Length(
         min: 2,
-        max: 50,
-        minMessage: "Le nom doit contenir au moins {{ limit }} caractères",
-        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères"
+        max: 100,
+        minMessage: "Le nom doit faire au moins {{ limit }} caractères",
+        maxMessage: "Le nom ne peut pas dépasser {{ limit }} caractères",
+        groups: ["create", "update"]
     )]
     private ?string $nom = null;
 
-    #[ORM\Column(length: 255)]
-    #[Assert\NotBlank(message: "La description est obligatoire")]
+    #[ORM\Column(type: 'text')]
+    #[Assert\NotBlank(message: "L'avis est obligatoire", groups: ["create", "update"])]
     #[Assert\Length(
         min: 10,
         max: 255,
-        minMessage: "La description doit contenir au moins {{ limit }} caractères",
-        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères"
+        minMessage: "L'avis doit faire au moins {{ limit }} caractères",
+        maxMessage: "L'avis ne peut pas dépasser {{ limit }} caractères",
+        groups: ["create", "update"]
+    )]
+    private ?string $avis = null;
+    
+    #[ORM\Column(type: 'text', nullable: true)]
+    #[Assert\Length(
+        max: 1000,
+        maxMessage: "La description ne peut pas dépasser {{ limit }} caractères",
+        groups: ["create", "update"]
     )]
     private ?string $description = null;
 
-    #[ORM\Column]
-    #[Assert\NotBlank(message: "La note est obligatoire")]
+    #[ORM\Column(type: 'integer')]
+    #[Assert\NotBlank(message: "La note est obligatoire", groups: ["create", "update"])]
     #[Assert\Range(
         min: 1,
         max: 5,
-        notInRangeMessage: "La note doit être entre {{ min }} et {{ max }}"
+        notInRangeMessage: "La note doit être entre {{ min }} et {{ max }}",
+        groups: ["create", "update"]
     )]
     private ?int $note = null;
 
-    #[ORM\Column(type: 'datetime_immutable')]
-    private ?\DateTimeImmutable $createdAt;
+    #[ORM\Column(type: 'datetime')]
+    private ?DateTime $createdAt = null;
 
     public function __construct()
     {
-        $this->createdAt = new \DateTimeImmutable();
+        $this->createdAt = new DateTime();
     }
-
-    // Getters et Setters
 
     public function getId(): ?int
     {
         return $this->id;
-    }
-
-    public function getIdUtilisateur(): ?int
-    {
-        return $this->id_utilisateur;
-    }
-
-    public function setIdUtilisateur(?int $id_utilisateur): self
-    {
-        $this->id_utilisateur = $id_utilisateur;
-        return $this;
-    }
-
-    public function getIdCentre(): ?int
-    {
-        return $this->id_centre;
-    }
-
-    public function setIdCentre(?int $id_centre): self
-    {
-        $this->id_centre = $id_centre;
-        return $this;
     }
 
     public function getNom(): ?string
@@ -103,6 +79,19 @@ class Avis
         return $this;
     }
 
+    // The nomComplet field has been removed and merged with the nom field
+
+    public function getAvis(): ?string
+    {
+        return $this->avis;
+    }
+
+    public function setAvis(string $avis): self
+    {
+        $this->avis = $avis;
+        return $this;
+    }
+    
     public function getDescription(): ?string
     {
         return $this->description;
@@ -125,14 +114,19 @@ class Avis
         return $this;
     }
 
-    public function getCreatedAt(): ?\DateTimeImmutable
+    public function getCreatedAt(): ?DateTime
     {
         return $this->createdAt;
     }
 
-    public function setCreatedAt(\DateTimeImmutable $createdAt): self
+    public function setCreatedAt(DateTime $createdAt): self
     {
         $this->createdAt = $createdAt;
         return $this;
+    }
+
+    public function __toString(): string
+    {
+        return $this->nom;
     }
 }

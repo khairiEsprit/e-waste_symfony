@@ -2,39 +2,297 @@
 
 {% block stylesheets %}
     {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
         /* Translation uniquement */
         .translated-content {
             transform: translateY(70px);
             margin-bottom: 70px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #FEFEFA 0%, #E8F5EE 100%);
         }
 
         /* Palette de couleurs */
         .alert-info {
-            background-color: #ACE1AF; /* Menthe */
-            border-color: #29AB87;    /* Vert moyen */
-            color: #013220;           /* Vert foncé */
+            background: linear-gradient(135deg, #ACE1AF 0%, #29AB87 100%);
+            border: none;
+            color: #013220;
+            border-radius: 12px;
+            box-shadow: 0 4px 15px rgba(41, 171, 135, 0.2);
+            padding: 15px 25px;
+            font-size: 1.2rem;
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            transition: all 0.3s ease;
+        }
+
+        .alert-info:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(41, 171, 135, 0.3);
+        }
+
+        .alert-info i {
+            font-size: 1.5rem;
+            color: #00693E;
+            animation: pulse 2s infinite;
         }
 
         .card-header.bg-primary {
-            background-color: #00693E !important; /* Vert profond */
+            background: linear-gradient(135deg, #013220 0%, #00693E 100%) !important;
+            color: #FEFEFA;
+            border-radius: 12px 12px 0 0;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(1, 50, 32, 0.15);
         }
 
         .text-muted {
-            color: #29AB87 !important; /* Vert moyen */
+            color: #29AB87 !important;
         }
 
-        .btn-primary {
-            background-color: #00693E; /* Vert profond */
-            border-color: #013220;     /* Vert foncé */
+        /* Bouton Enregistrer */
+        .save-btn {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            font-weight: 600;
+            letter-spacing: 1px;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: all 0.5s ease;
+            border-radius: 50px;
+            padding: 10px 24px;
+            font-size: 14px;
+            background: linear-gradient(145deg, #29AB87, #218838);
+            color: white;
+            box-shadow: 0 4px 20px rgba(41, 171, 135, 0.35);
         }
 
-        .btn-primary:hover {
-            background-color: #013220; /* Vert foncé */
+        .save-btn:hover {
+            animation: pulse-glow 1.5s infinite;
+            transform: translateY(-3px);
+            box-shadow: 0 8px 30px rgba(41, 171, 135, 0.5);
         }
 
-        body {
-            background-color: #FEFEFA; /* Blanc crème */
+        .save-btn::after {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -60%;
+            width: 200%;
+            height: 200%;
+            background: rgba(255, 255, 255, 0.13);
+            transform: rotate(45deg);
+            transition: all 0.6s ease;
+            pointer-events: none;
+        }
+
+        .save-btn:hover::after {
+            left: 100%;
+            top: 100%;
+        }
+
+        .save-btn .btn-icon {
+            margin-right: 8px;
+            transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+        }
+
+        .save-btn:hover .btn-icon {
+            transform: rotate(10deg) scale(1.3);
+        }
+
+        /* Effet de vague */
+        .ripple-wave {
+            position: absolute;
+            border-radius: 50%;
+            background: rgba(255, 255, 255, 0.7);
+            transform: scale(0);
+            animation: ripple 0.6s linear;
+            pointer-events: none;
+        }
+
+        @keyframes ripple {
+            to {
+                transform: scale(4);
+                opacity: 0;
+            }
+        }
+
+        @keyframes pulse-glow {
+            0% { box-shadow: 0 0 0 0 rgba(41, 171, 135, 0.7); }
+            70% { box-shadow: 0 0 0 12px rgba(41, 171, 135, 0); }
+            100% { box-shadow: 0 0 0 0 rgba(41, 171, 135, 0); }
+        }
+
+        /* Style du formulaire */
+        .card {
+            border: none;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1);
+            transition: all 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 105, 62, 0.15);
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .form-group {
+            margin-bottom: 25px;
+        }
+
+        label {
+            color: #00693E;
+            font-weight: 600;
+            margin-bottom: 8px;
+            font-size: 0.9rem;
+        }
+
+        input, textarea {
+            width: 100%;
+            padding: 12px 15px;
+            border: 1px solid #ACE1AF;
+            border-radius: 6px;
+            background: #FEFEFA;
+            transition: all 0.3s;
+            outline: none;
+        }
+
+        input:focus, textarea:focus {
+            border-color: #29AB87;
+            box-shadow: 0 0 0 3px rgba(41, 171, 135, 0.2);
+        }
+
+        textarea {
+            resize: vertical;
+            min-height: 100px;
+        }
+
+        /* Carte de l'image */
+        .image-card {
+            background: #FEFEFA;
+            border-radius: 12px;
+            box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 105, 62, 0.15);
+        }
+
+        .image-card img {
+            width: 100%;
+            height: auto;
+            border-radius: 12px 12px 0 0;
+        }
+
+        .image-card .card-body {
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Étoiles de notation (pour compatibilité avec new.html.twig) */
+        .star-rating-form {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .star-rating-form input {
+            display: none;
+        }
+        .star-rating-form label {
+            font-size: 1.8rem;
+            color: #ACE1AF;
+            cursor: pointer;
+            transition: all 0.2s;
+        }
+        .star-rating-form input:checked ~ label,
+        .star-rating-form label:hover,
+        .star-rating-form label:hover ~ label {
+            color: #29AB87;
+        }
+        .star-rating-form input:checked + label {
+            color: #00693E;
+            transform: scale(1.1);
+        }
+
+        /* Custom SweetAlert2 Styling */
+        .swal2-title-custom {
+            color: #D32F2F !important;
+            font-size: 1.5rem !important;
+            font-weight: 600 !important;
+            margin-bottom: 1rem !important;
+        }
+
+        .swal2-html-custom {
+            padding: 0 1rem !important;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(145deg, #29AB87, #218838) !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 24px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            letter-spacing: 1px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(41, 171, 135, 0.3) !important;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 25px rgba(41, 171, 135, 0.4) !important;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(145deg, #6c757d, #495057) !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 24px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            letter-spacing: 1px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3) !important;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4) !important;
+        }
+
+        .swal2-close {
+            color: #666 !important;
+            font-size: 1.5rem !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-close:hover {
+            color: #D32F2F !important;
+            transform: rotate(90deg) !important;
+        }
+
+        .swal2-popup {
+            border-radius: 12px !important;
+            box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1) !important;
         }
     </style>
 {% endblock %}
@@ -42,14 +300,14 @@
 {% block body %}
     <div class="translated-content">
         <div class="container mb-3 mt-4">
-            <div class="alert alert-info mb-3">
+            <div class="alert alert-info mb-4 animate__animated animate__fadeInDown">
                 <i class="fas fa-info-circle"></i> Votre avis nous intéresse !
             </div>
 
             <div class="row">
                 <!-- Carte du formulaire -->
                 <div class="col-md-8">
-                    <div class="card shadow-sm">
+                    <div class="card shadow-sm animate__animated animate__fadeIn">
                         <div class="card-header bg-primary text-white">
                             <h5 class="card-title mb-0">Donnez votre avis</h5>
                         </div>
@@ -61,17 +319,205 @@
 
                 <!-- Carte de l'image -->
                 <div class="col-md-4">
-                    <div class="card shadow-sm h-100">
-                        <div class="card-body text-center p-0">  <!-- Suppression du padding -->
+                    <div class="image-card h-100 animate__animated animate__fadeIn">
+                        <div class="card-body p-0">
                             <img src="{{ asset('assets/front/assets/img/image-avis.jpg') }}"
                                  alt="E-Waste Recycling"
-                                 class="img-fluid rounded-top">  <!-- Coins arrondis seulement en haut -->
-                            <p class="p-3 mb-0 small">  <!-- Padding réajouté pour le texte -->
-
+                                 class="img-fluid">
+                            <p class="p-3 mb-0 small text-muted">
+                                Un grand merci pour cette initiative et pour la prise en compte des retours des utilisateurs, ce qui améliore continuellement l'expérience et la qualité du projet. <br> #Eco-Byte
+                            </p>
                         </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Gestion des étoiles de notation
+            const stars = $('.star-rating-form label');
+            const noteInputs = $('.star-rating-input');
+            const hiddenNoteField = $('#avis_note_hidden');
+
+            stars.on('click', function() {
+                const value = $(this).prev('input').val();
+                
+                // Mettre à jour les inputs radio visibles
+                noteInputs.prop('checked', false);
+                noteInputs.filter(`[value="${value}"]`).prop('checked', true);
+                
+                // Mettre à jour le champ caché
+                hiddenNoteField.val(value);
+                
+                // Supprimer le message d'erreur si présent
+                $('#note-error').text('');
+            });
+
+            // Effet de vague sur le bouton Enregistrer
+            $('.save-btn').on('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple-wave');
+
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size/2;
+                const y = e.clientY - rect.top - size/2;
+
+                ripple.style.width = ripple.style.height = `${size}px`;
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                this.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+
+            // Validation et soumission du formulaire
+            $('#avis-form').on('submit', function(e) {
+                e.preventDefault();
+
+                // Réinitialiser les messages d'erreur
+                $('.error-message').text('');
+
+                // Récupérer les valeurs des champs
+                const nom = $('#avis_nom').val().trim();
+                const avis = $('#avis_avis').val().trim();
+                const note = $('input[name="avis[note]"]:checked').val();
+
+                let hasErrors = false;
+
+                // Validation des champs
+                if (!nom) {
+                    $('#nom-error').text('Veuillez entrer votre nom.');
+                    hasErrors = true;
+                }
+
+                if (!avis) {
+                    $('#avis-error').text('Veuillez entrer votre avis.');
+                    hasErrors = true;
+                }
+
+                if (!note) {
+                    $('#note-error').text('Veuillez sélectionner une note.');
+                    hasErrors = true;
+                }
+
+                // Si des erreurs sont présentes, arrêter la soumission
+                if (hasErrors) {
+                    return;
+                }
+
+                // Soumission du formulaire via AJAX
+                let formData = new FormData(this);
+                
+                // S'assurer que le champ note est inclus dans les données du formulaire
+                const noteValue = $('input.star-rating-input:checked').val();
+                if (noteValue) {
+                    // Forcer la valeur de note dans le formulaire
+                    formData.set('avis[note]', noteValue);
+                    
+                    // Mettre à jour le champ caché aussi
+                    $('#avis_note_hidden').val(noteValue);
+                }
+                
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: $(this).attr('method'),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Succès !',
+                            html: `
+                                <div style="text-align: center; line-height: 1.6;">
+                                    <p style="font-size: 1.1rem; color: #333;">
+                                        Votre avis a été enregistré avec succès.
+                                    </p>
+                                    <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                                        Merci pour votre contribution à l'amélioration de notre projet !
+                                    </p>
+                                </div>
+                            `,
+                            icon: 'success',
+                            iconColor: '#29AB87',
+                            confirmButtonText: '<i class="fas fa-check mr-2"></i> OK',
+                            background: '#FEFEFA',
+                            backdrop: 'rgba(0, 105, 62, 0.2)',
+                            customClass: {
+                                popup: 'animate__animated animate__zoomIn',
+                                title: 'swal2-title-custom',
+                                htmlContainer: 'swal2-html-custom',
+                                confirmButton: 'btn-confirm'
+                            },
+                            buttonsStyling: false,
+                            showCloseButton: true,
+                            focusConfirm: true,
+                            padding: '1.5rem',
+                            width: '32rem'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '{{ path('app_avis_index') }}';
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'Une erreur s\'est produite lors de l\'enregistrement de votre avis.';
+                        
+                        // Traiter les erreurs renvoyées par le serveur
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            
+                            if (xhr.responseJSON.errors) {
+                                // Si errors est un tableau
+                                if (Array.isArray(xhr.responseJSON.errors)) {
+                                    errorMessage = xhr.responseJSON.errors.join('<br>');
+                                } 
+                                // Si errors est un objet avec des champs nommés
+                                else {
+                                    errorMessage = '';
+                                    for (const field in xhr.responseJSON.errors) {
+                                        // Afficher l'erreur dans le champ correspondant
+                                        $('#' + field + '-error').text(xhr.responseJSON.errors[field]);
+                                        
+                                        // Ajouter au message d'erreur global
+                                        errorMessage += xhr.responseJSON.errors[field] + '<br>';
+                                    }
+                                }
+                            }
+                        }
+                        Swal.fire({
+                            title: 'Erreur',
+                            html: errorMessage,
+                            icon: 'error',
+                            iconColor: '#D32F2F',
+                            confirmButtonText: '<i class="fas fa-check mr-2"></i> OK',
+                            background: '#FEFEFA',
+                            backdrop: 'rgba(0, 105, 62, 0.2)',
+                            customClass: {
+                                popup: 'animate__animated animate__zoomIn',
+                                title: 'swal2-title-custom',
+                                htmlContainer: 'swal2-html-custom',
+                                confirmButton: 'btn-confirm'
+                            },
+                            buttonsStyling: false,
+                            showCloseButton: true,
+                            focusConfirm: true,
+                            padding: '1.5rem',
+                            width: '32rem'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
 {% endblock %}

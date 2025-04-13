@@ -11,6 +11,8 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
+use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Validator\Constraints\Range;
 
 class AvisType extends AbstractType
 {
@@ -18,7 +20,7 @@ class AvisType extends AbstractType
     {
         $builder
             ->add('nom', TextType::class, [
-                'label' => 'Nom/Prénom',
+                'label' => 'Votre nom',
                 'constraints' => [
                     new NotBlank([
                         'message' => 'Veuillez entrer votre nom',
@@ -34,10 +36,11 @@ class AvisType extends AbstractType
                 ],
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Votre nom complet'
+                    'placeholder' => 'Votre nom',
+                    'id' => 'avis_nom'
                 ]
             ])
-            ->add('description', TextareaType::class, [
+            ->add('avis', TextareaType::class, [
                 'label' => 'Votre avis',
                 'constraints' => [
                     new NotBlank([
@@ -58,27 +61,43 @@ class AvisType extends AbstractType
                     'placeholder' => 'Décrivez votre expérience...'
                 ]
             ])
-            ->add('note', ChoiceType::class, [
-                'label' => 'Note',
-                'choices' => [
-                    '1 étoile' => 1,
-                    '2 étoiles' => 2,
-                    '3 étoiles' => 3,
-                    '4 étoiles' => 4,
-                    '5 étoiles' => 5
-                ],
-                'expanded' => true,
-                'multiple' => false,
+            ->add('description', TextareaType::class, [
+                'label' => 'Description détaillée (optionnelle)',
+                'required' => false,
                 'constraints' => [
-                    new NotBlank([
-                        'message' => 'Veuillez sélectionner une note',
+                    new Length([
+                        'max' => 1000,
+                        'maxMessage' => 'La description ne doit pas dépasser {{ limit }} caractères',
                         'groups' => ['create', 'update']
                     ])
                 ],
                 'attr' => [
-                    'class' => 'star-rating'
+                    'class' => 'form-control',
+                    'rows' => 4,
+                    'placeholder' => 'Ajoutez des détails supplémentaires si nécessaire...'
+                ]
+            ])
+            ->add('note', IntegerType::class, [
+                
+                'constraints' => [
+                    new NotBlank([
+                        'message' => 'Veuillez donner une note',
+                        'groups' => ['create', 'update']
+                    ]),
+                    new Range([
+                        'min' => 1,
+                        'max' => 5,
+                        'notInRangeMessage' => 'La note doit être entre {{ min }} et {{ max }}',
+                        'groups' => ['create', 'update']
+                    ])
+                ],
+                'attr' => [
+                    'class' => 'form-control d-none',
+                    'min' => 1,
+                    'max' => 5
                 ]
             ]);
+            
     }
 
     public function configureOptions(OptionsResolver $resolver): void

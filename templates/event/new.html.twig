@@ -3,35 +3,58 @@
 {% block content %}
     <div class="app-content">
         <div class="container-fluid">
+            <!-- Affichage des messages flash -->
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }} alert-dismissible fade show mb-4">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
             <div class="d-flex justify-content-between align-items-center mb-4">
                 <h1 class="h3 mb-0" style="color: #013220;">Créer un événement</h1>
-                <a href="{{ path('app_event_index') }}" class="btn" style="background-color: #013220; color: #FEFEFA;">
-                    <i class="fas fa-arrow-left me-1"></i> Retour
-                </a>
+                <div>
+                    <a href="{{ path('app_event_ai_suggestions') }}" class="btn me-2" style="background-color: #29AB87; color: #FEFEFA;">
+                        <i class="fas fa-magic me-1"></i> Suggestions IA
+                    </a>
+                    <a href="{{ path('app_event_index') }}" class="btn" style="background-color: #013220; color: #FEFEFA;">
+                        <i class="fas fa-arrow-left me-1"></i> Retour
+                    </a>
+                </div>
             </div>
 
             <div class="card border-0 shadow-sm">
                 <div class="card-body">
-                    {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': true}}) }}
+                    {{ form_start(form, {'attr': {'id': 'event-form', 'class': 'needs-validation', 'novalidate': true}}) }}
 
                     <div class="row g-4">
                         <div class="col-md-6">
                             <div class="mb-3">
                                 {{ form_label(form.title, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
                                 {{ form_widget(form.title, {'attr': {
-                                    'class': 'form-control',
+                                    'class': 'form-control' ~ (form.title.vars.errors|length ? ' is-invalid' : ''),
                                     'style': 'border-color: #29AB87',
-                                    'placeholder': 'Titre de l\'événement'
+                                    'placeholder': 'Titre de l\'événement',
+                                    'required': true
                                 }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.title) }}
+                                </div>
                             </div>
 
                             <div class="mb-3">
                                 {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
                                 {{ form_widget(form.description, {'attr': {
-                                    'class': 'form-control',
+                                    'class': 'form-control' ~ (form.description.vars.errors|length ? ' is-invalid' : ''),
                                     'style': 'border-color: #29AB87; height: 120px',
-                                    'placeholder': 'Description détaillée...'
+                                    'placeholder': 'Description détaillée...',
+                                    'required': true
                                 }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.description) }}
+                                </div>
                             </div>
                         </div>
 
@@ -39,33 +62,45 @@
                             <div class="mb-3">
                                 {{ form_label(form.date, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
                                 {{ form_widget(form.date, {'attr': {
-                                    'class': 'form-control',
-                                    'style': 'border-color: #29AB87'
+                                    'class': 'form-control' ~ (form.date.vars.errors|length ? ' is-invalid' : ''),
+                                    'style': 'border-color: #29AB87',
+                                    'required': true
                                 }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.date) }}
+                                </div>
                             </div>
 
                             <div class="mb-3">
                                 {{ form_label(form.location, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
                                 {{ form_widget(form.location, {'attr': {
-                                    'class': 'form-control',
+                                    'class': 'form-control' ~ (form.location.vars.errors|length ? ' is-invalid' : ''),
                                     'style': 'border-color: #29AB87',
-                                    'placeholder': 'Lieu exact...'
+                                    'placeholder': 'Lieu exact...',
+                                    'required': true
                                 }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.location) }}
+                                </div>
                             </div>
 
                             <div class="mb-3">
                                 {{ form_label(form.remainingPlaces, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
                                 {{ form_widget(form.remainingPlaces, {'attr': {
-                                    'class': 'form-control',
+                                    'class': 'form-control' ~ (form.remainingPlaces.vars.errors|length ? ' is-invalid' : ''),
                                     'style': 'border-color: #29AB87',
-                                    'min': 0
+                                    'min': 0,
+                                    'required': true
                                 }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.remainingPlaces) }}
+                                </div>
                             </div>
                         </div>
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
-                        <button type="submit" class="btn px-4" style="background-color: #29AB87; color: white;">
+                        <button type="button" class="btn px-4" style="background-color: #29AB87; color: white;" id="submit-btn">
                             <i class="fas fa-save me-2"></i> Enregistrer
                         </button>
                     </div>
@@ -84,5 +119,144 @@
             border-radius: 10px;
             background-color: #FEFEFA;
         }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
     </style>
+
+    <!-- Intégration de SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        // Validation côté client
+        (function() {
+            'use strict';
+            const forms = document.querySelectorAll('.needs-validation');
+
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', function(event) {
+                    if (!form.checkValidity()) {
+                        event.preventDefault();
+                        event.stopPropagation();
+                    }
+                    form.classList.add('was-validated');
+                }, false);
+            });
+        })();
+
+        // Gestion de la confirmation avant enregistrement
+        document.getElementById('submit-btn').addEventListener('click', function(e) {
+            e.preventDefault();
+
+            const form = document.getElementById('event-form');
+            form.classList.add('was-validated');
+
+            if (form.checkValidity()) {
+                Swal.fire({
+                    title: 'Confirmer la création',
+                    text: 'Voulez-vous créer cet événement ?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#29AB87',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Oui, créer',
+                    cancelButtonText: 'Annuler',
+                    background: '#FEFEFA',
+                    customClass: {
+                        popup: 'animated bounceIn'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        form.submit();
+                    }
+                });
+            }
+        });
+        
+        // Vérifier s'il y a une suggestion à utiliser depuis le localStorage
+        document.addEventListener('DOMContentLoaded', function() {
+            const storedSuggestion = localStorage.getItem('event_suggestion');
+            if (storedSuggestion) {
+                try {
+                    const suggestion = JSON.parse(storedSuggestion);
+                    
+                    // Demander à l'utilisateur s'il souhaite utiliser la suggestion
+                    Swal.fire({
+                        title: 'Utiliser la suggestion ?',
+                        text: 'Voulez-vous remplir le formulaire avec la suggestion "' + suggestion.title + '" ?',
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#29AB87',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: 'Oui, utiliser',
+                        cancelButtonText: 'Non, ignorer',
+                        background: '#FEFEFA'
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            // Remplir le formulaire avec les données de la suggestion
+                            fillFormWithSuggestion(suggestion);
+                            
+                            // Afficher un message de succès
+                            Swal.fire({
+                                title: 'Formulaire pré-rempli',
+                                text: 'Les champs ont été remplis avec la suggestion. Vous pouvez les modifier avant de soumettre.',
+                                icon: 'success',
+                                confirmButtonColor: '#29AB87',
+                                background: '#FEFEFA'
+                            });
+                        }
+                        
+                        // Supprimer la suggestion du localStorage dans tous les cas
+                        localStorage.removeItem('event_suggestion');
+                    });
+                } catch (e) {
+                    console.error('Erreur lors du chargement de la suggestion:', e);
+                    localStorage.removeItem('event_suggestion');
+                }
+            }
+        });
+        
+        // Fonction pour remplir le formulaire avec les données de la suggestion
+        function fillFormWithSuggestion(suggestion) {
+            // Remplir le titre
+            if (suggestion.title) {
+                document.querySelector('#{{ form.title.vars.id }}').value = suggestion.title;
+            }
+            
+            // Remplir la description
+            if (suggestion.description) {
+                document.querySelector('#{{ form.description.vars.id }}').value = suggestion.description;
+            }
+            
+            // Remplir le lieu
+            if (suggestion.location) {
+                document.querySelector('#{{ form.location.vars.id }}').value = suggestion.location;
+            }
+            
+            // Remplir le nombre de places
+            if (suggestion.capacity || suggestion.remainingPlaces) {
+                document.querySelector('#{{ form.remainingPlaces.vars.id }}').value = suggestion.capacity || suggestion.remainingPlaces || 50;
+            }
+            
+            // Pour la date, nous utilisons la date actuelle + 7 jours
+            const futureDate = new Date();
+            futureDate.setDate(futureDate.getDate() + 7);
+            const formattedDate = futureDate.toISOString().slice(0, 16);
+            document.querySelector('#{{ form.date.vars.id }}').value = formattedDate;
+        }
+    </script>
 {% endblock %}
