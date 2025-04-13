@@ -57,13 +57,14 @@
                                             </a>
 
                                             <!-- Bouton Supprimer -->
-                                            <form method="post" action="{{ path('app_event_delete', {'id': event.id}) }}" class="d-inline">
+                                            <form method="post" action="{{ path('app_event_delete', {'id': event.id}) }}" class="d-inline delete-form" id="delete-form-{{ event.id }}">
                                                 <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
-                                                <button class="btn btn-action btn-delete"
+                                                <button type="button" class="btn btn-action btn-delete delete-btn"
                                                         data-bs-toggle="tooltip"
                                                         data-bs-placement="top"
                                                         title="Supprimer"
-                                                        onclick="return confirm('Êtes-vous sûr de vouloir supprimer cet événement ?')">
+                                                        data-id="{{ event.id }}"
+                                                        data-title="{{ event.title }}">
                                                     <span class="btn-icon"><i class="fas fa-trash-alt"></i></span>
                                                     <span class="btn-text">Supprimer</span>
                                                 </button>
@@ -204,9 +205,15 @@
         }
     </style>
 
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    
     <script>
-        // Activation des tooltips Bootstrap
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialiser les tooltips Bootstrap
             var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
             var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
                 return new bootstrap.Tooltip(tooltipTriggerEl, {
@@ -234,6 +241,65 @@
                     }
                 });
             });
+            
+            // Gestion de la confirmation de suppression avec SweetAlert2
+            const deleteButtons = document.querySelectorAll('.delete-btn');
+            deleteButtons.forEach(button => {
+                button.addEventListener('click', function() {
+                    const eventId = this.getAttribute('data-id');
+                    const eventTitle = this.getAttribute('data-title');
+                    const form = document.getElementById('delete-form-' + eventId);
+                    
+                    Swal.fire({
+                        title: 'Confirmer la suppression',
+                        text: 'Voulez-vous vraiment supprimer l\'événement "' + eventTitle + '" ?',
+                        icon: 'warning',
+                        showCancelButton: true,
+                        confirmButtonColor: '#d33',
+                        cancelButtonColor: '#29AB87',
+                        confirmButtonText: 'Oui, supprimer',
+                        cancelButtonText: 'Annuler',
+                        background: '#FEFEFA',
+                        customClass: {
+                            popup: 'animated bounceIn'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.submit();
+                        }
+                    });
+                });
+            });
+            
+            // Afficher les alertes de succès avec SweetAlert2 si présentes
+            {% for message in app.flashes('success') %}
+                Swal.fire({
+                    title: 'Succès !',
+                    text: "{{ message|e('js') }}",
+                    icon: 'success',
+                    confirmButtonColor: '#29AB87',
+                    confirmButtonText: 'OK',
+                    background: '#FEFEFA',
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+            {% endfor %}
+            
+            // Afficher les alertes d'erreur avec SweetAlert2 si présentes
+            {% for message in app.flashes('error') %}
+                Swal.fire({
+                    title: 'Erreur',
+                    text: "{{ message|e('js') }}",
+                    icon: 'error',
+                    confirmButtonColor: '#d33',
+                    confirmButtonText: 'OK',
+                    background: '#FEFEFA',
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+            {% endfor %}
         });
     </script>
 {% endblock %}
