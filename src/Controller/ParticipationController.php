@@ -42,6 +42,22 @@ class ParticipationController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $participation = new Participation();
+        
+        // Get the event_id from the request
+        $eventId = $request->query->get('event_id');
+        $event = null;
+        
+        // If event_id is provided, fetch the event
+        if ($eventId) {
+            $event = $entityManager->getRepository(\App\Entity\Event::class)->find($eventId);
+            
+            // If event not found, redirect to event list with error message
+            if (!$event) {
+                $this->addFlash('error', 'Événement non trouvé.');
+                return $this->redirectToRoute('app_front_event_list');
+            }
+        }
+        
         $form = $this->createForm(ParticipationType::class, $participation);
         $form->handleRequest($request);
 
@@ -74,6 +90,7 @@ class ParticipationController extends AbstractController
 
         return $this->render('participation/new.html.twig', [
             'form' => $form->createView(),
+            'event' => $event,
         ]);
     }
 

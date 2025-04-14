@@ -140,34 +140,49 @@
             <div class="col-lg-7 mb-4 mb-lg-0 d-flex">
                 <div class="card shadow border-0 w-100">
                     <div class="card-header bg-success text-white py-3">
-                        <h1 class="h4 mb-0">Create New Participation</h1>
+                        <h1 class="h4 mb-0">
+                            {% if event is defined and event is not null %}
+                                Inscription à l'événement : {{ event.title }}
+                            {% else %}
+                                Nouvelle Participation
+                            {% endif %}
+                        </h1>
                     </div>
                     <div class="card-body">
                         {{ include('participation/_form.html.twig') }}
                     </div>
-                    <div class="card-footer bg-light py-3">
-                        <a href="{{ path('app_participation_index') }}"
-                           class="btn btn-outline-secondary btn-magnetic">
-                            <i class="fas fa-arrow-left me-2"></i> Back to list
-                        </a>
-                    </div>
                 </div>
             </div>
 
-            <!-- Colonne image (identique) -->
+            <!-- Colonne image (dynamique) -->
             <div class="col-lg-5 d-flex">
                 <div class="card shadow border-0 w-100" style="border-left: 4px solid #29AB87;">
                     <div class="position-relative h-100">
-                        <img src="{{ asset('assets/front/assets/img/participation-image2.jpg') }}"
-                             class="img-fluid h-100 w-100"
-                             style="object-fit: cover; min-height: 300px;"
-                             alt="Éco-participation">
+                        {% if event is defined and event is not null and event.imageName %}
+                            <!-- Image de l'événement sélectionné -->
+                            <img src="{{ asset('uploads/events/' ~ event.imageName) }}"
+                                 class="img-fluid h-100 w-100"
+                                 style="object-fit: cover; min-height: 300px;"
+                                 alt="{{ event.title }}">
+                            
+                            <div class="position-absolute bottom-0 start-0 end-0 p-4"
+                                 style="background: linear-gradient(to top, rgba(0,105,62,0.9), transparent);">
+                                <h3 class="text-white mb-2">{{ event.title }}</h3>
+                                <p class="text-white-50 mb-0">{{ event.date|date('d/m/Y à H:i') }}<br>{{ event.location }}</p>
+                            </div>
+                        {% else %}
+                            <!-- Image par défaut si aucun événement n'est sélectionné -->
+                            <img src="{{ asset('assets/front/assets/img/participation-image2.jpg') }}"
+                                 class="img-fluid h-100 w-100"
+                                 style="object-fit: cover; min-height: 300px;"
+                                 alt="Éco-participation">
 
-                        <div class="position-absolute bottom-0 start-0 end-0 p-4"
-                             style="background: linear-gradient(to top, rgba(0,105,62,0.9), transparent);">
-                            <h3 class="text-white mb-2">#ECO-BYTE</h3>
-                            <p class="text-white-50 mb-0">BESOIN DE NATURE<br>REJOIGNEZ L'AVENTURE</p>
-                        </div>
+                            <div class="position-absolute bottom-0 start-0 end-0 p-4"
+                                 style="background: linear-gradient(to top, rgba(0,105,62,0.9), transparent);">
+                                <h3 class="text-white mb-2">#ECO-BYTE</h3>
+                                <p class="text-white-50 mb-0">BESOIN DE NATURE<br>REJOIGNEZ L'AVENTURE</p>
+                            </div>
+                        {% endif %}
                     </div>
                 </div>
             </div>
