@@ -140,7 +140,7 @@
                                     <tr>
                                         <td>{{ user.id }}</td>
                                         <td>
-                                            <img src="{{ user.profileImage ? asset('uploads/profile_images/' ~ user.profileImage) : asset('assets/back/assets/img/avatar.png') }}" 
+        <img src="{{ user.profileImage ? user.profileImage : asset('assets/back/assets/img/avatar.png') }}"
                                                  alt="User Avatar" 
                                                  class="img-circle elevation-2" 
                                                  style="width: 35px; height: 35px;">
@@ -163,7 +163,7 @@
                                                         data-user-email="{{ user.email }}"
                                                         data-user-roles="{{ user.roles|json_encode }}"
                                                         data-user-created="{{ user.createdAt ? user.createdAt|date('Y-m-d H:i') : 'N/A' }}"
-                                                        data-user-image="{{ user.profileImage ? asset('uploads/profile_images/' ~ user.profileImage) : asset('assets/back/assets/img/avatar.png') }}">
+                                                        data-user-image="{{ user.profileImage ? user.profileImage : asset('assets/back/assets/img/avatar.png') }}">
                                                     <i class="bi bi-eye"></i>
                                                 </button>
                                                 <a href="{{ path('back_user_delete', {'id': user.id}) }}" 

@@ -25,7 +25,7 @@
    <li class="nav-item dropdown user-menu">
     <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
         <img
-            src="{{ app.user.profileImage ? asset('uploads/profile_images/' ~ app.user.profileImage) : asset('assets/back/assets/img/avatar.png') }}"
+        <img src="{{ app.user.profileImage ? app.user.profileImage : asset('assets/back/assets/img/avatar.png') }}"
             class="user-image rounded-circle shadow"
             alt="User Image"
         />
@@ -34,8 +34,8 @@
     <ul class="dropdown-menu dropdown-menu-lg dropdown-menu-end">
         <!--begin::User Image-->
         <li class="user-header text-bg-primary">
-            <img
-                src="{{ app.user.profileImage ? asset('uploads/profile_images/' ~ app.user.profileImage) : asset('assets/back/assets/img/avatar.png') }}"
+                    <img src="{{ app.user.profileImage ? app.user.profileImage : asset('assets/back/assets/img/avatar.png') }}"
+
                 class="rounded-circle shadow"
                 alt="User Image"
             />

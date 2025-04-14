@@ -15,50 +15,62 @@
                 <li><a class="nav-link scrollto" href="{{ path('chat') }}"><span class="fa fa-award"> chat </span></a></li>
                 <li><a class="nav-link scrollto" href="#faq"><span class="fa fa-question-circle"> FAQ</span></a></li>
                 
-                {% if app.user %}
-                    <li class="dropdown">
-                        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
-                            {% set profileImage = 'uploads/profile_images/1674638131915-67e8239fd0044.jpg' %}
-                            {% if app.user.profileImage %}
-                                {% set imagePath = 'uploads/profile_images/' ~ app.user.profileImage %}
-                                {# {% if vich_uploader_asset(app.user, 'profileImageFile') is not null %}
-                                    {% set profileImage = imagePath %}
-                                {% endif %} #}
-                            {% endif %}
-                            <img src="{{ asset(imagePath) }}" 
-                                 alt="{{ app.user.firstName }}'s Avatar" 
-                                 class="rounded-circle" 
-                                 style="width: 40px; height: 40px; object-fit: cover;">
-                        </a>
-                        <ul class="dropdown-menu dropdown-menu-end">
-                            <li class="dropdown-header">
-                                <h6>{{ app.user.firstName }}</h6>
-                                <small>{{ app.user.email }}</small>
-                            </li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ path('app_profile') }}">Profile</a></li>
-                            <li><a class="dropdown-item" href="#">Settings</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="#">Dashboard</a></li>
-                            <li><a class="dropdown-item" href="#">My Reports</a></li>
-                            <li><hr class="dropdown-divider"></li>
-                            <li><a class="dropdown-item" href="{{ path('security_logout') }}">Logout</a></li>
-                        </ul>
-                    </li>
-                {% else %}
-                    <li><a class="nav-link scrollto" href="{{ path('security_login') }}">
-                        <button type="button" class="btn">
-                            <strong>LOGIN</strong>
-                            <div id="container-stars">
-                                <div id="stars"></div>
-                            </div>
-                            <div id="glow">
-                                <div class="circle"></div>
-                                <div class="circle"></div>
-                            </div>
-                        </button>
-                    </a></li>
-                {% endif %}
+            {% if app.user %}
+    <li class="dropdown">
+        <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
+            {# Define the path to your local default placeholder image if the user has no Cloudinary image #}
+            {% set defaultAvatarPath = 'images/default_avatar.png' %} {# <-- IMPORTANT: Change this to the actual path of your default avatar image within your public directory #}
+
+            {# Check if the user has a Cloudinary profile image URL stored #}
+            {% if app.user.profileImage %}
+                {# Use the Cloudinary URL directly. DO NOT use asset() #}
+                <img src="{{ app.user.profileImage }}"
+                     alt="{{ app.user.firstName }}'s Avatar"
+                     class="rounded-circle"
+                     style="width: 40px; height: 40px; object-fit: cover;">
+            {% else %}
+                {# Use the local default avatar via the asset() function #}
+                <img src="{{ asset(defaultAvatarPath) }}"
+                     alt="Default Avatar"
+                     class="rounded-circle"
+                     style="width: 40px; height: 40px; object-fit: cover;">
+            {% endif %}
+        </a>
+        <ul class="dropdown-menu dropdown-menu-end">
+            <li class="dropdown-header">
+                <h6>{{ app.user.firstName }}</h6>
+                <small>{{ app.user.email }}</small>
+            </li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ path('app_profile') }}">Profile</a></li>
+            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="#">Dashboard</a></li>
+            <li><a class="dropdown-item" href="#">My Reports</a></li>
+            <li><hr class="dropdown-divider"></li>
+            <li><a class="dropdown-item" href="{{ path('security_logout') }}">Logout</a></li>
+        </ul>
+    </li>
+{% else %}
+    <li><a class="nav-link scrollto" href="{{ path('security_login') }}">
+        <button type="button" class="btn">
+            <strong>LOGIN</strong>
+            <div id="container-stars">
+                <div id="stars"></div>
+            </div>
+            <div id="glow">
+                <div class="circle"></div>
+                <div class="circle"></div>
+            </div>
+        </button>
+    </a></li>
+{% endif %}
+{# Note: The </ul> closing tag from your original code snippet seemed misplaced;
+   I've assumed it belongs after the {% else %} block if this is part of a larger <ul>.
+   Adjust if necessary based on your full template structure. #}
+
+{# The PHP code snippet you provided seems correct for uploading
+   and saving the Cloudinary URL to the user entity. #}
             </ul>
             <i class="bi bi-list mobile-nav-toggle"></i>
         </nav><!-- .navbar -->
