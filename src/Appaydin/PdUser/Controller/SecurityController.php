@@ -20,12 +20,15 @@ use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 use Symfony\Contracts\EventDispatcher\EventDispatcherInterface;
 use Symfony\Contracts\Translation\TranslatorInterface;
+use Cloudinary\Cloudinary;
 use Symfony\Component\String\Slugger\AsciiSlugger;
 use App\Entity\Notification;
 use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\RequestStack;
 
-
+/**
+ * Security controller.
+ */
 class SecurityController extends AbstractController
 {
     private $translator;
@@ -35,6 +38,7 @@ class SecurityController extends AbstractController
     private $registry;
     private $config;
     private $logger;
+    private $cloudinary;
 
     public function __construct(
         TranslatorInterface $translator,
@@ -43,7 +47,8 @@ class SecurityController extends AbstractController
         UserPasswordHasherInterface $hasher,
         ManagerRegistry $registry,
         ?ConfigInterface $config = null,
-        LoggerInterface $logger
+        LoggerInterface $logger,
+        Cloudinary $cloudinary
     ) {
         $this->translator = $translator;
         $this->mailer = $mailer;
@@ -52,6 +57,7 @@ class SecurityController extends AbstractController
         $this->registry = $registry;
         $this->config = $config;
         $this->logger = $logger;
+        $this->cloudinary = $cloudinary;
     }
 
     public function login(AuthenticationUtils $authenticationUtils): Response
@@ -155,22 +161,22 @@ class SecurityController extends AbstractController
                 if ($profileImageFile) {
                     error_log('Processing file upload: ' . $profileImageFile->getClientOriginalName());
 
-                    $slugger = new AsciiSlugger();
-                    $originalFilename = pathinfo($profileImageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    $safeFilename = $slugger->slug($originalFilename)->lower();
-                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $profileImageFile->guessExtension();
-                    error_log('Generated filename: ' . $newFilename);
-
                     try {
-                        error_log('Attempting to move uploaded file');
-                        $profileImageFile->move(
-                            $this->getParameter('profile_images_directory'),
-                            $newFilename
+                        error_log('Attempting to upload file to Cloudinary');
+                        // Upload image to Cloudinary
+                        $uploadResult = $this->cloudinary->uploadApi()->upload(
+                            $profileImageFile->getPathname(),
+                            [
+                                'folder' => 'profile_images',
+                                'resource_type' => 'image',
+                            ]
                         );
-                        $user->setProfileImage($newFilename);
-                        error_log('File successfully uploaded and saved');
-                    } catch (FileException $e) {
-                        error_log('ERROR uploading file: ' . $e->getMessage());
+                        
+                        // Save the secure URL to the user's profile
+                        $user->setProfileImage($uploadResult['secure_url']);
+                        error_log('File successfully uploaded to Cloudinary');
+                    } catch (\Exception $e) {
+                        error_log('ERROR uploading file to Cloudinary: ' . $e->getMessage());
                         $this->addFlash('error', $this->translator->trans('security.profile_image_upload_error'));
                     }
                 } else {

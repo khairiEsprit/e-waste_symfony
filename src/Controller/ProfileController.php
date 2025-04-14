@@ -13,9 +13,17 @@ use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\String\Slugger\SluggerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\PasswordHasher\Hasher\UserPasswordHasherInterface;
+use Cloudinary\Cloudinary;
 
 class ProfileController extends AbstractController
 {
+    private $cloudinary;
+    
+    public function __construct(Cloudinary $cloudinary)
+    {
+        $this->cloudinary = $cloudinary;
+    }
+    
     #[Route('/profile', name: 'app_profile')]
     public function index(): Response
     {
@@ -47,17 +55,19 @@ class ProfileController extends AbstractController
             $profileImageFile = $form->get('profileImageFile')->getData();
             
             if ($profileImageFile) {
-                $originalFilename = pathinfo($profileImageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                $safeFilename = $slugger->slug($originalFilename);
-                $newFilename = $safeFilename . '-' . uniqid() . '.' . $profileImageFile->guessExtension();
-
                 try {
-                    $profileImageFile->move(
-                        $this->getParameter('profile_images_directory'),
-                        $newFilename
+                    // Upload image to Cloudinary
+                    $uploadResult = $this->cloudinary->uploadApi()->upload(
+                        $profileImageFile->getPathname(),
+                        [
+                            'folder' => 'profile_images',
+                            'resource_type' => 'image',
+                        ]
                     );
-                    $user->setProfileImage($newFilename);
-                } catch (FileException $e) {
+                    
+                    // Save the secure URL to the user's profile
+                    $user->setProfileImage($uploadResult['secure_url']);
+                } catch (\Exception $e) {
                     $this->addFlash('error', 'There was an error uploading your profile image.');
                 }
             }

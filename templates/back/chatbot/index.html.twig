@@ -3,6 +3,7 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
+        /* Chatbot container styles */
         .chatbot-container {
             position: fixed;
             bottom: 2rem;
@@ -14,14 +15,19 @@
             width: 60px;
             height: 60px;
             border-radius: 50%;
-            background: #4F46E5;
-            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
+            box-shadow: 0 6px 16px rgba(79, 70, 229, 0.3);
             cursor: pointer;
-            transition: transform 0.3s ease;
+            transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 2px solid rgba(255, 255, 255, 0.2);
         }
 
         .chat-button:hover {
-            transform: scale(1.1);
+            transform: scale(1.1) rotate(5deg);
+            box-shadow: 0 8px 20px rgba(79, 70, 229, 0.4);
         }
 
         .chat-window {
@@ -31,79 +37,132 @@
             width: 380px;
             height: 500px;
             background: white;
-            border-radius: 12px;
-            box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
+            border-radius: 16px;
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.15), 0 2px 10px rgba(0, 0, 0, 0.05);
             display: none;
             flex-direction: column;
             overflow: hidden;
+            border: 1px solid rgba(229, 231, 235, 0.5);
         }
 
         .chat-window.active {
             display: flex;
-            animation: slideUp 0.3s ease;
+            animation: slideUp 0.4s cubic-bezier(0.16, 1, 0.3, 1);
         }
 
         .chat-header {
-            padding: 1rem;
-            background: #4F46E5;
+            padding: 1rem 1.25rem;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             color: white;
             display: flex;
             justify-content: space-between;
             align-items: center;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
         }
 
         .chat-messages {
             flex: 1;
             overflow-y: auto;
-            padding: 1rem;
+            padding: 1.25rem;
+            background-color: #F9FAFB;
+            scroll-behavior: smooth;
         }
 
         .message {
-            margin-bottom: 1rem;
+            margin-bottom: 1.25rem;
             max-width: 80%;
+            animation: fadeIn 0.3s ease-out;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.05);
+            line-height: 1.5;
         }
 
         .message.user {
             margin-left: auto;
-            background: #4F46E5;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             color: white;
-            border-radius: 12px 12px 0 12px;
-            padding: 0.75rem;
+            border-radius: 16px 16px 0 16px;
+            padding: 0.875rem 1rem;
         }
 
         .message.bot {
-            background: #F3F4F6;
-            border-radius: 12px 12px 12px 0;
-            padding: 0.75rem;
+            background: white;
+            border-radius: 16px 16px 16px 0;
+            padding: 0.875rem 1rem;
+            border: 1px solid rgba(229, 231, 235, 0.7);
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
         }
 
         .chat-input {
-            padding: 1rem;
+            padding: 1rem 1.25rem 1.25rem;
             border-top: 1px solid #E5E7EB;
             display: flex;
-            gap: 0.5rem;
+            gap: 0.75rem;
+            background-color: white;
+            flex-wrap: nowrap;
+            align-items: center;
+        }
+        
+        #imagePreviewContainer {
+            padding: 0 1.25rem;
+            background-color: white;
+            border-top: 1px solid #E5E7EB;
+            margin-bottom: 0;
         }
 
         .chat-input input {
             flex: 1;
-            padding: 0.5rem;
+            padding: 0.75rem 1rem;
             border: 1px solid #E5E7EB;
-            border-radius: 6px;
+            border-radius: 10px;
+            font-size: 0.95rem;
+            transition: border-color 0.2s, box-shadow 0.2s;
+            box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+        }
+        
+        .chat-input input:focus {
+            outline: none;
+            border-color: #4F46E5;
+            box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.2);
         }
 
         .chat-input button {
-            padding: 0.5rem 1rem;
-            background: #4F46E5;
+            padding: 0.75rem 1.25rem;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             color: white;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             cursor: pointer;
+            font-weight: 500;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+        }
+        
+        .chat-input button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+        }
+        
+        /* Ensure send button is always visible */
+        #sendButton {
+            flex-shrink: 0;
+        }
+        
+        /* Style for image preview container */
+        #imagePreviewContainer {
+            width: 26%;
+            padding: 0.75rem 1.25rem 0;
+            background-color: white;
+            z-index: 1;
         }
 
         @keyframes slideUp {
             from {
                 opacity: 0;
-                transform: translateY(20px);
+                transform: translateY(30px);
             }
             to {
                 opacity: 1;
@@ -126,19 +185,23 @@
         }
 
         .file-upload button {
-            background: #4F46E5;
+            background: linear-gradient(135deg, #4F46E5 0%, #7C3AED 100%);
             color: white;
-            padding: 0.5rem;
+            padding: 0.75rem;
             border: none;
-            border-radius: 6px;
+            border-radius: 10px;
             cursor: pointer;
             display: flex;
             align-items: center;
             gap: 0.25rem;
+            transition: transform 0.2s, box-shadow 0.2s;
+            box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
         }
 
         .file-upload button:hover {
-            background: #4338CA;
+            background: linear-gradient(135deg, #4338CA 0%, #6D28D9 100%);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
         }
 
         .file-upload svg {
@@ -150,94 +213,189 @@
                background: transparent;
                border: none;
                cursor: pointer;
-               padding: 0.25rem;
+               padding: 0.5rem;
                transition: transform 0.2s ease;
+               border-radius: 50%;
+               display: flex;
+               align-items: center;
+               justify-content: center;
            }
    
            .chat-header button:hover {
                transform: scale(1.1);
+               background-color: rgba(255, 255, 255, 0.1);
            }
-
+           
+           .chat-header h3 {
+               font-weight: 600;
+               font-size: 1.1rem;
+               letter-spacing: 0.01em;
+               margin: 0;
+           }
+           
+           /* Insight buttons styles */
+           .insight-buttons {
+               display: flex;
+               flex-wrap: wrap;
+               gap: 8px;
+               margin-top: 10px;
+               margin-bottom: 15px;
+           }
+           
+           .insight-button {
+               background-color: #4F46E5;
+               color: white;
+               border: none;
+               border-radius: 8px;
+               padding: 10px 14px;
+               font-size: 13px;
+               cursor: pointer;
+               transition: all 0.2s ease;
+               box-shadow: 0 2px 4px rgba(79, 70, 229, 0.2);
+               font-weight: 500;
+           }
+           
+           .insight-button:hover {
+               background-color: #4338CA;
+               transform: translateY(-2px);
+               box-shadow: 0 4px 8px rgba(79, 70, 229, 0.3);
+           }
     </style>
 {% endblock %}
 
 {% block content %}
     <div class="chatbot-container">
         <div class="chat-button" id="chatButton">
-            <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6 m-auto mt-4" fill="none" viewBox="0 0 24 24" stroke="white">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 10h.01M12 10h.01M16 10h.01M9 16H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-5l-5 5v-5z" />
+            <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+                <path d="M8 9h.01"></path>
+                <path d="M12 9h.01"></path>
+                <path d="M16 9h.01"></path>
             </svg>
         </div>
 
         <div class="chat-window" id="chatWindow">
             <div class="chat-header">
-                <h3>Chat Assistant</h3>
+                <h3>Waste Management Assistant</h3>
                 <button id="closeChat" class="text-white">
-                    <svg xmlns="http://www.w3.org/2000/svg" class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+                    <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M18 6L6 18"></path>
+                        <path d="M6 6l12 12"></path>
                     </svg>
                 </button>
             </div>
 
-            <div class="chat-messages" id="chatMessages">
-                <div class="message bot">
-                    Hello! How can I help you today?
-                </div>
-            </div>
-
-         
-
-         
-   <div class="chat-input">
-        <input type="text" id="messageInput" placeholder="Type your message...">
-        <div class="file-upload">
-            <button title="Upload image">
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4v16m8-8H4" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 12h16" />
-                </svg>
-                <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
-                </svg>
-            </button>
-            <input type="file" id="fileInput" accept="image/*">
-        </div>
-        <button>Send</button>
+          <!-- Corrected indentation and structure for chat-input -->
+<div class="chat-messages" id="chatMessages">
+    <div class="message bot">
+        <strong>👋 Welcome to E-Waste Assistant!</strong><br><br>
+        I can help you with waste management information and provide real-time insights about waste collection. How can I assist you today?
     </div>
+    <div class="insight-buttons">
+        <button class="insight-button">Recycling Tips</button>
+        <button class="insight-button">Collection Schedule</button>
+        <button class="insight-button">Waste Categories</button>
+    </div>
+</div>
+
+<div id="imagePreviewContainer" style="display: none; margin-bottom: 10px; position: relative;">
+    <img id="imagePreview" style="max-width: 100px; max-height: 100px; border-radius: 8px; box-shadow: 0 2px 4px rgba(0,0,0,0.1);" alt="Preview">
+    <button id="removeImageBtn" style="position: absolute; top: -8px; right: -8px; background: #ff4757; color: white; border: none; border-radius: 50%; width: 20px; height: 20px; font-size: 12px; display: flex; align-items: center; justify-content: center; cursor: pointer;">&times;</button>
+</div>
+<div class="chat-input">
+    <input type="text" id="messageInput" placeholder="Type your question here...">
+    <div class="file-upload">
+        <button title="Upload image">
+            <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                <polyline points="21 15 16 10 5 21"></polyline>
+            </svg>
+        </button>
+        <input type="file" id="fileInput" accept="image/*">
+    </div>
+    <button id="sendButton">
+        <svg xmlns="http://www.w3.org/2000/svg" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="margin-right: 5px;">
+            <line x1="22" y1="2" x2="11" y2="13"></line>
+            <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+        </svg>
+        Send
+    </button>
+</div>
+
         </div>
     </div>
     {% endblock %}
 {% block javascripts %}
+{{ parent() }}
+<script src="{{ asset('assets/back/js/chatbot-insights.js') }}"></script>
 <script>
 class Chatbot {
     constructor() {
         this.chatWindow = document.getElementById('chatWindow');
         this.chatButton = document.getElementById('chatButton');
+        this.closeButton = document.getElementById('closeChat');
         this.messageInput = document.getElementById('messageInput');
         this.messagesContainer = document.getElementById('chatMessages');
         this.fileInput = document.getElementById('fileInput');
-        this.sendButton = this.chatWindow.querySelector('.chat-input button:last-child');
+        this.sendButton = document.getElementById('sendButton');
+        this.imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        this.imagePreview = document.getElementById('imagePreview');
+        this.removeImageBtn = document.getElementById('removeImageBtn');
 
         this.isChatOpen = false;
         this.uploadedImageUrl = null;
+        this.isProcessingMessage = false; // Added to prevent double-send
 
         this.toggleChat = this.toggleChat.bind(this);
         this.sendMessage = this.sendMessage.bind(this);
         this.handleFileUpload = this.handleFileUpload.bind(this);
         this.handleKeyPress = this.handleKeyPress.bind(this);
+        this.removeImage = this.removeImage.bind(this);
 
         this.initEventListeners();
     }
 
     initEventListeners() {
         this.chatButton.addEventListener('click', this.toggleChat);
+        this.closeButton.addEventListener('click', this.toggleChat);
         this.messageInput.addEventListener('keypress', this.handleKeyPress);
-        this.sendButton.addEventListener('click', this.sendMessage);
+        
+        // Check if elements exist before adding listeners
+        if (this.sendButton) {
+            this.sendButton.addEventListener('click', this.sendMessage);
+        } else {
+            console.error('Send button element not found.');
+        }
+        
         if (this.fileInput) {
             this.fileInput.addEventListener('change', this.handleFileUpload);
         } else {
-            console.warn('File input element not found.');
+            console.error('File input element not found.');
         }
+        
+        if (this.removeImageBtn) {
+            this.removeImageBtn.addEventListener('click', this.removeImage);
+        } else {
+            console.error('Remove image button element not found.');
+        }
+    }
+    
+    removeImage() {
+        // Hide the image preview container
+        this.imagePreviewContainer.style.display = 'none';
+        
+        // Reset the file input
+        this.fileInput.value = '';
+        
+        // Clear the uploaded image URL
+        this.uploadedImageUrl = null;
+        
+        // Reset the input placeholder
+        this.messageInput.placeholder = 'Type your question here...';
+        
+        // Ensure chat input is properly displayed
+        document.querySelector('.chat-input').style.display = 'flex';
     }
 
     toggleChat() {
@@ -248,40 +406,75 @@ class Chatbot {
         }
     }
 
-   async sendMessage() {
-    const message = this.messageInput.value.trim();
-    if (!message) return;
-
-    this.addMessage(message, 'user', this.uploadedImageUrl);
-    this.messageInput.value = '';
-
-    try {
-        const response = await fetch('/admin/chatbot/message', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ 
-                message,
-                imageUrl: this.uploadedImageUrl // Send the image URL if it exists
-            })
-        });
-        const data = await response.json();
-
-        this.addMessage(
-            data.success ? data.response : 'Sorry, there was an error processing your request.',
-            'bot'
-        );
-        this.uploadedImageUrl = null; // Reset after successful send
-    } catch (error) {
-        console.error('Error:', error);
-        this.addMessage('Sorry, there was an error processing your request.', 'bot');
-        this.uploadedImageUrl = null; // Reset on error too
+    async sendMessage() {
+        const message = this.messageInput.value.trim();
+        if ((!message && !this.uploadedImageUrl) || this.isProcessingMessage) return;
+        
+        // Set flag to prevent double-sending
+        this.isProcessingMessage = true;
+        
+        try {
+            // Add message with image if available
+            this.addMessage(message || 'What is in this image?', 'user', this.uploadedImageUrl);
+            this.messageInput.value = '';
+            
+            const response = await fetch('/admin/chatbot/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ 
+                    message: message || 'What is in this image?',
+                    imageUrl: this.uploadedImageUrl // Send the image URL if it exists
+                })
+            });
+            
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+            
+            const data = await response.json();
+            
+            if (data.success) {
+                this.addMessage(data.response, 'bot');
+            } else {
+                console.error('API Error:', data.error || 'Unknown error');
+                this.addMessage(data.error || 'Sorry, there was an error processing your request.', 'bot');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            this.addMessage('Sorry, there was an error processing your request. Please try again later.', 'bot');
+        } finally {
+            // Reset image preview
+            if (this.uploadedImageUrl) {
+                this.imagePreviewContainer.style.display = 'none';
+            }
+            this.uploadedImageUrl = null; // Reset after processing
+            this.isProcessingMessage = false; // Reset flag
+            this.messageInput.placeholder = 'Type your question here...';
+        }
     }
-}
 
     async handleFileUpload(event) {
         const file = event.target.files[0];
         if (!file) return;
-
+        
+        // Show image preview instead of adding a message
+        const imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        const imagePreview = document.getElementById('imagePreview');
+        
+        // Create a temporary URL for the image preview
+        const tempUrl = URL.createObjectURL(file);
+        imagePreview.src = tempUrl;
+        imagePreviewContainer.style.display = 'block';
+        
+        // Ensure chat input remains properly visible
+        document.querySelector('.chat-input').style.display = 'flex';
+        
+        // Set focus to input and prompt user
+        this.messageInput.placeholder = "Ask a question about this image...";
+        this.messageInput.focus();
+        
         const formData = new FormData();
         formData.append('file', file);
 
@@ -290,51 +483,65 @@ class Chatbot {
                 method: 'POST',
                 body: formData
             });
+            
+            if (!uploadResponse.ok) {
+                throw new Error(`Upload failed with status: ${uploadResponse.status}`);
+            }
+            
             const uploadData = await uploadResponse.json();
 
             if (uploadData.success) {
                 this.uploadedImageUrl = uploadData.url;
-                this.addMessage(`Uploaded image: ${file.name}`, 'user', this.uploadedImageUrl);
-
-                const chatResponse = await fetch('/admin/chatbot/message', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({
-                        message: 'What is in this image?',
-                        imageUrl: this.uploadedImageUrl
-                    })
-                });
-                const chatData = await chatResponse.json();
-
-                this.addMessage(
-                    chatData.success ? chatData.response : 'Sorry, there was an error processing your image.',
-                    'bot'
-                );
+                // Release the temporary URL to free memory
+                URL.revokeObjectURL(tempUrl);
+                // Update the preview with the actual uploaded URL
+                imagePreview.src = this.uploadedImageUrl;
+            } else {
+                throw new Error(uploadData.error || 'Upload failed');
             }
         } catch (error) {
             console.error('Error:', error);
-            this.addMessage('Sorry, there was an error processing your image.', 'bot');
+            imagePreviewContainer.style.display = 'none';
+            this.addMessage('Sorry, there was an error uploading your image.', 'bot');
         }
     }
 
     addMessage(message, type, imageUrl = null) {
         const messageElement = document.createElement('div');
         messageElement.classList.add('message', type);
+        messageElement.style.opacity = '0';
 
-        const textElement = document.createElement('span');
-        textElement.textContent = message;
-        messageElement.appendChild(textElement);
+        // Process the message content
+        let processedMessage = message;
+        
+        // Replace markdown bold with HTML bold
+        processedMessage = processedMessage.replace(/\*\*(.*?)\*\*/g, '<strong>$1</strong>');
+        
+        // Replace newlines with HTML breaks
+        processedMessage = processedMessage.replace(/\n/g, '<br>');
+        
+        // Add the message content
+        messageElement.innerHTML = processedMessage;
 
+        // Add image if provided
         if (imageUrl) {
             const imgElement = document.createElement('img');
             imgElement.src = imageUrl;
             imgElement.alt = 'Uploaded image';
             imgElement.style.maxWidth = '200px';
+            imgElement.style.borderRadius = '8px';
+            imgElement.style.marginTop = '8px';
+            imgElement.style.boxShadow = '0 2px 4px rgba(0, 0, 0, 0.1)';
             messageElement.appendChild(imgElement);
         }
 
         this.messagesContainer.appendChild(messageElement);
-        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        
+        // Add a small delay before showing the message for a nice animation effect
+        setTimeout(() => {
+            messageElement.style.opacity = '1';
+            this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+        }, 50);
     }
 
     handleKeyPress(event) {
@@ -345,7 +552,18 @@ class Chatbot {
 }
 
 document.addEventListener('DOMContentLoaded', () => {
-    const chatbot = new Chatbot();
+    // Initialize chatbot and expose it globally for the insights module
+    window.chatbot = new Chatbot();
+    
+    // Add event listeners for insight buttons
+    document.querySelectorAll('.insight-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const query = button.textContent.trim();
+            window.chatbot.messageInput.value = query;
+            window.chatbot.sendMessage();
+        });
+    });
 });
+
 </script>
     {% endblock %}
