@@ -1,0 +1,33 @@
+<div class="kanban-task" data-task-id="{{ tache.id }}">
+    <div class="kanban-task-title">
+        <span>Tâche #{{ tache.id }}</span>
+        <span class="kanban-task-status {{ tache.etat == 'Terminé' ? 'badge-terminé' : (tache.etat == 'En cours' ? 'badge-en-cours' : 'badge-en-attente') }}">
+            {{ tache.etat }}
+        </span>
+    </div>
+    <div class="kanban-task-message" title="{{ tache.message }}">
+        {{ tache.message }}
+    </div>
+    <div class="kanban-task-footer">
+        <small>
+            <i class="bi bi-geo-alt"></i> {{ tache.idCentre }}
+            <span class="ms-2"><i class="bi bi-person"></i> {{ tache.idEmploye }}</span>
+        </small>
+        <div class="kanban-task-actions">
+            <a href="{{ path('app_tache_show', {'id': tache.id}) }}" class="btn btn-sm btn-info" title="Voir">
+                <i class="bi bi-eye"></i>
+            </a>
+            <a href="{{ path('app_tache_edit', {'id': tache.id}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                <i class="bi bi-pencil"></i>
+            </a>
+            <button type="button" class="btn btn-sm btn-danger delete-btn" 
+                    title="Supprimer" 
+                    data-bs-toggle="modal" 
+                    data-bs-target="#deleteConfirmationModal"
+                    data-url="{{ path('app_tache_delete', {'id': tache.id}) }}"
+                    data-token="{{ csrf_token('delete' ~ tache.id) }}">
+                <i class="bi bi-trash"></i>
+            </button>
+        </div>
+    </div>
+</div>
