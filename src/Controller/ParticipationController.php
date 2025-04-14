@@ -56,6 +56,13 @@ class ParticipationController extends AbstractController
                 $this->addFlash('error', 'Événement non trouvé.');
                 return $this->redirectToRoute('app_front_event_list');
             }
+            
+            // Associate the event with the participation
+            $participation->setEvent($event);
+        } else {
+            // Event is required
+            $this->addFlash('error', 'Vous devez sélectionner un événement.');
+            return $this->redirectToRoute('app_front_event_list');
         }
         
         $form = $this->createForm(ParticipationType::class, $participation);
@@ -80,6 +87,12 @@ class ParticipationController extends AbstractController
             }
 
             if (!$existingParticipation && !$existingPhone) {
+                // Decrease remaining places for the event
+                $event = $participation->getEvent();
+                if ($event->getRemainingPlaces() > 0) {
+                    $event->setRemainingPlaces($event->getRemainingPlaces() - 1);
+                }
+                
                 $entityManager->persist($participation);
                 $entityManager->flush();
 

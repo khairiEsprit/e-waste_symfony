@@ -6,6 +6,8 @@
 parameters:
     app.openrouter_api_key: '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'
     events_directory: '%kernel.project_dir%/public/uploads/events'
+    app.sender_email: 'no-reply@eco-byte.com'
+    app.sender_name: 'Eco-Byte'
 
 services:
     # App\Security\AuthenticationSuccessHandler:
@@ -29,6 +31,12 @@ services:
     # please note that last definitions always *replace* previous ones
     
     # AI Event Generator Service
+    
+    # Email Service
+    App\Service\EmailService:
+        arguments:
+            $senderEmail: '%app.sender_email%'
+            $senderName: '%app.sender_name%'
     App\Service\AIEventGenerator:
         arguments:
             $apiKey: '%app.openrouter_api_key%'

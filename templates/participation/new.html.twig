@@ -7,129 +7,152 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
     <style>
-        /* Styles améliorés pour les boutons */
-        .btn-magnetic {
+        /* Styles généraux des boutons */
+        .participation-btn {
             position: relative;
             overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            transform: translateY(0);
-            z-index: 1;
             border: none;
             font-weight: 600;
-            letter-spacing: 0.5px;
-        }
-
-        /* Bouton Principal (Save) */
-        .btn-primary {
-            background: linear-gradient(135deg, #29AB87 0%, #218838 100%);
-            box-shadow: 0 4px 15px rgba(41, 171, 135, 0.4);
-            color: white;
-            padding: 12px 30px;
+            padding: 12px 25px;
             border-radius: 50px;
-            position: relative;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 1;
         }
 
-        .btn-primary:hover {
-            transform: translateY(-3px) scale(1.02);
-            box-shadow: 0 8px 25px rgba(41, 171, 135, 0.6);
+        .participation-btn i {
+            margin-right: 8px;
+            transition: all 0.3s ease;
         }
 
-        .btn-primary::before {
+        /* Effet de vague au survol */
+        .participation-btn::after {
             content: '';
             position: absolute;
             top: 0;
             left: 0;
             width: 100%;
             height: 100%;
-            background: linear-gradient(135deg, #218838 0%, #29AB87 100%);
-            opacity: 0;
-            transition: opacity 0.4s ease;
+            background: rgba(255,255,255,0.1);
+            transform: scale(0);
+            border-radius: 50px;
+            transition: transform 0.6s ease;
             z-index: -1;
-            border-radius: 50px;
         }
 
-        .btn-primary:hover::before {
-            opacity: 1;
+        .participation-btn:hover::after {
+            transform: scale(1);
         }
 
-        /* Bouton Secondaire (Back) */
-        .btn-outline-secondary {
-            border: 2px solid #6c757d;
-            color: #6c757d;
-            padding: 10px 25px;
-            border-radius: 50px;
-            transition: all 0.4s ease;
-            background-color: transparent;
-            font-weight: 600;
-        }
-
-        .btn-outline-secondary:hover {
-            background-color: #6c757d;
+        /* Bouton Back to list */
+        .btn-back-list {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
             color: white;
+        }
+
+        .btn-back-list:hover {
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(108, 117, 125, 0.3);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
         }
 
-        /* Effet Magnétique */
-        .btn-magnetic:hover {
-            animation: magnetic 0.5s ease;
+        .btn-back-list:hover i {
+            transform: translateX(-5px);
         }
 
-        @keyframes magnetic {
-            0%, 100% { transform: translateY(-3px) scale(1.02); }
-            50% { transform: translateY(-5px) scale(1.05); }
+        /* Bouton Retour aux événements */
+        .btn-back-events {
+            background: linear-gradient(135deg, #29AB87 0%, #1E7D65 100%);
+            color: white;
         }
 
-        /* Effet de Lumière */
-        .btn-primary::after {
+        .btn-back-events:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(41, 171, 135, 0.4);
+        }
+
+        .btn-back-events:hover i {
+            transform: translateX(-5px);
+        }
+
+        /* Bouton Envoyer */
+        .btn-submit {
+            background: linear-gradient(135deg, #218838 0%, #1a7433 100%);
+            color: white;
+            position: relative;
+            overflow: visible;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(33, 136, 56, 0.6);
+            animation: pulse 1s infinite alternate;
+        }
+
+        .btn-submit:hover i {
+            transform: translateY(-3px) rotate(15deg);
+        }
+
+        /* Effet de particules */
+        .btn-submit::before {
             content: '';
             position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: rgba(255, 255, 255, 0.1);
-            transform: rotate(45deg);
-            transition: all 0.6s ease;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
             pointer-events: none;
+            overflow: hidden;
+            border-radius: 50px;
         }
 
-        .btn-primary:hover::after {
-            left: 100%;
-            top: 100%;
+        .btn-submit:hover::before {
+            animation: particles 2s ease infinite;
         }
 
-        /* Effet de Vague amélioré */
-        .ripple-effect {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.6);
-            transform: scale(0);
-            animation: ripple 0.8s linear;
-            pointer-events: none;
+        @keyframes pulse {
+            0% { transform: translateY(-3px) scale(1); }
+            100% { transform: translateY(-3px) scale(1.05); }
         }
 
-        @keyframes ripple {
-            to {
-                transform: scale(3);
+        @keyframes particles {
+            0% {
+                background: rgba(255,255,255,0.5);
+                transform: translate(0, 0);
+                opacity: 1;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                top: 50%;
+                left: 50%;
+            }
+            100% {
+                transform: translate(var(--x), var(--y));
                 opacity: 0;
+                width: 2px;
+                height: 2px;
             }
         }
 
-        /* Icônes animées */
-        .btn-primary i, .btn-outline-secondary i {
-            transition: transform 0.3s ease;
+        /* Disposition des boutons */
+        .form-buttons-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
         }
 
-        .btn-primary:hover i {
-            transform: translateX(3px) rotate(5deg);
+        @media (max-width: 768px) {
+            .form-buttons-container {
+                flex-direction: column;
+            }
+            .participation-btn {
+                width: 100%;
+            }
         }
-
-        .btn-outline-secondary:hover i {
-            transform: translateX(-3px);
-        }
-
-        /* Autres styles existants... */
     </style>
 {% endblock %}
 
@@ -140,20 +163,44 @@
             <div class="col-lg-7 mb-4 mb-lg-0 d-flex">
                 <div class="card shadow border-0 w-100">
                     <div class="card-header bg-success text-white py-3">
-                        <h1 class="h4 mb-0">
-                            {% if event is defined and event is not null %}
-                                Inscription à l'événement : {{ event.title }}
-                            {% else %}
-                                Nouvelle Participation
-                            {% endif %}
-                        </h1>
+                        <h1 class="h4 mb-0">Create New Participation</h1>
                     </div>
                     <div class="card-body">
-                        {{ include('participation/_form.html.twig') }}
+                        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                {% for child in form %}
+                                    {% if child.vars.name != '_token' %}
+                                        <div class="mb-3">
+                                            {{ form_label(child, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                            {{ form_widget(child, {'attr': {'class': 'form-control' ~ (child.vars.valid ? '' : ' is-invalid')}}) }}
+                                            <div class="invalid-feedback">
+                                                {{ form_errors(child) }}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="card-footer bg-white">
+                                <div class="form-buttons-container">
+                                    <a href="{{ path('app_participation_index') }}" 
+                                       class="participation-btn btn-back-list">
+                                        <i class="fas fa-list"></i> Back to list
+                                    </a>
+                                    <a href="{{ path('app_front_event_list') }}" 
+                                       class="participation-btn btn-back-events">
+                                        <i class="fas fa-calendar-alt"></i> Retour aux événements
+                                    </a>
+                                    <button type="submit" class="participation-btn btn-submit">
+                                        <i class="fas fa-paper-plane"></i> {{ button_label|default('Envoyer') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {{ form_end(form) }}
                     </div>
                 </div>
             </div>
-
             <!-- Colonne image (dynamique) -->
             <div class="col-lg-5 d-flex">
                 <div class="card shadow border-0 w-100" style="border-left: 4px solid #29AB87;">

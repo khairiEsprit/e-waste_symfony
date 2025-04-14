@@ -6,6 +6,7 @@ use App\Repository\ParticipationRepository;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
+use App\Entity\Event;
 
 #[ORM\Entity(repositoryClass: ParticipationRepository::class)]
 #[UniqueEntity(fields: ['email'], message: 'Cet email est déjà utilisé.')]
@@ -55,6 +56,13 @@ class Participation
     #[ORM\Column(length: 255)]
     #[Assert\NotBlank(message: 'Le pays est obligatoire')]
     private ?string $country = null;
+
+    #[ORM\ManyToOne(targetEntity: Event::class)]
+    #[ORM\JoinColumn(nullable: true)]
+    private ?Event $event = null;
+    
+    #[ORM\Column(type: 'boolean', options: ['default' => false])]
+    private bool $reminderSent = false;
 
     // Getters et Setters
 
@@ -137,6 +145,28 @@ class Participation
     public function setCountry(string $country): static
     {
         $this->country = $country;
+        return $this;
+    }
+
+    public function getEvent(): ?Event
+    {
+        return $this->event;
+    }
+
+    public function setEvent(?Event $event): static
+    {
+        $this->event = $event;
+        return $this;
+    }
+    
+    public function isReminderSent(): bool
+    {
+        return $this->reminderSent;
+    }
+    
+    public function setReminderSent(bool $reminderSent): static
+    {
+        $this->reminderSent = $reminderSent;
         return $this;
     }
 }
