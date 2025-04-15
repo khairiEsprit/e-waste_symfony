@@ -105,16 +105,41 @@
                     <div class="login__box">
                         <i class="ri-lock-2-line login__icon"></i>
                         <div class="login__box-input">
-                            {{ form_widget(form.plainPassword.first, {'attr': {'class': 'login__input', 'id': 'register-pass'}}) }}
+                            {{ form_widget(form.plainPassword.first, {
+                                'attr': {
+                                    'class': 'login__input',
+                                    'id': 'register-pass',
+                                    'oninput': 'validatePasswordStrength(this)'
+                                }
+                            }) }}
                             <label for="register-pass" class="login__label">{{ 'security.login_password'|trans }}</label>
                             <i class="ri-eye-off-line login__eye" id="register-eye"></i>
+                            <div class="password-strength-container">
+                                <div class="password-strength-meter">
+                                    <div class="password-strength-meter-fill" id="password-strength-meter"></div>
+                                </div>
+                                <div class="password-strength-text" id="password-strength-text">Weak</div>
+                            </div>
+                            <div class="password-requirements" id="password-requirements">
+                                <div class="requirement" id="length-req"><i class="ri-checkbox-blank-circle-line"></i> 8+ chars</div>
+                                <div class="requirement" id="uppercase-req"><i class="ri-checkbox-blank-circle-line"></i> A-Z</div>
+                                <div class="requirement" id="lowercase-req"><i class="ri-checkbox-blank-circle-line"></i> a-z</div>
+                                <div class="requirement" id="number-req"><i class="ri-checkbox-blank-circle-line"></i> 0-9</div>
+                                <div class="requirement" id="special-req"><i class="ri-checkbox-blank-circle-line"></i> !@#$</div>
+                            </div>
                             <span class="error-text">{{ form_errors(form.plainPassword.first) }}</span>
                         </div>
                     </div>
                     <div class="login__box">
                         <i class="ri-lock-2-line login__icon"></i>
                         <div class="login__box-input">
-                            {{ form_widget(form.plainPassword.second, {'attr': {'class': 'login__input', 'id': 'register-pass-confirm'}}) }}
+                            {{ form_widget(form.plainPassword.second, {
+                                'attr': {
+                                    'class': 'login__input',
+                                    'id': 'register-pass-confirm',
+                                    'oninput': 'validatePasswordMatch(this)'
+                                }
+                            }) }}
                             <label for="register-pass-confirm" class="login__label">Confirm Password</label>
                             <i class="ri-eye-off-line login__eye" id="register-eye-confirm"></i>
                             <span class="error-text">{{ form_errors(form.plainPassword.second) }}</span>
@@ -415,6 +440,96 @@
             display: block;
             margin-top: 0.2rem;
         }
+
+        /* Password Strength Meter Styles */
+        .password-strength-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .password-strength-meter {
+            flex: 1;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .password-strength-meter-fill {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .password-strength-text {
+            font-size: 0.8rem;
+            color: var(--white-color);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .password-requirements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+            font-size: 0.7rem;
+            color: var(--white-color);
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            opacity: 0.7;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .requirement i {
+            font-size: 0.8rem;
+        }
+
+        .requirement.valid {
+            opacity: 1;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .requirement.valid i {
+            color: #4CAF50;
+        }
+
+        .requirement.valid i::before {
+            content: "\f00c";
+            font-family: "remixicon";
+        }
+
+        /* Form validation styles */
+        .login__input.has-error {
+            border-color: #ff4444;
+        }
+
+        .error-text {
+            color: #ff4444;
+            font-size: 0.7rem;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .login__box-input {
+            position: relative;
+        }
+
+        .login__error {
+            position: absolute;
+            bottom: -1.2rem;
+            left: 0;
+            font-size: 0.7rem;
+            color: #ff4444;
+        }
 </style>
 
     {% block javascripts %}
@@ -612,6 +727,218 @@
                 }
             }, 100);
         }
+
+        function validatePasswordStrength(input) {
+            const password = input.value;
+            const strengthMeter = document.getElementById('password-strength-meter');
+            const strengthText = document.getElementById('password-strength-text');
+            const requirements = {
+                length: document.getElementById('length-req'),
+                uppercase: document.getElementById('uppercase-req'),
+                lowercase: document.getElementById('lowercase-req'),
+                number: document.getElementById('number-req'),
+                special: document.getElementById('special-req')
+            };
+
+            // Reset requirements
+            Object.values(requirements).forEach(req => {
+                req.classList.remove('valid');
+                req.querySelector('i').className = 'ri-checkbox-blank-circle-line';
+            });
+
+            // Check requirements
+            let strength = 0;
+            let totalChecks = 0;
+
+            // Length check
+            if (password.length >= 8) {
+                requirements.length.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Uppercase check
+            if (/[A-Z]/.test(password)) {
+                requirements.uppercase.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Lowercase check
+            if (/[a-z]/.test(password)) {
+                requirements.lowercase.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Number check
+            if (/[0-9]/.test(password)) {
+                requirements.number.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Special character check
+            if (/[^A-Za-z0-9]/.test(password)) {
+                requirements.special.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Update strength meter
+            strengthMeter.style.width = strength + '%';
+            
+            // Update color and text based on strength
+            if (strength <= 20) {
+                strengthMeter.style.backgroundColor = '#ff4444';
+                strengthText.textContent = 'Weak';
+            } else if (strength <= 40) {
+                strengthMeter.style.backgroundColor = '#ffbb33';
+                strengthText.textContent = 'Fair';
+            } else if (strength <= 60) {
+                strengthMeter.style.backgroundColor = '#ffeb3b';
+                strengthText.textContent = 'Good';
+            } else if (strength <= 80) {
+                strengthMeter.style.backgroundColor = '#00C851';
+                strengthText.textContent = 'Strong';
+            } else {
+                strengthMeter.style.backgroundColor = '#007E33';
+                strengthText.textContent = 'Excellent';
+            }
+
+            return totalChecks === 5;
+        }
+
+        function validatePasswordMatch(input) {
+            const password = document.getElementById('register-pass').value;
+            const confirmPassword = input.value;
+            const errorDiv = input.parentElement.querySelector('.error-text');
+
+            if (confirmPassword !== password) {
+                errorDiv.textContent = 'Passwords do not match';
+                input.classList.add('has-error');
+                return false;
+            } else {
+                errorDiv.textContent = '';
+                input.classList.remove('has-error');
+                return true;
+            }
+        }
+
+        // Form validation
+        document.querySelector('.login__form').addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Validate first name
+            const firstNameInput = document.getElementById('register-firstname');
+            if (!firstNameInput.value.trim()) {
+                showError(firstNameInput, 'First name is required');
+                isValid = false;
+            } else {
+                clearError(firstNameInput);
+            }
+
+            // Validate email
+            const emailInput = document.getElementById('register-email');
+            if (!emailInput.value.trim()) {
+                showError(emailInput, 'Email is required');
+                isValid = false;
+            } else if (!isValidEmail(emailInput.value)) {
+                showError(emailInput, 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                clearError(emailInput);
+            }
+
+            // Validate password
+            const passwordInput = document.getElementById('register-pass');
+            if (!passwordInput.value.trim()) {
+                showError(passwordInput, 'Password is required');
+                isValid = false;
+            } else if (passwordInput.value.length < 8) {
+                showError(passwordInput, 'Password must be at least 8 characters long');
+                isValid = false;
+            } else {
+                const isPasswordValid = validatePasswordStrength(passwordInput);
+                if (!isPasswordValid) {
+                    showError(passwordInput, 'Password does not meet requirements');
+                    isValid = false;
+                } else {
+                    clearError(passwordInput);
+                }
+            }
+
+            // Validate password confirmation
+            const confirmPasswordInput = document.getElementById('register-pass-confirm');
+            const isPasswordMatch = validatePasswordMatch(confirmPasswordInput);
+            if (!isPasswordMatch) {
+                showError(confirmPasswordInput, 'Passwords do not match');
+                isValid = false;
+            } else {
+                clearError(confirmPasswordInput);
+            }
+
+            // Validate birthdate
+            const birthdateInput = document.getElementById('register-birthdate');
+            const isBirthdateValid = validateBirthdate(birthdateInput);
+            if (!isBirthdateValid) {
+                isValid = false;
+            }
+
+            // Validate file if selected
+            const fileInput = document.getElementById('register-image');
+            if (fileInput.files.length > 0) {
+                const isFileValid = validateFile(fileInput);
+                if (!isFileValid) {
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        function showError(input, message) {
+            input.classList.add('has-error');
+            const errorDiv = input.parentElement.querySelector('.error-text');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+            }
+        }
+
+        function clearError(input) {
+            input.classList.remove('has-error');
+            const errorDiv = input.parentElement.querySelector('.error-text');
+            if (errorDiv) {
+                errorDiv.textContent = '';
+            }
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Add password visibility toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = (eyeIcon, inputId) => {
+                const passwordInput = document.getElementById(inputId);
+                if (passwordInput) {
+                    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+                    eyeIcon.classList.toggle('ri-eye-line');
+                    eyeIcon.classList.toggle('ri-eye-off-line');
+                }
+            };
+
+            // Add click event listeners for eye icons
+            document.getElementById('register-eye').addEventListener('click', function() {
+                togglePassword(this, 'register-pass');
+            });
+
+            document.getElementById('register-eye-confirm').addEventListener('click', function() {
+                togglePassword(this, 'register-pass-confirm');
+            });
+        });
         </script>
     {% endblock %}
     

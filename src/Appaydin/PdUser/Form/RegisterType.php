@@ -55,7 +55,7 @@ class RegisterType extends AbstractType
                 'constraints' => [
                     new Assert\NotBlank(['message' => 'Please enter a password.']),
                     new Assert\Length([
-                        'min' => 3,
+                        'min' => 8,
                         'max' => 4096,
                         'minMessage' => 'Your password must be at least {{ limit }} characters long.',
                         'maxMessage' => 'Your password cannot be longer than {{ limit }} characters.',
