@@ -8,6 +8,16 @@
         <h1>Liste des Demandes</h1>
     </div>
 
+    <!-- Search Container -->
+    <div class="search-container mb-4">
+        <div class="input-group">
+            <span class="input-group-text">
+                <i class="fas fa-search"></i>
+            </span>
+            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher une demande...">
+        </div>
+    </div>
+
     <!-- Modal de confirmation -->
     <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
         <div class="modal-dialog">
@@ -49,10 +59,10 @@
                         <th>Actions</th>
                     </tr>
                 </thead>
-                <tbody>
+                <tbody id="demandesTableBody">
                     {% for demande in demandes %}
                         {% set dernierTraitement = demande.traitements|last %}
-                        <tr>
+                        <tr class="demande-row" data-search="{{ demande.adresse|lower }} {{ demande.emailUtilisateur|lower }} {{ demande.message|lower }} {{ demande.type|lower }}">
                             <td>{{ demande.adresse }}</td>
                             <td>{{ demande.emailUtilisateur }}</td>
                             <td>{{ demande.message }}</td>
@@ -153,17 +163,79 @@
 </div>
 {% endblock %}
 
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    .search-container {
+        max-width: 600px;
+        margin: 0 auto 30px;
+    }
+
+    .input-group-text {
+        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        border: none;
+        color: white;
+    }
+
+    .input-group .form-control {
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem;
+    }
+
+    .input-group .form-control:focus {
+        border-color: #2C5E1A;
+        box-shadow: 0 0 0 0.2rem rgba(44, 94, 26, 0.25);
+    }
+</style>
+{% endblock %}
+
 {% block javascripts %}
 {{ parent() }}
 <script>
 document.addEventListener('DOMContentLoaded', function() {
-    // Gestion de la suppression
+    const searchInput = document.getElementById('searchInput');
+    const demandesTableBody = document.getElementById('demandesTableBody');
+    const demandeRows = document.querySelectorAll('.demande-row');
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        demandeRows.forEach(row => {
+            const searchableText = row.getAttribute('data-search');
+            if (searchableText.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Check if any rows are visible
+        const visibleRows = Array.from(demandesTableBody.querySelectorAll('.demande-row'))
+            .filter(row => row.style.display !== 'none');
+
+        if (visibleRows.length === 0) {
+            if (!document.querySelector('.no-results-message')) {
+                const noResults = document.createElement('tr');
+                noResults.className = 'no-results-message';
+                noResults.innerHTML = '<td colspan="7" class="text-center">Aucune demande ne correspond à votre recherche.</td>';
+                demandesTableBody.appendChild(noResults);
+            }
+        } else {
+            const noResults = document.querySelector('.no-results-message');
+            if (noResults) {
+                noResults.remove();
+            }
+        }
+    });
+
+    // Existing code for delete confirmation
     const deleteButtons = document.querySelectorAll('.delete-btn');
     const deleteForm = document.getElementById('deleteForm');
 
     deleteButtons.forEach(button => {
         button.addEventListener('click', function() {
-            // Mise à jour du formulaire avec les données du bouton cliqué
             deleteForm.action = this.dataset.url;
             deleteForm.querySelector('input[name="_token"]').value = this.dataset.token;
         });

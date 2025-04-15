@@ -1,41 +1,123 @@
 {% extends 'back/base.html.twig' %}
 
-{% block title %}Traitement{% endblock %}
+{% block title %}Détails du Traitement{% endblock %}
 
 {% block content %}
-<div class="container mt-5">
-    <div class="card shadow-gray bg-light">
-        <div class="card-header bg-white text-black">
-            <h1 class="mb-0">Traitement</h1>
-        </div>
-        <div class="card-body">
-            <table class="table table-borderless">
-                <tbody>
-                    <tr>
-                        <th>Id</th>
-                        <td>{{ traitement.id }}</td>
-                    </tr>
-                    <tr>
-                        <th>Status</th>
-                        <td>{{ traitement.status }}</td>
-                    </tr>
-                    <tr>
-                        <th>Date de traitement</th>
-                        <td>{{ traitement.dateTraitement ? traitement.dateTraitement|date('Y-m-d') : '' }}</td>
-                    </tr>
-                    <tr>
-                        <th>Commentaire</th>
-                        <td>{{ traitement.commentaire }}</td>
-                    </tr>
-                </tbody>
-            </table>
-
-            <div class="d-flex justify-content-between mt-4">
-                <a href="{{ path('app_traitement_index') }}" class="btn btn-secondary">Retour à la liste</a>
-                <a href="{{ path('app_traitement_edit', {'id': traitement.id}) }}" class="btn btn-primary">Modifier</a>
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm">
+                <div class="card-header bg-white d-flex justify-content-between align-items-center">
+                    <h1 class="h4 mb-0">Détails du Traitement</h1>
+                    <div class="btn-group">
+                        <a href="{{ path('app_traitement_index') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-arrow-left"></i> Retour
+                        </a>
+                        <a href="{{ path('app_traitement_edit', {'id': traitement.id}) }}" class="btn btn-success">
+                            <i class="fas fa-edit"></i> Modifier
+                        </a>
+                    </div>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="info-section mb-4">
+                                <h5 class="text-muted mb-3">Informations du Traitement</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <th class="text-muted" style="width: 40%">ID</th>
+                                                <td>{{ traitement.id }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-muted">Statut</th>
+                                                <td>
+                                                    <span class="badge bg-{{ traitement.status == 'Traité' ? 'success' : (traitement.status == 'Refusé' ? 'danger' : 'warning') }}">
+                                                        {{ traitement.status }}
+                                                    </span>
+                                                </td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-muted">Date de traitement</th>
+                                                <td>{{ traitement.dateTraitement ? traitement.dateTraitement|date('d/m/Y') : 'Non spécifiée' }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-section mb-4">
+                                <h5 class="text-muted mb-3">Détails de la Demande</h5>
+                                <div class="table-responsive">
+                                    <table class="table table-borderless">
+                                        <tbody>
+                                            <tr>
+                                                <th class="text-muted" style="width: 40%">Email Utilisateur</th>
+                                                <td>{{ traitement.demande.emailUtilisateur }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-muted">Type</th>
+                                                <td>{{ traitement.demande.type }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-muted">Adresse</th>
+                                                <td>{{ traitement.demande.adresse }}</td>
+                                            </tr>
+                                            <tr>
+                                                <th class="text-muted">Message</th>
+                                                <td>{{ traitement.demande.message }}</td>
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-12">
+                            <div class="info-section">
+                                <h5 class="text-muted mb-3">Commentaire</h5>
+                                <div class="card bg-light">
+                                    <div class="card-body">
+                                        {{ traitement.commentaire ? traitement.commentaire : 'Aucun commentaire' }}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="card-footer bg-white">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <small class="text-muted">Dernière mise à jour: {{ traitement.dateTraitement ? traitement.dateTraitement|date('d/m/Y H:i') : 'Non spécifiée' }}</small>
+                        <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                            <i class="fas fa-trash"></i> Supprimer
+                        </button>
+                    </div>
+                </div>
             </div>
+        </div>
+    </div>
+</div>
 
-            {{ include('back/traitement/_delete_form.html.twig') }}
+<!-- Modal de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title" id="deleteModalLabel">Confirmation de suppression</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer ce traitement ?</p>
+                <p class="text-muted"><small>Cette action est irréversible.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                {{ include('back/traitement/_delete_form.html.twig') }}
+            </div>
         </div>
     </div>
 </div>
@@ -44,21 +126,43 @@
 {% block stylesheets %}
 {{ parent() }}
 <style>
-    .shadow-gray {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    .info-section {
+        background-color: #f8f9fa;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
     }
 
-    .card-header.bg-white {
-        background-color: #ffffff !important;
+    .card {
+        border: none;
+        border-radius: 10px;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
     }
 
-    .card-header h1 {
-        font-size: 1.5rem;
-        color: black; /* Assure que le texte est en noir */
+    .card-header {
+        border-bottom: 1px solid rgba(0,0,0,0.1);
     }
 
-    .table-borderless th, .table-borderless td {
-        border: none; /* Supprime les bordures des cellules pour un look plus propre */
+    .table-borderless th {
+        font-weight: 500;
+    }
+
+    .badge {
+        padding: 0.5em 0.75em;
+        font-weight: 500;
+    }
+
+    .btn-group .btn {
+        margin-left: 0.5rem;
+    }
+
+    .btn-success {
+        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        border: none;
+    }
+
+    .btn-success:hover {
+        background: linear-gradient(145deg, #1a7718, #2C5E1A);
     }
 </style>
 {% endblock %}
