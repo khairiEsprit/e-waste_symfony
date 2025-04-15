@@ -81,4 +81,23 @@ class EngagementPredictionRepository extends ServiceEntityRepository
 
         return $result->fetchAllAssociative();
     }
+
+    /**
+     * Find all predictions with user information, grouped by user
+     */
+    public function findAllPredictionsWithUsers(): array
+    {
+        $conn = $this->getEntityManager()->getConnection();
+
+        // Get the latest prediction for each user
+        $sql = 'SELECT ep.*, u.id as user_id, u.first_name, u.last_name, u.email, u.profile_image
+                FROM engagement_prediction ep
+                JOIN user u ON ep.user_id = u.id
+                ORDER BY ep.score DESC, ep.predicted_at DESC';
+
+        $stmt = $conn->prepare($sql);
+        $result = $stmt->executeQuery();
+
+        return $result->fetchAllAssociative();
+    }
 }

@@ -322,7 +322,7 @@
                             <div class="col-md-4">
                                 <div class="profile-preview" data-aos="fade-right" data-aos-delay="100">
                                     {% if user.profileImage %}
-                                        <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}" alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
+                                        <img src={{user.profileImage}} alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
                                     {% else %}
                                         <img src="{{ asset('assets/front/assets/img/default-avatar.png') }}" alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
                                     {% endif %}

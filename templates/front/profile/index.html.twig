@@ -208,7 +208,7 @@
                 <div class="profile-card" data-aos="fade-right" data-aos-delay="100">
                     <div class="profile-header">
                         {% if user.profileImage %}
-                            <img src="{{ asset('uploads/profile_images/' ~ user.profileImage) }}" alt="{{ user.fullName }}" class="profile-img">
+                                        <img src={{user.profileImage}} alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
                         {% else %}
                             <img src="{{ asset('assets/front/assets/img/default-avatar.png') }}" alt="{{ user.fullName }}" class="profile-img">
                         {% endif %}

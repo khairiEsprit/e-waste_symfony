@@ -1,0 +1,174 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}User Engagement Predictions{% endblock %}
+
+{% block content %}
+<!--begin::App Content Header-->
+<div class="app-content-header">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!--begin::Row-->
+        <div class="row">
+            <div class="col-sm-6">
+                <h3 class="mb-0">User Engagement Predictions</h3>
+            </div>
+            <div class="col-sm-6">
+                <ol class="breadcrumb float-sm-end">
+                    <li class="breadcrumb-item"><a href="{{ path('back_dashboard') }}">Home</a></li>
+                    <li class="breadcrumb-item"><a href="{{ path('admin_gamification_dashboard') }}">Gamification</a></li>
+                    <li class="breadcrumb-item active" aria-current="page">Predictions</li>
+                </ol>
+            </div>
+        </div>
+        <!--end::Row-->
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content Header-->
+
+<!--begin::App Content-->
+<div class="app-content">
+    <!--begin::Container-->
+    <div class="container-fluid">
+        <!-- Flash messages -->
+        {% for label, messages in app.flashes %}
+            {% for message in messages %}
+                <div class="alert alert-{{ label }} alert-dismissible fade show">
+                    {{ message }}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            {% endfor %}
+        {% endfor %}
+
+        <!-- Generation Results -->
+        {% if generationResult %}
+            <div class="row mb-4">
+                <div class="col-md-12">
+                    <div class="card">
+                        <div class="card-header bg-success text-white">
+                            <h3 class="card-title">Prediction Generation Results</h3>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-3 text-center">
+                                    <div class="info-box bg-success">
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Successful Predictions</span>
+                                            <span class="info-box-number">{{ generationResult.success }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <div class="info-box bg-danger">
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Failed Predictions</span>
+                                            <span class="info-box-number">{{ generationResult.error }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <div class="info-box bg-warning">
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Skipped Users</span>
+                                            <span class="info-box-number">{{ generationResult.skipped }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-3 text-center">
+                                    <div class="info-box bg-info">
+                                        <div class="info-box-content">
+                                            <span class="info-box-text">Total Users</span>
+                                            <span class="info-box-number">{{ generationResult.total }}</span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        {% endif %}
+
+        <!-- Actions -->
+        <div class="row mb-4">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <a href="{{ path('admin_gamification_generate_predictions', {'generate': 1}) }}" class="btn btn-primary">
+                            <i class="bi bi-lightning-charge"></i> Generate New Predictions
+                        </a>
+                        <a href="{{ path('admin_gamification_dashboard') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Back to Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Predictions Table -->
+        <div class="row">
+            <div class="col-md-12">
+                <div class="card">
+                    <div class="card-header">
+                        <h3 class="card-title">User Engagement Predictions</h3>
+                    </div>
+                    <div class="card-body table-responsive p-0">
+                        <table class="table table-hover text-nowrap">
+                            <thead>
+                                <tr>
+                                    <th>User</th>
+                                    <th>Email</th>
+                                    <th>Engagement Score</th>
+                                    <th>Predicted At</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for prediction in predictions %}
+                                <tr>
+                                    <td>
+                                        <img src="{{ prediction.profile_image ?: asset('assets/back/assets/img/avatar.png') }}" 
+                                             class="img-circle elevation-2" 
+                                             alt="User Image" 
+                                             style="width: 35px; height: 35px; margin-right: 10px;">
+                                        {{ prediction.first_name }} {{ prediction.last_name }}
+                                    </td>
+                                    <td>{{ prediction.email }}</td>
+                                    <td>
+                                        <div class="progress" style="height: 20px;">
+                                            {% set color = prediction.score < 30 ? 'danger' : (prediction.score < 70 ? 'warning' : 'success') %}
+                                            <div class="progress-bar bg-{{ color }}" role="progressbar" 
+                                                 style="width: {{ prediction.score }}%;" 
+                                                 aria-valuenow="{{ prediction.score }}" 
+                                                 aria-valuemin="0" 
+                                                 aria-valuemax="100">
+                                                {{ prediction.score|number_format(0) }}%
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ prediction.predicted_at|date('M d, Y H:i') }}</td>
+                                    <td>
+                                        <a href="{{ path('admin_gamification_assign_reward') }}" class="btn btn-sm btn-primary">
+                                            <i class="bi bi-gift"></i> Assign Reward
+                                        </a>
+                                    </td>
+                                </tr>
+                                {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center">No predictions found. Click "Generate New Predictions" to create predictions.</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <!--end::Container-->
+</div>
+<!--end::App Content-->
+{% endblock %}
