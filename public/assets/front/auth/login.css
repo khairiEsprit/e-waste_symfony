@@ -48,6 +48,17 @@ img {
   height: auto;
 }
 
+.login__button {
+  width: 100%;
+  padding: 1rem;
+  border-radius: 0.5rem;
+  background-color: var(--white-color);
+  font-weight: var(--font-medium);
+  cursor: pointer;
+  margin-bottom: 2rem;
+  text-align: center; /* Ensure text is centered */
+}
+
 /*=============== LOGIN ===============*/
 .login {
   position: relative;
@@ -62,15 +73,19 @@ img {
   object-fit: cover;
   object-position: center;
 }
+
 .login__form {
   position: relative;
   background-color: hsla(0, 0%, 10%, 0.1);
   border: 2px solid var(--white-color);
   margin-inline: 1.5rem;
-  padding: 2.5rem 1.5rem;
-  border-radius: 1rem;
+  padding: 2.5rem 3rem 1rem 3rem; /* Reduced padding from 2.5rem 1.5rem */
+    border-radius: 1rem;
   backdrop-filter: blur(8px);
 }
+
+
+
 .login__title {
   text-align: center;
   font-size: var(--h1-font-size);
@@ -145,15 +160,7 @@ img {
 .login__forgot:hover {
   text-decoration: underline;
 }
-.login__button {
-  width: 100%;
-  padding: 1rem;
-  border-radius: 0.5rem;
-  background-color: var(--white-color);
-  font-weight: var(--font-medium);
-  cursor: pointer;
-  margin-bottom: 2rem;
-}
+
 .login__register {
   text-align: center;
 }
@@ -170,6 +177,8 @@ img {
   top: -12px;
   font-size: var(--small-font-size);
 }
+
+
 
 /* Input focus sticky top label */
 .login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label {

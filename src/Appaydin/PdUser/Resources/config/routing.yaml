@@ -1,0 +1,22 @@
+# Login - Logout
+security_login:
+    path: "/login"
+    controller: App\Appaydin\PdUser\Controller\SecurityController::login
+security_logout:
+    path: "/logout"
+
+# Register
+security_register:
+    path: "/register"
+    controller: App\Appaydin\PdUser\Controller\SecurityController::register
+security_register_confirm:
+    path: "/register/{token}"
+    controller: App\Appaydin\PdUser\Controller\SecurityController::registerConfirm
+
+# Resetting
+security_resetting:
+    path: "/resetting"
+    controller: App\Appaydin\PdUser\Controller\SecurityController::resetting
+security_resetting_password:
+    path: "/resetting/{token}"
+    controller: App\Appaydin\PdUser\Controller\SecurityController::resettingPassword

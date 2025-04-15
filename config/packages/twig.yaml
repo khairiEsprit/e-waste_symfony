@@ -1,6 +1,9 @@
 twig:
     file_name_pattern: '*.twig'
 
+    globals:
+        notification_repository: '@App\Repository\NotificationRepository'
+
 when@test:
     twig:
         strict_variables: true

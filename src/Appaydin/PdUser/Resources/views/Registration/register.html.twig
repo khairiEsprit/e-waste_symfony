@@ -1,0 +1,950 @@
+{% extends "@PdUser/base.html.twig" %}
+
+{% block body %}
+
+    {% form_theme form 'bootstrap_4_layout.html.twig' %}
+    <div class="login">
+        <img src="{{ asset('assets/front/auth/bg-image.png') }}" alt="register image" class="login__img">
+
+        {{ form_start(form, {'attr': {'class': 'login__form', 'novalidate': 'novalidate'}}) }}
+            <h1 class="login__title">{{ 'security.register_title'|trans }}</h1>
+            
+            {% if form_errors(form) %}
+            <div class="login__alert">
+                <i class="ri-error-warning-line login__alert-icon"></i>
+                <div class="login__alert-text">{{ form_errors(form) }}</div>
+            </div>
+            {% endif %}
+            
+            {% if app.session.flashBag.has('error') %}
+            <div class="login__alert">
+                <i class="ri-error-warning-line login__alert-icon"></i>
+                <div class="login__alert-text">{{ app.session.flashBag.get('error')[0] }}</div>
+            </div>
+            {% endif %}
+            
+            {% if app.session.flashBag.has('modal_error') %}
+            <div class="login__alert">
+                <i class="ri-error-warning-line login__alert-icon"></i>
+                <div class="login__alert-text">{{ app.session.flashBag.get('modal_error')[0] }}</div>
+            </div>
+            {% endif %}
+
+            <div class="login__content">
+                <div class="login__column">
+                    <div class="login__box">
+                        <i class="ri-user-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.firstName, {'attr': {'class': 'login__input', 'id': 'register-firstname'}}) }}
+                            <label for="register-firstname" class="login__label">First Name</label>
+                            <span class="error-text">{{ form_errors(form.firstName) }}</span>
+                        </div>
+                    </div>
+                    <div class="login__box">
+                        <i class="ri-calendar-line login__icon"></i>
+                        <div class="login__box-input birthdate-container">
+                            {{ form_widget(form.birthdate, {'attr': {
+                                'class': 'login__input js-datepicker',
+                                'id': 'register-birthdate',
+                                'placeholder': ' ',
+                                'oninvalid': 'this.setCustomValidity(\'\')',
+                                'oninput': 'validateBirthdate(this)',
+                                'autocomplete': 'off'
+                            }}) }}
+                            <label for="register-birthdate" class="login__label">Birthdate</label>
+                            <div class="login__error" id="birthdate-error"></div>
+                            {% if form.birthdate.vars.errors|length > 0 %}
+                                <div class="error-text" style="color: #ff4444 !important; display: block !important;">
+                                    {% for error in form.birthdate.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    <div class="login__box">
+                        <i class="ri-image-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.profileImageFile, {
+                                'attr': {
+                                    'class': 'login__input file-input',
+                                    'id': 'register-image',
+                                    'type': 'file',
+                                    'accept': 'image/jpeg, image/png, image/gif',
+                                    'onchange': 'handleFileSelect(this)'
+                                }
+                            }) }}
+                            <label for="register-image" class="file-label" id="file-label">
+                                <i class="ri-upload-cloud-line"></i> Choose File
+                                <span class="file-name" id="file-name">No file chosen</span>
+                            </label>
+                            <div class="progress-container" id="progress-container" style="display: none;">
+                                <div class="progress-bar" id="progress-bar"></div>
+                                <span class="progress-text" id="progress-text">0%</span>
+                            </div>
+                            <div class="login__error" id="image-error"></div>
+                            {% if form.profileImageFile.vars.errors|length > 0 %}
+                                <div class="error-text" style="color: #ff4444 !important; display: block !important;">
+                                    {% for error in form.profileImageFile.vars.errors %}
+                                        {{ error.message }}
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                <div class="login__column">
+                    <div class="login__box">
+                        <i class="ri-user-3-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.email, {'attr': {'class': 'login__input', 'id': 'register-email'}}) }}
+                            <label for="register-email" class="login__label">{{ 'security.login_username'|trans }}</label>
+                            <span class="error-text">{{ form_errors(form.email) }}</span>
+                        </div>
+                    </div>
+                    <div class="login__box">
+                        <i class="ri-lock-2-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.plainPassword.first, {
+                                'attr': {
+                                    'class': 'login__input',
+                                    'id': 'register-pass',
+                                    'oninput': 'validatePasswordStrength(this)'
+                                }
+                            }) }}
+                            <label for="register-pass" class="login__label">{{ 'security.login_password'|trans }}</label>
+                            <i class="ri-eye-off-line login__eye" id="register-eye"></i>
+                            <div class="password-strength-container">
+                                <div class="password-strength-meter">
+                                    <div class="password-strength-meter-fill" id="password-strength-meter"></div>
+                                </div>
+                                <div class="password-strength-text" id="password-strength-text">Weak</div>
+                            </div>
+                            <div class="password-requirements" id="password-requirements">
+                                <div class="requirement" id="length-req"><i class="ri-checkbox-blank-circle-line"></i> 8+ chars</div>
+                                <div class="requirement" id="uppercase-req"><i class="ri-checkbox-blank-circle-line"></i> A-Z</div>
+                                <div class="requirement" id="lowercase-req"><i class="ri-checkbox-blank-circle-line"></i> a-z</div>
+                                <div class="requirement" id="number-req"><i class="ri-checkbox-blank-circle-line"></i> 0-9</div>
+                                <div class="requirement" id="special-req"><i class="ri-checkbox-blank-circle-line"></i> !@#$</div>
+                            </div>
+                            <span class="error-text">{{ form_errors(form.plainPassword.first) }}</span>
+                        </div>
+                    </div>
+                    <div class="login__box">
+                        <i class="ri-lock-2-line login__icon"></i>
+                        <div class="login__box-input">
+                            {{ form_widget(form.plainPassword.second, {
+                                'attr': {
+                                    'class': 'login__input',
+                                    'id': 'register-pass-confirm',
+                                    'oninput': 'validatePasswordMatch(this)'
+                                }
+                            }) }}
+                            <label for="register-pass-confirm" class="login__label">Confirm Password</label>
+                            <i class="ri-eye-off-line login__eye" id="register-eye-confirm"></i>
+                            <span class="error-text">{{ form_errors(form.plainPassword.second) }}</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="login__box login__box-select">
+                <i class="ri-user-star-line login__icon"></i>
+                <div class="login__box-input">
+                    {{ form_widget(form.selectedRole, {'attr': {'class': 'login__input login__select', 'id': 'register-role'}}) }}
+                    <label for="register-role" class="login__label">{{ 'security.role'|trans }}</label>
+                    <span class="error-text">{{ form_errors(form.selectedRole) }}</span>
+                </div>
+            </div>
+
+            <button type="submit" class="login__button">{{ 'security.register_btn'|trans }}</button>
+
+            {# Google Registration Button #}
+          <div class="login__social">
+    <p class="login__social-text">Or register with:</p>
+    <a href="{{ path('set_oauth_flow', {'flow': 'register'}) }}" class="login__button login__button--social">
+        <i class="ri-google-fill login__icon--social"></i>
+        <span>Register with Google</span>
+    </a>
+</div>
+
+            <p class="login__register">
+                Already have an account?
+                <a href="{{ path('security_login') }}">{{ 'security.login_title'|trans }}</a>
+            </p>
+        {{ form_end(form) }}
+    </div>
+    
+    {# Modal for user already exists #}
+    {% if app.session.flashBag.has('modal_error') %}
+        <div class="modal-overlay" id="errorModal">
+            <div class="modal-content">
+                <h2>Error</h2>
+                <p>{{ app.session.flashBag.get('modal_error')[0] }}</p>
+                <button onclick="closeModal()">OK</button>
+            </div>
+        </div>
+    {% endif %}
+<style>
+        /* Reduce form padding */
+        .login__form {
+            position: relative;
+            background-color: hsla(0, 0%, 10%, 0.1);
+            border: 2px solid var(--white-color);
+            margin-inline: 1.5rem;
+            padding: 1rem 2rem 0.5rem; /* Reduced padding */
+            border-radius: 1rem;
+            width: 800px;
+            backdrop-filter: blur(8px);
+        }
+
+        /* Reduce input field height */
+        .login__input {
+            height: 50px; /* Reduced from 80px */
+            padding-left: 40px;
+            padding-right: 40px;
+            width: 100%;
+            background: transparent;
+            color: var(--white-color);
+            border-radius: 8px;
+        }
+
+        /* Adjust datepicker input specifically */
+        .login__box-datepicker .login__input {
+            height: 50px; /* Reduced from 80px */
+            padding-left: 40px;
+            padding-right: 40px;
+        }
+
+        /* Reduce spacing between form elements */
+        .login__box {
+            margin-bottom: 0.5rem; /* Reduced from 1rem */
+        }
+
+        /* Reduce button padding and margin */
+        .login__button {
+            width: 100%;
+            padding: 0.3rem; /* Reduced from 0.5rem */
+            border-radius: 0.5rem;
+            background-color: var(--white-color);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            margin-bottom: 1rem; /* Reduced from 2rem */
+            text-align: center;
+        }
+
+        /* Adjust Google button section */
+        .login__social {
+            display: flex;
+            justify-content: flex-end;
+            align-items: center;
+            gap: 0.5rem; /* Reduced gap */
+            margin-bottom: 0.5rem; /* Reduced from 1rem */
+        }
+
+       .login__button--social {
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Centers content horizontally */
+    gap: 0.5rem;
+    padding: 0.5rem 1rem;
+    background-color: var(--white-color);
+    color: var(--black-color);
+    border-radius: 0.5rem;
+    text-decoration: none;
+    width: 100%; /* Ensures it takes full width for centering */
+    text-align: center; /* Fallback for text alignment */
+}
+
+        /* Adjust label positioning for smaller inputs */
+        .login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label,
+        .active-label {
+            top: -10px !important; /* Adjusted for smaller input height */
+            font-size: var(--small-font-size) !important;
+        }
+        .login__input:focus + .login__label {
+            top: -10px;
+            font-size: var(--small-font-size);
+        }
+
+        /* Adjust file input label */
+        .file-label {
+            padding: 5px 10px; /* Reduced padding */
+            gap: 5px; /* Reduced gap */
+        }
+
+        /* Other unchanged styles */
+        .login__social-text {
+            font-size: var(--small-font-size);
+            color: var(--white-color);
+        }
+
+        .login__button--social {
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+            border-radius: 0.5rem;
+            background-color: var(--white-color);
+            color: var(--black-color);
+            font-weight: var(--font-medium);
+            cursor: pointer;
+            text-decoration: none;
+        }
+
+        .login__icon--social {
+            font-size: 1.2rem;
+        }
+
+        .login__box-datepicker .login__box-input {
+            position: relative;
+            width: 100%;
+            display: flex;
+            align-items: center;
+        }
+
+        .ui-datepicker-trigger {
+            background: none;
+            border: none;
+            color: white;
+            position: absolute;
+            right: 0;
+            top: 50%;
+            transform: translateY(-50%);
+            cursor: pointer;
+            z-index: 2;
+        }
+
+        .birthdate-container {
+            position: relative;
+        }
+
+        .login__register {
+            text-align: center;
+            font-size: var(--small-font-size);
+        }
+        .login__register a {
+            color: var(--white-color);
+            font-weight: var(--font-medium);
+        }
+        .login__register a:hover {
+            text-decoration: underline;
+        }
+
+        input,
+        button,
+        select {
+            border: none;
+            outline: none;
+        }
+
+        .login__box-select .login__select option {
+            color: var(--black-color);
+            background: var(--white-color);
+        }
+
+        .login__content {
+            display: flex;
+            justify-content: space-between;
+            gap: 1rem; /* Reduced from 1.5rem */
+        }
+        .login__column {
+            width: 48%;
+        }
+        
+        .file-input {
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            opacity: 0;
+            cursor: pointer;
+        }
+
+        .file-label {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background-color: rgba(255, 255, 255, 0.2);
+            border: 2px solid white;
+            border-radius: 8px;
+            color: white;
+            cursor: pointer;
+            font-size: 1rem;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .file-label i {
+            font-size: 1.5rem;
+        }
+
+        .file-label:hover {
+            background-color: rgba(255, 255, 255, 0.3);
+        }
+        
+        .file-selected {
+            background-color: rgba(76, 175, 80, 0.3);
+            border-color: #4CAF50;
+        }
+
+        .file-name {
+            font-size: 0.9rem;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+            max-width: 150px;
+        }
+        
+        .progress-container {
+            width: 100%;
+            margin-top: 5px; /* Reduced from 10px */
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 5px;
+            position: relative;
+            height: 15px; /* Reduced from 20px */
+        }
+        
+        .progress-bar {
+            height: 100%;
+            border-radius: 5px;
+            background-color: #4CAF50;
+            width: 0%;
+            transition: width 0.3s ease;
+        }
+        
+        .progress-text {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 10px; /* Reduced from 12px */
+            font-weight: bold;
+        }
+        
+        .login__error {
+            position: absolute;
+            bottom: -1rem; /* Adjusted for smaller spacing */
+            left: 0;
+            font-size: 0.7rem;
+            color: #ff4444;
+            margin-top: 0.2rem;
+        }
+        
+        .login__input.has-error {
+            border-bottom-color: #ff4444;
+        }
+        
+        .error-text {
+            color: #ff4444;
+            font-size: 0.7rem;
+            display: block;
+            margin-top: 0.2rem;
+        }
+
+        /* Password Strength Meter Styles */
+        .password-strength-container {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            margin-top: 5px;
+        }
+
+        .password-strength-meter {
+            flex: 1;
+            height: 4px;
+            background-color: rgba(255, 255, 255, 0.2);
+            border-radius: 2px;
+            overflow: hidden;
+        }
+
+        .password-strength-meter-fill {
+            height: 100%;
+            width: 0;
+            transition: width 0.3s ease, background-color 0.3s ease;
+        }
+
+        .password-strength-text {
+            font-size: 0.8rem;
+            color: var(--white-color);
+            min-width: 50px;
+            text-align: right;
+        }
+
+        .password-requirements {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 5px;
+            margin-top: 5px;
+            font-size: 0.7rem;
+            color: var(--white-color);
+        }
+
+        .requirement {
+            display: flex;
+            align-items: center;
+            gap: 3px;
+            opacity: 0.7;
+            background: rgba(255, 255, 255, 0.1);
+            padding: 2px 6px;
+            border-radius: 3px;
+        }
+
+        .requirement i {
+            font-size: 0.8rem;
+        }
+
+        .requirement.valid {
+            opacity: 1;
+            background: rgba(76, 175, 80, 0.2);
+        }
+
+        .requirement.valid i {
+            color: #4CAF50;
+        }
+
+        .requirement.valid i::before {
+            content: "\f00c";
+            font-family: "remixicon";
+        }
+
+        /* Form validation styles */
+        .login__input.has-error {
+            border-color: #ff4444;
+        }
+
+        .error-text {
+            color: #ff4444;
+            font-size: 0.7rem;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .login__box-input {
+            position: relative;
+        }
+
+        .login__error {
+            position: absolute;
+            bottom: -1.2rem;
+            left: 0;
+            font-size: 0.7rem;
+            color: #ff4444;
+        }
+</style>
+
+    {% block javascripts %}
+        {{ parent() }}
+        <!-- jQuery and jQuery UI dependencies -->
+        <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+        <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.min.js"></script>
+        <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+
+        <script>
+        $(document).ready(function() {
+            // Initialize datepicker
+            $('.js-datepicker').datepicker({
+                changeMonth: true,
+                changeYear: true,
+                yearRange: "-100:+0",
+                maxDate: "-18y",
+                dateFormat: 'mm/dd/yy',
+                showOn: 'both', // Show datepicker on input focus and button click
+                buttonText: '<i class="ri-calendar-line"></i>',
+                beforeShow: function(input, inst) {
+                    // Position the datepicker below the input
+                    setTimeout(function() {
+                        inst.dpDiv.css({
+                            top: $(input).offset().top + $(input).outerHeight() + 10,
+                            left: $(input).offset().left
+                        });
+                    }, 0);
+                },
+                onSelect: function(dateText) {
+                    $(this).trigger('change');
+                    $(this).addClass('has-value');
+                    
+                    // Ensure the date is in the correct format for Symfony (MM/DD/YYYY)
+                    var date = $(this).datepicker('getDate');
+                    if (date) {
+                        var month = ('0' + (date.getMonth() + 1)).slice(-2);
+                        var day = ('0' + date.getDate()).slice(-2);
+                        var year = date.getFullYear();
+                        var formattedDate = month + '/' + day + '/' + year;
+                        $(this).val(formattedDate);
+                    }
+                    
+                    // Force the label to stay in the "active" position
+                    $(this).parent().find('.login__label').addClass('active-label');
+                    
+                    // Clear any previous error
+                    document.getElementById('birthdate-error').textContent = '';
+                    $(this).removeClass('has-error');
+                    
+                    validateBirthdate(this);
+                }
+            });
+            
+            // Check if the birthdate field already has a value on page load
+            if ($('#register-birthdate').val()) {
+                $('#register-birthdate').parent().find('.login__label').addClass('active-label');
+            }
+
+            // Form validation on submit
+            $('.login__form').on('submit', function(e) {
+                const birthdateInput = document.getElementById('register-birthdate');
+                const fileInput = document.getElementById('register-image');
+                
+                const isBirthdateValid = validateBirthdate(birthdateInput);
+                const isFileValid = validateFile(fileInput);
+                
+                if (!isBirthdateValid || !isFileValid) {
+                    e.preventDefault();
+                }
+            });
+
+            // Remove custom password eye toggle as it's handled by login.js
+            // The login.js script already handles the eye icon functionality for both login and register pages
+        });
+
+        // Validate birthdate
+        function validateBirthdate(input) {
+            const errorDiv = document.getElementById('birthdate-error');
+            
+            if (!input.value) {
+                errorDiv.textContent = 'Birthdate is required';
+                input.classList.add('has-error');
+                $(input).parent().find('.login__label').removeClass('active-label');
+                return false;
+            } else {
+                // Check if the user is at least 18 years old
+                // Parse date in MM/dd/yyyy format
+                const parts = input.value.split('/');
+                if (parts.length !== 3) {
+                    errorDiv.textContent = 'Please enter a valid date (MM/DD/YYYY)';
+                    input.classList.add('has-error');
+                    return false;
+                }
+                
+                const month = parseInt(parts[0], 10) - 1; // Months are 0-indexed in JS
+                const day = parseInt(parts[1], 10);
+                const year = parseInt(parts[2], 10);
+                
+                if (isNaN(month) || isNaN(day) || isNaN(year) || 
+                    month < 0 || month > 11 || day < 1 || day > 31 || year < 1900) {
+                    errorDiv.textContent = 'Please enter a valid date (MM/DD/YYYY)';
+                    input.classList.add('has-error');
+                    return false;
+                }
+                
+                const birthDate = new Date(year, month, day);
+                const today = new Date();
+                const age = today.getFullYear() - birthDate.getFullYear();
+                const monthDiff = today.getMonth() - birthDate.getMonth();
+                
+                // Keep the label in the active position
+                $(input).parent().find('.login__label').addClass('active-label');
+                
+                if (age < 18 || (age === 18 && monthDiff < 0) || (age === 18 && monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                    errorDiv.textContent = 'You must be at least 18 years old';
+                    input.classList.add('has-error');
+                    return false;
+                } else {
+                    errorDiv.textContent = '';
+                    input.classList.remove('has-error');
+                    return true;
+                }
+            }
+        }
+
+        // Handle file selection
+        function handleFileSelect(input) {
+            const fileName = input.files.length > 0 ? input.files[0].name : 'No file chosen';
+            const fileNameElement = document.getElementById('file-name');
+            const fileLabel = document.getElementById('file-label');
+            const errorDiv = document.getElementById('image-error');
+            
+            if (input.files.length > 0) {
+                // Update file name display
+                fileNameElement.textContent = fileName;
+                fileLabel.classList.add('file-selected');
+                
+                // Validate file type and size
+                const file = input.files[0];
+                const fileType = file.type;
+                const validTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                const maxSize = 5 * 1024 * 1024; // 5MB
+                
+                if (!validTypes.includes(fileType)) {
+                    errorDiv.textContent = 'Please select a valid image file (JPEG, PNG, GIF)';
+                    input.classList.add('has-error');
+                    return false;
+                } else if (file.size > maxSize) {
+                    errorDiv.textContent = 'File size must be less than 5MB';
+                    input.classList.add('has-error');
+                    return false;
+                } else {
+                    errorDiv.textContent = '';
+                    input.classList.remove('has-error');
+                    
+                    // Show upload progress simulation
+                    simulateUploadProgress();
+                    return true;
+                }
+            } else {
+                fileNameElement.textContent = 'No file chosen';
+                fileLabel.classList.remove('file-selected');
+                return true;
+            }
+        }
+
+        // Validate file on form submission
+        function validateFile(input) {
+            if (input.files.length === 0) {
+                return true; // File is optional
+            }
+            return handleFileSelect(input);
+        }
+
+        // Simulate upload progress
+        function simulateUploadProgress() {
+            const progressContainer = document.getElementById('progress-container');
+            const progressBar = document.getElementById('progress-bar');
+            const progressText = document.getElementById('progress-text');
+            
+            progressContainer.style.display = 'block';
+            let progress = 0;
+            
+            const interval = setInterval(function() {
+                progress += 5;
+                progressBar.style.width = progress + '%';
+                progressText.textContent = progress + '%';
+                
+                if (progress >= 100) {
+                    clearInterval(interval);
+                    setTimeout(function() {
+                        progressContainer.style.display = 'none';
+                    }, 1000);
+                }
+            }, 100);
+        }
+
+        function validatePasswordStrength(input) {
+            const password = input.value;
+            const strengthMeter = document.getElementById('password-strength-meter');
+            const strengthText = document.getElementById('password-strength-text');
+            const requirements = {
+                length: document.getElementById('length-req'),
+                uppercase: document.getElementById('uppercase-req'),
+                lowercase: document.getElementById('lowercase-req'),
+                number: document.getElementById('number-req'),
+                special: document.getElementById('special-req')
+            };
+
+            // Reset requirements
+            Object.values(requirements).forEach(req => {
+                req.classList.remove('valid');
+                req.querySelector('i').className = 'ri-checkbox-blank-circle-line';
+            });
+
+            // Check requirements
+            let strength = 0;
+            let totalChecks = 0;
+
+            // Length check
+            if (password.length >= 8) {
+                requirements.length.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Uppercase check
+            if (/[A-Z]/.test(password)) {
+                requirements.uppercase.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Lowercase check
+            if (/[a-z]/.test(password)) {
+                requirements.lowercase.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Number check
+            if (/[0-9]/.test(password)) {
+                requirements.number.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Special character check
+            if (/[^A-Za-z0-9]/.test(password)) {
+                requirements.special.classList.add('valid');
+                strength += 20;
+                totalChecks++;
+            }
+
+            // Update strength meter
+            strengthMeter.style.width = strength + '%';
+            
+            // Update color and text based on strength
+            if (strength <= 20) {
+                strengthMeter.style.backgroundColor = '#ff4444';
+                strengthText.textContent = 'Weak';
+            } else if (strength <= 40) {
+                strengthMeter.style.backgroundColor = '#ffbb33';
+                strengthText.textContent = 'Fair';
+            } else if (strength <= 60) {
+                strengthMeter.style.backgroundColor = '#ffeb3b';
+                strengthText.textContent = 'Good';
+            } else if (strength <= 80) {
+                strengthMeter.style.backgroundColor = '#00C851';
+                strengthText.textContent = 'Strong';
+            } else {
+                strengthMeter.style.backgroundColor = '#007E33';
+                strengthText.textContent = 'Excellent';
+            }
+
+            return totalChecks === 5;
+        }
+
+        function validatePasswordMatch(input) {
+            const password = document.getElementById('register-pass').value;
+            const confirmPassword = input.value;
+            const errorDiv = input.parentElement.querySelector('.error-text');
+
+            if (confirmPassword !== password) {
+                errorDiv.textContent = 'Passwords do not match';
+                input.classList.add('has-error');
+                return false;
+            } else {
+                errorDiv.textContent = '';
+                input.classList.remove('has-error');
+                return true;
+            }
+        }
+
+        // Form validation
+        document.querySelector('.login__form').addEventListener('submit', function(e) {
+            let isValid = true;
+            
+            // Validate first name
+            const firstNameInput = document.getElementById('register-firstname');
+            if (!firstNameInput.value.trim()) {
+                showError(firstNameInput, 'First name is required');
+                isValid = false;
+            } else {
+                clearError(firstNameInput);
+            }
+
+            // Validate email
+            const emailInput = document.getElementById('register-email');
+            if (!emailInput.value.trim()) {
+                showError(emailInput, 'Email is required');
+                isValid = false;
+            } else if (!isValidEmail(emailInput.value)) {
+                showError(emailInput, 'Please enter a valid email address');
+                isValid = false;
+            } else {
+                clearError(emailInput);
+            }
+
+            // Validate password
+            const passwordInput = document.getElementById('register-pass');
+            if (!passwordInput.value.trim()) {
+                showError(passwordInput, 'Password is required');
+                isValid = false;
+            } else if (passwordInput.value.length < 8) {
+                showError(passwordInput, 'Password must be at least 8 characters long');
+                isValid = false;
+            } else {
+                const isPasswordValid = validatePasswordStrength(passwordInput);
+                if (!isPasswordValid) {
+                    showError(passwordInput, 'Password does not meet requirements');
+                    isValid = false;
+                } else {
+                    clearError(passwordInput);
+                }
+            }
+
+            // Validate password confirmation
+            const confirmPasswordInput = document.getElementById('register-pass-confirm');
+            const isPasswordMatch = validatePasswordMatch(confirmPasswordInput);
+            if (!isPasswordMatch) {
+                showError(confirmPasswordInput, 'Passwords do not match');
+                isValid = false;
+            } else {
+                clearError(confirmPasswordInput);
+            }
+
+            // Validate birthdate
+            const birthdateInput = document.getElementById('register-birthdate');
+            const isBirthdateValid = validateBirthdate(birthdateInput);
+            if (!isBirthdateValid) {
+                isValid = false;
+            }
+
+            // Validate file if selected
+            const fileInput = document.getElementById('register-image');
+            if (fileInput.files.length > 0) {
+                const isFileValid = validateFile(fileInput);
+                if (!isFileValid) {
+                    isValid = false;
+                }
+            }
+
+            if (!isValid) {
+                e.preventDefault();
+            }
+        });
+
+        function showError(input, message) {
+            input.classList.add('has-error');
+            const errorDiv = input.parentElement.querySelector('.error-text');
+            if (errorDiv) {
+                errorDiv.textContent = message;
+            }
+        }
+
+        function clearError(input) {
+            input.classList.remove('has-error');
+            const errorDiv = input.parentElement.querySelector('.error-text');
+            if (errorDiv) {
+                errorDiv.textContent = '';
+            }
+        }
+
+        function isValidEmail(email) {
+            return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email);
+        }
+
+        // Add password visibility toggle functionality
+        document.addEventListener('DOMContentLoaded', function() {
+            const togglePassword = (eyeIcon, inputId) => {
+                const passwordInput = document.getElementById(inputId);
+                if (passwordInput) {
+                    passwordInput.type = passwordInput.type === 'password' ? 'text' : 'password';
+                    eyeIcon.classList.toggle('ri-eye-line');
+                    eyeIcon.classList.toggle('ri-eye-off-line');
+                }
+            };
+
+            // Add click event listeners for eye icons
+            document.getElementById('register-eye').addEventListener('click', function() {
+                togglePassword(this, 'register-pass');
+            });
+
+            document.getElementById('register-eye-confirm').addEventListener('click', function() {
+                togglePassword(this, 'register-pass-confirm');
+            });
+        });
+        </script>
+    {% endblock %}
+    
+    <script>
+        function closeModal() {
+            document.getElementById('errorModal').style.display = 'none';
+        }
+    </script>
+{% endblock %}

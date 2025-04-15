@@ -1,0 +1,381 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Waste Classification Chatbot{% endblock %}
+
+{% block body %}
+    <section class="chat-section py-5 chat-background">
+        <div class="container">
+            <div class="row justify-content-center">
+                <div class="col-lg-8 col-md-10">
+                    <div class="chat-container">
+                        <div class="chat-intro text-center mb-4 animate-intro">
+                            <h1 class="section-title">Welcome to the Waste Classification Chatbot!</h1>
+                            <p class="lead">This helpful chatbot assists you in recognizing whether your waste is recyclable or organic. Simply upload an image of your waste below, and I’ll analyze it for you!</p>
+                        </div>
+
+                        <div class="chat-messages" id="chat-messages">
+                            <!-- Messages will be cleared on reload via JavaScript -->
+                            <div class="pending-message" id="pending-indicator" style="display: none;">
+                                <div class="loading-dots">
+                                    <span></span>
+                                    <span></span>
+                                    <span></span>
+                                </div>
+                                <span class="pending-text">Analyzing your waste...</span>
+                            </div>
+                        </div>
+
+                        <form id="chat-form" action="{{ path('chat_upload') }}" method="post" enctype="multipart/form-data" class="mt-4">
+                            <div class="input-group animate-input">
+                                <input type="text" name="message" placeholder="Type a message (optional)" class="form-control chat-input">
+                                <input type="file" name="image" accept="image/*" required class="form-control chat-file">
+                                <button type="submit" class="btn-primary chat-submit" id="submit-btn">Send</button>
+                            </div>
+                        </form>
+
+                        {% for message in app.flashes('error') %}
+                            <div class="alert alert-danger text-center mt-3 animate-error">{{ message }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </section>
+
+<style>
+.chat-section {
+    min-height: calc(100vh - 200px);
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-background {
+    background: linear-gradient(135deg, #377e71 0%, #2ecc71 100%);
+    animation: backgroundPulse 10s infinite alternate;
+}
+
+.chat-container {
+    background: rgba(255, 255, 255, 0.97);
+    padding: 25px;
+    border-radius: 15px;
+    box-shadow: 0 6px 20px rgba(0, 0, 0, 0.15);
+    font-family: 'Open Sans', sans-serif;
+    margin-top: 90px;
+    position: relative;
+    transition: transform 0.3s ease;
+}
+
+.chat-container:hover {
+    transform: translateY(-5px);
+}
+
+.chat-intro h1 {
+    color: #2c3e50;
+    font-size: 30px;
+    margin-bottom: 15px;
+    text-shadow: 1px 1px 2px rgba(0, 0, 0, 0.1);
+}
+
+.chat-intro p {
+    color: #7f8c8d;
+    font-size: 17px;
+    line-height: 1.6;
+}
+
+.chat-messages {
+    max-height: 400px;
+    overflow-y: auto;
+    padding: 15px;
+    background: #f8f9fa;
+    border-radius: 10px;
+    margin-bottom: 25px;
+    position: relative;
+}
+
+.chat-message {
+    padding: 12px 18px;
+    margin: 12px 0;
+    border-radius: 10px;
+    animation: slideIn 0.4s ease-out, fadeIn 0.4s ease-out;
+    word-wrap: break-word;
+    transition: transform 0.2s ease;
+}
+
+.chat-message:hover {
+    transform: scale(1.02);
+}
+
+.user-message {
+    background: linear-gradient(45deg, #3498db, #2980b9);
+    color: #fff;
+    margin-left: 25%;
+    text-align: right;
+}
+
+.bot-message {
+    background: linear-gradient(45deg, #2ecc71, #27ae60);
+    color: #fff;
+    margin-right: 25%;
+}
+
+.timestamp {
+    display: block;
+    font-size: 12px;
+    opacity: 0;
+    transition: opacity 0.3s ease;
+}
+
+.chat-message:hover .timestamp {
+    opacity: 0.8;
+}
+
+.chat-input,
+.chat-file {
+    padding: 12px;
+    font-size: 15px;
+    border: none;
+    transition: all 0.3s ease;
+}
+
+.chat-input:focus,
+.chat-file:focus {
+    box-shadow: 0 0 10px rgba(46, 204, 113, 0.3);
+    outline: none;
+}
+
+.chat-submit {
+    padding: 12px 25px;
+    transition: all 0.3s ease;
+    position: relative;
+    overflow: hidden;
+}
+
+.chat-submit:disabled {
+    opacity: 0.6;
+    cursor: not-allowed;
+}
+
+.chat-submit:hover {
+    background: #c0392b;
+    transform: translateY(-2px);
+}
+
+.chat-submit::after {
+    content: '';
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    width: 0;
+    height: 0;
+    background: rgba(255, 255, 255, 0.2);
+    border-radius: 50%;
+    transform: translate(-50%, -50%);
+    transition: width 0.4s ease, height 0.4s ease;
+}
+
+.chat-submit:hover::after {
+    width: 200px;
+    height: 200px;
+}
+
+.chat-image {
+    max-width: 220px;
+    height: auto;
+    margin-top: 12px;
+    border-radius: 8px;
+    display: block;
+    transition: transform 0.3s ease;
+}
+
+.chat-image:hover {
+    transform: scale(1.1);
+}
+
+/* Pending State Styles */
+.pending-message {
+    padding: 12px 18px;
+    margin: 12px 0;
+    border-radius: 10px;
+    background: #ecf0f1;
+    color: #7f8c8d;
+    display: flex;
+    align-items: center;
+    animation: fadeIn 0.3s ease-out;
+}
+
+.loading-dots {
+    display: flex;
+    margin-right: 10px;
+}
+
+.loading-dots span {
+    width: 8px;
+    height: 8px;
+    background: #2ecc71;
+    border-radius: 50%;
+    margin: 0 3px;
+    animation: bounce 0.6s infinite alternate;
+}
+
+.loading-dots span:nth-child(2) {
+    animation-delay: 0.2s;
+}
+
+.loading-dots span:nth-child(3) {
+    animation-delay: 0.4s;
+}
+
+.pending-text {
+    font-size: 14px;
+}
+
+/* Animation Keyframes */
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-30px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes fadeIn {
+    from { opacity: 0; }
+    to { opacity: 1; }
+}
+
+@keyframes backgroundPulse {
+    0% { background-position: 0% 50%; }
+    100% { background-position: 100% 50%; }
+}
+
+@keyframes bounce {
+    from { transform: translateY(0); }
+    to { transform: translateY(-5px); }
+}
+
+.animate-intro {
+    animation: fadeIn 1s ease-out;
+}
+
+.animate-input {
+    animation: slideUp 0.5s ease-out;
+}
+
+@keyframes slideUp {
+    from {
+        opacity: 0;
+        transform: translateY(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.animate-error {
+    animation: shake 0.5s ease;
+}
+
+@keyframes shake {
+    0% { transform: translateX(0); }
+    25% { transform: translateX(-5px); }
+    50% { transform: translateX(5px); }
+    75% { transform: translateX(-5px); }
+    100% { transform: translateX(0); }
+}
+</style>
+
+<script>
+// Prevent caching
+window.onbeforeunload = function() {
+    // Clear any stored messages in localStorage if used
+    localStorage.removeItem('chatMessages');
+};
+
+// Clear messages on page load
+document.addEventListener('DOMContentLoaded', function() {
+    const messagesContainer = document.getElementById('chat-messages');
+    // Remove all child elements except the pending indicator
+    while (messagesContainer.firstChild && messagesContainer.firstChild.id !== 'pending-indicator') {
+        messagesContainer.removeChild(messagesContainer.firstChild);
+    }
+});
+
+// Handle form submission
+document.getElementById('chat-form').addEventListener('submit', function(e) {
+    e.preventDefault();
+    
+    const pendingIndicator = document.getElementById('pending-indicator');
+    const submitBtn = document.getElementById('submit-btn');
+    const form = this;
+    
+    pendingIndicator.style.display = 'flex';
+    submitBtn.disabled = true;
+    
+    const messages = document.getElementById('chat-messages');
+    messages.scrollTop = messages.scrollHeight;
+
+    // AJAX request to handle submission without page reload
+    fetch(form.action, {
+        method: 'POST',
+        body: new FormData(form),
+        headers: {
+            'X-Requested-With': 'XMLHttpRequest' // Helpful for Symfony to detect AJAX
+        }
+    })
+ .then(response => response.json())
+.then(data => {
+    // Add user message
+    const userMessage = document.createElement('div');
+    userMessage.className = 'chat-message user-message';
+    const fileInput = form.querySelector('input[type="file"]');
+    const textInput = form.querySelector('input[type="text"]');
+    let messageContent = textInput.value ? textInput.value + ' ' : '';
+    
+    // Create and append the image if one was uploaded
+    if (fileInput.files.length > 0) {
+        const img = document.createElement('img');
+        img.src = URL.createObjectURL(fileInput.files[0]);
+        img.className = 'chat-image'; // Add the class here
+        img.alt = 'Uploaded waste image';
+        userMessage.innerHTML = `<strong>User:</strong> ${messageContent}`;
+        userMessage.appendChild(img);
+        userMessage.innerHTML += `<span class="timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+    } else {
+        userMessage.innerHTML = `<strong>User:</strong> ${messageContent} <span class="timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+    }
+    
+    messages.insertBefore(userMessage, pendingIndicator);
+
+    // Add bot response
+    const botMessage = document.createElement('div');
+    botMessage.className = 'chat-message bot-message';
+    botMessage.innerHTML = `<strong>Bot:</strong> ${data.message} <span class="timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+    messages.insertBefore(botMessage, pendingIndicator);
+
+    // Hide pending indicator and reset form
+    pendingIndicator.style.display = 'none';
+    submitBtn.disabled = false;
+    form.reset();
+    
+    // Scroll to bottom
+    messages.scrollTop = messages.scrollHeight;
+})
+.catch(error => {
+    console.error('Error:', error);
+    pendingIndicator.style.display = 'none';
+    submitBtn.disabled = false;
+});
+});
+</script>
+
+<!-- Add no-cache meta tags in the head (if not in base template) -->
+{% block head %}
+    <meta http-equiv="Cache-Control" content="no-cache, no-store, must-revalidate">
+    <meta http-equiv="Pragma" content="no-cache">
+    <meta http-equiv="Expires" content="0">
+{% endblock %}
+{% endblock %}

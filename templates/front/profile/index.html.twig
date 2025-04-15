@@ -1,0 +1,406 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}My Profile{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .profile-section {
+            padding: 120px 0 60px;
+            background: linear-gradient(rgba(0, 105, 62, 0.9), rgba(1, 50, 32, 0.9)), url('{{ asset('assets/front/assets/img/hero-bg.jpg') }}') fixed center center;
+            background-size: cover;
+            position: relative;
+        }
+        
+        .profile-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        
+        .profile-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
+        }
+        
+        .profile-header {
+            background: #013220;
+            padding: 30px;
+            text-align: center;
+            color: #fff;
+            position: relative;
+        }
+        
+        .profile-img {
+            width: 150px;
+            height: 150px;
+            border-radius: 50%;
+            border: 5px solid #fff;
+            object-fit: cover;
+            margin: 0 auto 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+            transition: all 0.3s ease;
+        }
+        
+        .profile-img:hover {
+            transform: scale(1.05);
+        }
+        
+        .profile-name {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 5px;
+        }
+        
+        .profile-role {
+            font-size: 16px;
+            opacity: 0.9;
+            margin-bottom: 15px;
+        }
+        
+        .profile-actions {
+            margin-top: 20px;
+        }
+        
+        .profile-edit-btn {
+            background: #fff;
+            color: #013220;
+            border: 2px solid #fff;
+            padding: 10px 25px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+        }
+        
+        .profile-edit-btn:hover {
+            background: transparent;
+            color: #fff;
+        }
+        
+        .profile-body {
+            padding: 30px;
+        }
+        
+        .profile-info {
+            margin-bottom: 30px;
+        }
+        
+        .info-title {
+            font-size: 20px;
+            font-weight: 600;
+            color: #013220;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 2px solid #29AB87;
+        }
+        
+        .info-item {
+            display: flex;
+            margin-bottom: 15px;
+            align-items: center;
+        }
+        
+        .info-icon {
+            width: 40px;
+            height: 40px;
+            background: #ACE1AF;
+            border-radius: 50%;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #013220;
+            margin-right: 15px;
+            flex-shrink: 0;
+        }
+        
+        .info-text {
+            flex-grow: 1;
+        }
+        
+        .info-label {
+            font-size: 14px;
+            color: #6c757d;
+            margin-bottom: 3px;
+        }
+        
+        .info-value {
+            font-size: 16px;
+            font-weight: 500;
+            color: #212529;
+        }
+        
+        .stats-card {
+            background: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            text-align: center;
+            margin-bottom: 20px;
+            transition: all 0.3s ease;
+        }
+        
+        .stats-card:hover {
+            background: #ACE1AF;
+            transform: translateY(-5px);
+        }
+        
+        .stats-icon {
+            font-size: 30px;
+            color: #013220;
+            margin-bottom: 10px;
+        }
+        
+        .stats-value {
+            font-size: 24px;
+            font-weight: 700;
+            color: #013220;
+            margin-bottom: 5px;
+        }
+        
+        .stats-label {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            padding: 15px;
+            border-radius: 5px;
+            margin-bottom: 20px;
+            animation: fadeIn 0.5s ease-in-out;
+        }
+        
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(-10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.05); }
+            100% { transform: scale(1); }
+        }
+        
+        .pulse-animation {
+            animation: pulse 2s infinite;
+        }
+     
+      
+    </style>
+{% endblock %}
+
+{% block body %}
+<section class="profile-section">
+    <div class="container" data-aos="fade-up">
+        {% for message in app.flashes('success') %}
+            <div class="alert-success">
+                <i class="bi bi-check-circle-fill"></i> {{ message }}
+            </div>
+        {% endfor %}
+        
+        <div class="row">
+            <div class="col-lg-4">
+                <div class="profile-card" data-aos="fade-right" data-aos-delay="100">
+                    <div class="profile-header">
+                        {% if user.profileImage %}
+                                        <img src={{user.profileImage}} alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
+                        {% else %}
+                            <img src="{{ asset('assets/front/assets/img/default-avatar.png') }}" alt="{{ user.fullName }}" class="profile-img">
+                        {% endif %}
+                        <h2 class="profile-name">{{ user.fullName }}</h2>
+                        <p class="profile-role">
+                          Member
+                        </p>
+                        <div class="profile-actions">
+                            <a href="{{ path('app_profile_edit') }}" class="profile-edit-btn">
+                                <i class="bi bi-pencil-square"></i> Edit Profile
+                            </a>
+                        </div>
+                    </div>
+                    <div class="profile-body">
+                        <div class="profile-info">
+                            <h3 class="info-title">Account Information</h3>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="bi bi-envelope"></i>
+                                </div>
+                                <div class="info-text">
+                                    <div class="info-label">Email</div>
+                                    <div class="info-value">{{ user.email }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="bi bi-phone"></i>
+                                </div>
+                                <div class="info-text">
+                                    <div class="info-label">Phone</div>
+                                    <div class="info-value">{{ user.phone ?? 'Not provided' }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="bi bi-calendar-date"></i>
+                                </div>
+                                <div class="info-text">
+                                    <div class="info-label">Birthdate</div>
+                                    <div class="info-value">
+                                        {% if user.birthdate %}
+                                            {{ user.birthdate|date('F d, Y') }}
+                                        {% else %}
+                                            Not provided
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="bi bi-clock-history"></i>
+                                </div>
+                                <div class="info-text">
+                                    <div class="info-label">Member Since</div>
+                                    <div class="info-value">{{ user.createdAt|date('F d, Y') }}</div>
+                                </div>
+                            </div>
+                            <div class="info-item">
+                                <div class="info-icon">
+                                    <i class="bi bi-box-arrow-in-right"></i>
+                                </div>
+                                <div class="info-text">
+                                    <div class="info-label">Last Login</div>
+                                    <div class="info-value">
+                                        {% if user.lastLogin %}
+                                            {{ user.lastLogin|date('F d, Y H:i') }}
+                                        {% else %}
+                                            Never
+                                        {% endif %}
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-lg-8">
+                <div class="profile-card" data-aos="fade-left" data-aos-delay="200">
+                    <div class="profile-body">
+                        <h3 class="info-title">Activity Dashboard</h3>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="stats-card pulse-animation">
+                                    <div class="stats-icon">
+                                        <i class="bi bi-recycle"></i>
+                                    </div>
+                                    <div class="stats-value">0</div>
+                                    <div class="stats-label">Recycling Points</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stats-card">
+                                    <div class="stats-icon">
+                                        <i class="bi bi-trash"></i>
+                                    </div>
+                                    <div class="stats-value">0</div>
+                                    <div class="stats-label">Items Recycled</div>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="stats-card">
+                                    <div class="stats-icon">
+                                        <i class="bi bi-award"></i>
+                                    </div>
+                                    <div class="stats-value">Beginner</div>
+                                    <div class="stats-label">Recycling Level</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h3 class="info-title">Recent Activity</h3>
+                            <div class="text-center py-5">
+                                <img src="{{ asset('assets/front/assets/img/no-data.svg') }}" alt="No activity" style="max-width: 200px; opacity: 0.7;">
+                                <p class="mt-3 text-muted">No recent activity to display.</p>
+                                <a href="#" class="btn btn-primary mt-2">Start Recycling Now</a>
+                            </div>
+                        </div>
+                        
+                        <div class="mt-4">
+                            <h3 class="info-title">Environmental Impact</h3>
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="stats-card">
+                                        <div class="stats-icon">
+                                            <i class="bi bi-tree"></i>
+                                        </div>
+                                        <div class="stats-value">0 kg</div>
+                                        <div class="stats-label">CO2 Emissions Saved</div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="stats-card">
+                                        <div class="stats-icon">
+                                            <i class="bi bi-droplet"></i>
+                                        </div>
+                                        <div class="stats-value">0 L</div>
+                                        <div class="stats-label">Water Saved</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        // Initialize AOS animations
+        AOS.init({
+            duration: 1000,
+            easing: 'ease-in-out',
+            once: true,
+            mirror: false
+        });
+        
+        // Add hover effects
+        document.addEventListener('DOMContentLoaded', function() {
+            const profileImg = document.querySelector('.profile-img');
+            
+            if (profileImg) {
+                profileImg.addEventListener('mouseover', function() {
+                    this.style.transform = 'scale(1.05) rotate(5deg)';
+                });
+                
+                profileImg.addEventListener('mouseout', function() {
+                    this.style.transform = 'scale(1)';
+                });
+            }
+            
+            // Fade out success alerts after 5 seconds
+            const alerts = document.querySelectorAll('.alert-success');
+            if (alerts.length > 0) {
+                setTimeout(function() {
+                    alerts.forEach(alert => {
+                        alert.style.opacity = '0';
+                        alert.style.transform = 'translateY(-10px)';
+                        alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
+                        
+                        setTimeout(function() {
+                            alert.style.display = 'none';
+                        }, 500);
+                    });
+                }, 5000);
+            }
+        });
+    </script>
+{% endblock %}

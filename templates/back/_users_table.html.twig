@@ -1,0 +1,48 @@
+{% for user in users %}
+<tr>
+    <td>{{ user.id }}</td>
+    <td>
+        {# Corrected: Use user.profileImage directly if available (it's a full URL), otherwise use asset() for the local fallback #}
+        <img src="{{ user.profileImage ? user.profileImage : asset('assets/back/assets/img/avatar.png') }}"
+             alt="User Avatar"
+             class="img-circle elevation-2"
+             style="width: 35px; height: 35px; object-fit: cover;"> {# Added object-fit for better scaling #}
+    </td>
+    <td>{{ user.firstName }} {{ user.lastName }}</td>
+    <td>{{ user.email }}</td>
+        <td>{{ user.active }}</td>
+
+    <td>
+        {% for role in user.roles %}
+            <span class="badge bg-primary">{{ role }}</span>
+        {% endfor %}
+    </td>
+    <td>{{ user.createdAt ? user.createdAt|date('Y-m-d H:i') : 'N/A' }}</td>
+    <td>
+        <div class="btn-group">
+            <button type="button"
+                    class="btn btn-info btn-sm show-user-btn"
+                    data-user-id="{{ user.id }}"
+                    data-user-firstname="{{ user.firstName }}"
+                    data-user-lastname="{{ user.lastName }}"
+                    data-user-email="{{ user.email }}"
+
+                    data-user-roles="{{ user.roles|json_encode }}" 
+                    data-user-created="{{ user.createdAt ? user.createdAt|date('Y-m-d H:i') : 'N/A' }}"
+                    {# Corrected: Same logic for the data attribute - use the direct URL or the fallback asset URL #}
+                    data-user-image="{{ user.profileImage ? user.profileImage : asset('assets/back/assets/img/avatar.png') }}">
+                <i class="bi bi-eye"></i>
+            </button>
+            <a href="{{ path('back_user_delete', {'id': user.id}) }}"
+               class="btn btn-danger btn-sm"
+               onclick="return confirm('Are you sure you want to delete this user?')">
+                <i class="bi bi-trash"></i>
+            </a>
+        </div>
+    </td>
+</tr>
+{% else %}
+<tr>
+    <td colspan="7" class="text-center">No users found</td>
+</tr>
+{% endfor %}

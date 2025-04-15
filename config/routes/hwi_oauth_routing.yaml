@@ -1,0 +1,10 @@
+hwi_oauth_redirect_to_service:
+    path: /login/google
+    defaults:
+        _controller: 'HWI\Bundle\OAuthBundle\Controller\RedirectToServiceController::redirectToServiceAction'
+        service: google
+hwi_oauth_connect_service:
+    path: /login/check-google
+    defaults:
+        _controller: 'HWI\Bundle\OAuthBundle\Controller\Connect\ConnectController::connectServiceAction'
+        service: google

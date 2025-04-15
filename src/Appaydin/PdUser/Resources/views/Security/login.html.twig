@@ -1,0 +1,338 @@
+{% extends "@PdUser/base.html.twig" %}
+
+{% block head_title %}{{ 'security.login_title'|trans }}{% endblock %}
+
+{% block body %}
+{# templates/security/login.html.twig #}
+<div class="login">
+    <img src="{{ asset('assets/front/auth/bg-image.png') }}" alt="login image" class="login__img">
+
+    <form action="{{ path('security_login') }}" method="post" class="login__form" novalidate>
+        <h1 class="login__title">{{ 'security.login_title'|trans }}</h1>
+        
+        {% if error %}
+        <div class="login__alert">
+            <i class="ri-error-warning-line login__alert-icon"></i>
+            <div class="login__alert-text">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
+        </div>
+        {% endif %}
+        
+        <div class="login__content">
+            <div class="login__box">
+                <i class="ri-user-3-line login__icon"></i>
+                <div class="login__box-input">
+                    <input name="_username" 
+                           value="{{ last_username }}" 
+                           type="email" 
+                           required 
+                           class="login__input" 
+                           id="login-email" 
+                           placeholder=" "
+                           oninvalid="this.setCustomValidity('')"
+                           oninput="validateEmail(this)">
+                    <label for="login-email" class="login__label">{{ 'security.login_username'|trans }}</label>
+                </div>
+                <div class="login__error" id="email-error"></div>
+            </div>
+
+            <div class="login__box">
+                <i class="ri-lock-2-line login__icon"></i>
+                <div class="login__box-input">
+                    <input name="_password" 
+                           type="password" 
+                           required 
+                           class="login__input" 
+                           id="login-pass" 
+                           placeholder=" "
+                           oninvalid="this.setCustomValidity('')"
+                           oninput="validatePassword(this)">
+                    <label for="login-pass" class="login__label">{{ 'security.login_password'|trans }}</label>
+                    <i class="ri-eye-off-line login__eye" id="login-eye"></i>
+                </div>
+                <div class="login__error" id="password-error"></div>
+            </div>
+        </div>
+
+        <div class="login__check">
+            <div class="login__check-group">
+                <input type="checkbox" class="login__check-input" id="login-check" name="_remember_me" value="on">
+                <label for="login-check" class="login__check-label">{{ 'security.login_rememberme'|trans }}</label>
+            </div>
+
+            <a href="{{ path('security_resetting') }}" class="login__forgot">{{ 'security.forgot_password'|trans }}</a>
+        </div>
+
+        <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
+
+        <button type="submit" class="login__button">{{ 'security.login_btn'|trans }}</button>
+
+        {# Refactored Google Login Button #}
+     <div class="login__social">
+    <p class="login__social-text">Or sign in with:</p>
+    <a href="{{ path('set_oauth_flow', {'flow': 'login'}) }}" class="login__button login__button--social">
+        <i class="ri-google-fill login__icon--social"></i>
+        <span>Login with Google</span>
+    </a>
+</div>
+
+        <p class="login__register">
+            Don’t have an account?
+            {% if user_registration is not empty %}
+                <a href="{{ path('security_register') }}">{{ 'security.register'|trans }}</a>
+            {% endif %}
+        </p>
+    </form>
+</div>
+{# Modal for user already exists #}
+{% if app.session.flashBag.has('modal_error') %}
+    <div class="modal-overlay" id="errorModal">
+        <div class="modal-content">
+            <h2>Error</h2>
+            <p>{{ app.session.flashBag.get('modal_error')[0] }}</p>
+            <button onclick="closeModal()">OK</button>
+        </div>
+    </div>
+{% endif %}
+
+
+<style>
+
+    .login__alert {
+        background-color: rgba(255, 68, 68, 0.1);
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+        display: flex;
+        align-items: center;
+    }
+
+    .login__alert-icon {
+        color: #ff4444;
+        font-size: 1.2rem;
+        margin-right: 0.5rem;
+    }
+
+    .login__alert-text {
+        color: var(--white-color);
+        font-size: 0.85rem;
+    }
+
+ .modal-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.5); /* Semi-transparent black for blur effect */
+            backdrop-filter: blur(5px); /* Blur the background */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            z-index: 1000;
+        }
+
+        .modal-content {
+            background: white;
+            padding: 20px;
+            border-radius: 8px;
+            text-align: center;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            max-width: 400px;
+            width: 100%;
+        }
+
+        .modal-content h2 {
+            margin-bottom: 10px;
+            color: #d9534f; /* Red for error */
+        }
+
+        .modal-content p {
+            margin-bottom: 20px;
+            color:black;
+        }
+
+        .modal-content button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+        }
+
+        .modal-content button:hover {
+            background-color: #0056b3;
+        }
+   .login__form {
+        position: relative;
+        background-color: hsla(0, 0%, 10%, 0.1);
+        border: 2px solid var(--white-color);
+        margin-inline: 1.5rem;
+        padding: 1rem 3.5rem 1rem; /* Reduced top and bottom padding */
+        border-radius: 1rem;
+        backdrop-filter: blur(8px);
+        max-width: 400px;
+        width: 100%;
+    }
+   .login__box {
+        position: relative;
+        margin-bottom: 0.75rem; /* Reduced margin */
+    }
+
+    .login__box-input {
+        position: relative;
+        margin-bottom: 0.15rem; /* Minimal margin */
+    }
+    .login__button {
+        padding: 0.5rem; /* Smaller button */
+        margin: 0.5rem 0;
+    }
+
+    .login__error {
+        position: absolute;
+        bottom: -1.25rem;
+        left: 0;
+        font-size: 0.7rem;
+        color: #ff4444;
+        margin-top: 0.2rem;
+    }
+
+    .login__input {
+        width: 100%;
+        padding: 0.75rem 0.5rem;
+        background: rgba(255, 255, 255, 0.1);
+        color: var(--white-color);
+        position: relative;
+        z-index: 1;
+        border: none;
+        outline: none;
+        border-radius: 4px;
+        transition: background-color 0.3s;
+    }
+    
+    .login__input:focus {
+        background: rgba(255, 255, 255, 0.15);
+    }
+
+    .login__label {
+        position: absolute;
+        left: 8px;
+        top: 12px;
+        font-weight: var(--font-medium);
+        transition: top 0.3s, font-size 0.3s, transform 0.3s;
+        color: var(--white-color);
+        pointer-events: none;
+    }
+
+    .login__input:focus + .login__label,
+    .login__input:not(:placeholder-shown).login__input:not(:focus) + .login__label {
+        top: -20px;
+        font-size: var(--small-font-size);
+        transform: translateY(0);
+    }
+
+    .login__input.has-error {
+  background-color: transparent;      
+    }
+
+    .login__social {
+        text-align: center;
+        margin-bottom: 0.5rem;
+    }
+
+    .login__social-text {
+        font-size: var(--small-font-size);
+        color: var(--white-color);
+        margin-bottom: 0.5rem;
+    }
+
+    .login__button--social {
+        background-color: white;
+        color: black;
+        border: none;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 0.5rem;
+        padding: 0.5rem;
+        border-radius: 0.5rem;
+        font-weight: var(--font-medium);
+        margin-bottom: 0.5rem;
+    }
+
+    .login__register {
+        text-align: center;
+        margin-top: 0.5rem; /* Reduced top margin */
+        margin-bottom: 0.25rem; /* Added small bottom margin */
+        color: var(--white-color);
+    }
+
+    .login__register a {
+        color: var(--white-color);
+        text-decoration: underline;
+        margin-left: 0.25rem;
+    }
+</style>
+
+<script>
+        function closeModal() {
+            document.getElementById('errorModal').style.display = 'none';
+        }
+    
+        // Add error class to inputs when there's an error
+        document.addEventListener('DOMContentLoaded', function() {
+            const error = document.querySelector('.login__error');
+            if (error) {
+                const inputs = document.querySelectorAll('.login__input');
+                inputs.forEach(input => {
+                    input.classList.add('has-error');
+                });
+            }
+        });
+
+           function validateEmail(input) {
+        const errorDiv = document.getElementById('email-error');
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        
+        if (input.value.trim() === '') {
+            errorDiv.textContent = 'Email is required';
+            input.classList.add('has-error');
+            return false;
+        } else if (!emailRegex.test(input.value)) {
+            errorDiv.textContent = 'Please enter a valid email address';
+            input.classList.add('has-error');
+            return false;
+        } else {
+            errorDiv.textContent = '';
+            input.classList.remove('has-error');
+            return true;
+        }
+    }
+
+    function validatePassword(input) {
+        const errorDiv = document.getElementById('password-error');
+        
+        if (input.value.trim() === '') {
+            errorDiv.textContent = 'Password is required';
+            input.classList.add('has-error');
+            return false;
+        } else {
+            errorDiv.textContent = '';
+            input.classList.remove('has-error');
+            return true;
+        }
+    }
+
+    document.querySelector('.login__form').addEventListener('submit', function(e) {
+        const emailInput = document.getElementById('login-email');
+        const passwordInput = document.getElementById('login-pass');
+        
+        const isEmailValid = validateEmail(emailInput);
+        const isPasswordValid = validatePassword(passwordInput);
+        
+        if (!isEmailValid || !isPasswordValid) {
+            e.preventDefault();
+        }
+    });
+    </script>
+
+{% endblock %}
