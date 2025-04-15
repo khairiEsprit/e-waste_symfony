@@ -12,9 +12,10 @@
                 <li><a class="nav-link scrollto active" href="#hero"><span class="fa fa-home"> Home </span></a></li>
                 <li><a class="nav-link scrollto" href="#about"><span class="fa fa-info-circle" aria-hidden="true"> About us</span></a></li>
                 <li><a class="nav-link scrollto" href="#"><span class="fa fa-trash"> Complain</span></a></li>
-                <li><a class="nav-link scrollto" href="{{ path('chat') }}"><span class="fa fa-award"> chat </span></a></li>
+                <li><a class="nav-link scrollto" href="{{ path('chat') }}"><span class="fa fa-comment"> Chat </span></a></li>
+                <li><a class="nav-link scrollto" href="{{ path('user_leaderboard') }}"><span class="fa fa-trophy"> Leaderboard </span></a></li>
                 <li><a class="nav-link scrollto" href="#faq"><span class="fa fa-question-circle"> FAQ</span></a></li>
-                
+
             {% if app.user %}
     <li class="dropdown">
         <a href="#" class="nav-link dropdown-toggle" data-bs-toggle="dropdown">
@@ -43,7 +44,8 @@
             </li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{ path('app_profile') }}">Profile</a></li>
-            <li><a class="dropdown-item" href="#">Settings</a></li>
+            <li><a class="dropdown-item" href="{{ path('user_rewards') }}">My Rewards</a></li>
+            <li><a class="dropdown-item" href="{{ path('user_actions') }}">Submit Actions</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="#">Dashboard</a></li>
             <li><a class="dropdown-item" href="#">My Reports</a></li>

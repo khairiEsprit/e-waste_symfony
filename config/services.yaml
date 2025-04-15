@@ -1,76 +1,78 @@
 # config/services.yaml
 
 parameters:
-    # Define the user class as a parameter (replace with your actual User entity class)
-    app.user_class: 'App\Entity\User'
-    profile_images_directory: '%kernel.project_dir%/public/uploads/profile_images'
-    upload_directory: '%kernel.project_dir%/public/uploads/waste_classification'
-    openrouter_api_url: '%env(OPENROUTER_API_URL)%'
-    openrouter_api_key: '%env(OPENROUTER_API_KEY)%'
-    cloudinary_url: '%env(CLOUDINARY_URL)%'
+  # Define the user class as a parameter (replace with your actual User entity class)
+  app.user_class: 'App\Entity\User'
+  profile_images_directory: "%kernel.project_dir%/public/uploads/profile_images"
+  upload_directory: "%kernel.project_dir%/public/uploads/waste_classification"
+  openrouter_api_url: "%env(OPENROUTER_API_URL)%"
+  openrouter_api_key: "%env(OPENROUTER_API_KEY)%"
+  cloudinary_url: "%env(CLOUDINARY_URL)%"
 
 services:
+  App\Controller\Back\ChatbotController:
+    autowire: true
+    tags: ["controller.service_arguments"]
 
-    App\Controller\Back\ChatbotController:
-        autowire: true
-        tags: ['controller.service_arguments']
+  Cloudinary\Cloudinary:
+    arguments:
+      - "%cloudinary_url%"
+  # config/services.yaml
 
-    Cloudinary\Cloudinary:
-        arguments:
-            - '%cloudinary_url%'
-    # config/services.yaml
+  App\Security\MyOAuthUserProvider:
+    arguments:
+      $em: "@doctrine.orm.entity_manager"
+      $logger: "@logger"
+      $session: "@request_stack"
 
-    App\Security\MyOAuthUserProvider:
-        arguments:
-            $em: '@doctrine.orm.entity_manager'
-            $logger: '@logger'
-            $session: '@request_stack'
-            
-    App\Security\AuthenticationSuccessHandler:
-        arguments:
-            $router: '@router'
-            
-    App\Controller\OAuthFlowController:
-        arguments:
-            $oauthUtils: '@hwi_oauth.security.oauth_utils'
-            $googleResourceOwner: '@hwi_oauth.resource_owner.google'
+  App\Security\AuthenticationSuccessHandler:
+    arguments:
+      $router: "@router"
 
-    App\EventListener\SecurityRedirectListener:
-        tags:
-            - { name: kernel.event_subscriber }
+  App\Controller\OAuthFlowController:
+    arguments:
+      $oauthUtils: "@hwi_oauth.security.oauth_utils"
+      $googleResourceOwner: "@hwi_oauth.resource_owner.google"
 
-    # Default configuration for services in *this* file
-    _defaults:
-        autowire: true      # Automatically injects dependencies in your services.
-        autoconfigure: true
-        bind:
-            $userClass: '%user_class%' # Automatically registers your services as commands, event subscribers, etc.
+  App\EventListener\SecurityRedirectListener:
+    tags:
+      - { name: kernel.event_subscriber }
 
-    # Makes classes in src/ available to be used as services
-    App\:
-        resource: '../src/'
-        exclude:
-            - '../src/DependencyInjection/'
-            - '../src/Entity/'
-            - '../src/Kernel.php'
+  App\EventListener\UserActionListener:
+    tags:
+      - { name: kernel.event_subscriber }
 
-    # Explicitly configure the ChangePasswordCommand service
-    App\Appaydin\PdUser\Command\ChangePasswordCommand:
-        arguments:
-            $userClass: '%app.user_class%'
-        tags:
-            - { name: 'console.command' }
+  # Default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services.
+    autoconfigure: true
+    bind:
+      $userClass: "%user_class%" # Automatically registers your services as commands, event subscribers, etc.
 
-    # Explicitly configure the CreateUserCommand service
-    App\Appaydin\PdUser\Command\CreateUserCommand:
-        arguments:
-            $userClass: '%app.user_class%'
-        tags:
-            - { name: 'console.command' }
+  # Makes classes in src/ available to be used as services
+  App\:
+    resource: "../src/"
+    exclude:
+      - "../src/DependencyInjection/"
+      - "../src/Entity/"
+      - "../src/Kernel.php"
 
-    App\Appaydin\PdUser\Command\RoleUserCommand:
-        arguments:
-            $userClass: '%app.user_class%'
-        tags:
-            - { name: 'console.command' }
-    
+  # Explicitly configure the ChangePasswordCommand service
+  App\Appaydin\PdUser\Command\ChangePasswordCommand:
+    arguments:
+      $userClass: "%app.user_class%"
+    tags:
+      - { name: "console.command" }
+
+  # Explicitly configure the CreateUserCommand service
+  App\Appaydin\PdUser\Command\CreateUserCommand:
+    arguments:
+      $userClass: "%app.user_class%"
+    tags:
+      - { name: "console.command" }
+
+  App\Appaydin\PdUser\Command\RoleUserCommand:
+    arguments:
+      $userClass: "%app.user_class%"
+    tags:
+      - { name: "console.command" }

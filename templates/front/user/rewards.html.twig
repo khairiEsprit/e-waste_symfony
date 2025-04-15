@@ -1,0 +1,118 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}My Rewards{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-10 mx-auto">
+            {% for label, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ label }} alert-dismissible fade show">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+            
+            <div class="row mb-4">
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Total Points</h5>
+                            <h1 class="display-4 text-primary">{{ totalPoints }}</h1>
+                            <p class="card-text">Keep recycling to earn more points!</p>
+                            <a href="{{ path('user_actions') }}" class="btn btn-primary">Submit Action</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Leaderboard Rank</h5>
+                            <h1 class="display-4 text-success">{{ rank ? '#' ~ rank : 'N/A' }}</h1>
+                            <p class="card-text">Your position on the global leaderboard</p>
+                            <a href="{{ path('user_leaderboard') }}" class="btn btn-success">View Leaderboard</a>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-md-4">
+                    <div class="card text-center shadow-sm h-100">
+                        <div class="card-body">
+                            <h5 class="card-title">Badges Earned</h5>
+                            <h1 class="display-4 text-warning">{{ badges|length }}</h1>
+                            <p class="card-text">Collect more badges by recycling!</p>
+                            <a href="#badges" class="btn btn-warning">View Badges</a>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mb-4" id="badges">
+                <div class="card-header bg-warning text-white">
+                    <h3 class="mb-0">My Badges</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for badge in badges %}
+                            <div class="col-md-3 mb-3">
+                                <div class="card text-center h-100">
+                                    <div class="card-body">
+                                        {% if badge.reward.imageUrl %}
+                                            <img src="{{ badge.reward.imageUrl }}" alt="{{ badge.reward.name }}" class="img-fluid mb-3" style="max-height: 100px;">
+                                        {% else %}
+                                            <div class="bg-light rounded-circle mx-auto d-flex align-items-center justify-content-center" style="width: 100px; height: 100px;">
+                                                <i class="bi bi-award text-warning" style="font-size: 3rem;"></i>
+                                            </div>
+                                        {% endif %}
+                                        <h5 class="card-title">{{ badge.reward.name }}</h5>
+                                        <p class="card-text small text-muted">Earned on {{ badge.earnedAt|date('M d, Y') }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col-12">
+                                <p class="text-center">You haven't earned any badges yet. Keep recycling to earn badges!</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+            
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Recent Activity</h3>
+                </div>
+                <div class="card-body">
+                    <div class="table-responsive">
+                        <table class="table table-hover">
+                            <thead>
+                                <tr>
+                                    <th>Date</th>
+                                    <th>Action</th>
+                                    <th>Points</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for action in actionHistory %}
+                                    <tr>
+                                        <td>{{ action.earnedAt|date('M d, Y H:i') }}</td>
+                                        <td>{{ action.actionName ?? 'Bonus Points' }}</td>
+                                        <td>{{ action.points }}</td>
+                                    </tr>
+                                {% else %}
+                                    <tr>
+                                        <td colspan="3" class="text-center">No activity recorded yet.</td>
+                                    </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

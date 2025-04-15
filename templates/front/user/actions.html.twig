@@ -1,0 +1,70 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Submit Actions{% endblock %}
+
+{% block body %}
+<div class="container py-5">
+    <div class="row">
+        <div class="col-md-8 mx-auto">
+            <div class="card shadow-sm">
+                <div class="card-header bg-primary text-white">
+                    <h3 class="mb-0">Submit Waste Disposal Action</h3>
+                </div>
+                <div class="card-body">
+                    {% for label, messages in app.flashes %}
+                        {% for message in messages %}
+                            <div class="alert alert-{{ label }} alert-dismissible fade show">
+                                {{ message }}
+                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                            </div>
+                        {% endfor %}
+                    {% endfor %}
+                    
+                    <p class="lead">Select an action you've completed to earn points!</p>
+                    
+                    {{ form_start(form, {'action': path('user_action_submit'), 'method': 'POST'}) }}
+                        <div class="mb-3">
+                            {{ form_label(form.action) }}
+                            {{ form_widget(form.action) }}
+                            {{ form_errors(form.action) }}
+                        </div>
+                        
+                        <div class="mb-3">
+                            {{ form_label(form.comment) }}
+                            {{ form_widget(form.comment) }}
+                            {{ form_errors(form.comment) }}
+                        </div>
+                        
+                        <button type="submit" class="btn btn-primary">Submit Action</button>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+            
+            <div class="card shadow-sm mt-4">
+                <div class="card-header bg-success text-white">
+                    <h3 class="mb-0">Available Actions</h3>
+                </div>
+                <div class="card-body">
+                    <div class="row">
+                        {% for action in actions %}
+                            <div class="col-md-6 mb-3">
+                                <div class="card h-100">
+                                    <div class="card-body">
+                                        <h5 class="card-title">{{ action.name }}</h5>
+                                        <h6 class="card-subtitle mb-2 text-muted">{{ action.points }} points</h6>
+                                        <p class="card-text">{{ action.description }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        {% else %}
+                            <div class="col-12">
+                                <p class="text-center">No actions available at this time.</p>
+                            </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
