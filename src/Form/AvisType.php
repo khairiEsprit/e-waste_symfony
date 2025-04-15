@@ -12,6 +12,8 @@ use Symfony\Component\Form\Extension\Core\Type\TextType;
 use Symfony\Component\Form\Extension\Core\Type\ChoiceType;
 use Symfony\Component\Form\Extension\Core\Type\TextareaType;
 use Symfony\Component\Form\Extension\Core\Type\IntegerType;
+use Symfony\Component\Form\Extension\Core\Type\FileType;
+use Symfony\Component\Validator\Constraints\File;
 use Symfony\Component\Validator\Constraints\Range;
 
 class AvisType extends AbstractType
@@ -79,6 +81,24 @@ class AvisType extends AbstractType
                     'class' => 'form-control d-none',
                     'min' => 1,
                     'max' => 5
+                ]
+            ])
+            ->add('image', FileType::class, [
+                'label' => 'Image (optionnel)',
+                'mapped' => false,
+                'required' => false,
+                'constraints' => [
+                    new File([
+                        'maxSize' => '5m',
+                        'mimeTypes' => ['image/jpeg', 'image/png', 'image/gif'],
+                        'mimeTypesMessage' => 'Veuillez uploader une image valide (JPEG, PNG, GIF)',
+                        'maxSizeMessage' => 'L\'image ne doit pas dépasser 5 Mo.',
+                        'groups' => ['create', 'update']
+                    ])
+                ],
+                'attr' => [
+                    'class' => 'form-control',
+                    'accept' => 'image/*'
                 ]
             ]);
             

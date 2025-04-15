@@ -11,13 +11,16 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\String\Slugger\SluggerInterface;
+use Symfony\Component\HttpFoundation\File\Exception\FileException;
 
 #[Route('/avis')]
 class AvisController extends AbstractController
 {
     public function __construct(
         private EntityManagerInterface $entityManager,
-        private ValidatorInterface $validator
+        private ValidatorInterface $validator,
+        private SluggerInterface $slugger
     ) {}
 
     #[Route('/', name: 'app_avis_index', methods: ['GET'])]
@@ -57,6 +60,36 @@ class AvisController extends AbstractController
                 $noteValue = (int) $formData['avis']['note'];
                 if ($noteValue >= 1 && $noteValue <= 5) {
                     $avi->setNote($noteValue);
+                }
+            }
+            
+            // Handle image upload
+            $imageFile = $form->get('image')->getData();
+            if ($imageFile) {
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                $safeFilename = $this->slugger->slug($originalFilename);
+                $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+
+                try {
+                    // Make sure the upload directory exists
+                    $uploadDir = $this->getParameter('avis_images_directory');
+                    if (!file_exists($uploadDir) && !is_dir($uploadDir)) {
+                        mkdir($uploadDir, 0777, true);
+                    }
+                    
+                    $imageFile->move(
+                        $uploadDir,
+                        $newFilename
+                    );
+                    $avi->setImage($newFilename);
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image: ' . $e->getMessage());
+                    if ($request->isXmlHttpRequest()) {
+                        return $this->json([
+                            'success' => false,
+                            'message' => 'Une erreur est survenue lors du téléchargement de l\'image: ' . $e->getMessage()
+                        ], 500);
+                    }
                 }
             }
             
@@ -151,6 +184,44 @@ class AvisController extends AbstractController
                     }
                 }
                 
+                // Handle image upload
+                $imageFile = $form->get('image')->getData();
+                if ($imageFile) {
+                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                    $safeFilename = $this->slugger->slug($originalFilename);
+                    $newFilename = $safeFilename.'-'.uniqid().'.'.$imageFile->guessExtension();
+
+                    try {
+                        // Make sure the upload directory exists
+                        $uploadDir = $this->getParameter('avis_images_directory');
+                        if (!file_exists($uploadDir) && !is_dir($uploadDir)) {
+                            mkdir($uploadDir, 0777, true);
+                        }
+                        
+                        // Delete old image if exists
+                        if ($avi->getImage()) {
+                            $oldImagePath = $uploadDir.'/'.$avi->getImage();
+                            if (file_exists($oldImagePath)) {
+                                unlink($oldImagePath);
+                            }
+                        }
+                        
+                        $imageFile->move(
+                            $uploadDir,
+                            $newFilename
+                        );
+                        $avi->setImage($newFilename);
+                    } catch (FileException $e) {
+                        $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image: ' . $e->getMessage());
+                        if ($request->isXmlHttpRequest()) {
+                            return $this->json([
+                                'success' => false,
+                                'message' => 'Une erreur est survenue lors du téléchargement de l\'image: ' . $e->getMessage()
+                            ], 500);
+                        }
+                    }
+                }
+                
                 $errors = $this->validator->validate($avi, null, ['update']);
 
                 if ($form->isValid() && count($errors) === 0) {
@@ -178,6 +249,14 @@ class AvisController extends AbstractController
     public function delete(Request $request, Avis $avi): Response
     {
         if ($this->isCsrfTokenValid('delete'.$avi->getId(), $request->request->get('_token'))) {
+            // Delete associated image if exists
+            if ($avi->getImage()) {
+                $imagePath = $this->getParameter('avis_images_directory').'/'.$avi->getImage();
+                if (file_exists($imagePath)) {
+                    unlink($imagePath);
+                }
+            }
+            
             $this->entityManager->remove($avi);
             $this->entityManager->flush();
             $this->addFlash('success', 'L\'avis a été supprimé avec succès !');

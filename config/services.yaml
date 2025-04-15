@@ -6,6 +6,7 @@
 parameters:
     app.openrouter_api_key: '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'
     events_directory: '%kernel.project_dir%/public/uploads/events'
+    avis_images_directory: '%kernel.project_dir%/public/uploads/avis'
     app.sender_email: 'no-reply@eco-byte.com'
     app.sender_name: 'Eco-Byte'
 

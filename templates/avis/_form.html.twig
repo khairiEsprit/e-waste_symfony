@@ -62,6 +62,33 @@
         <div class="error-message text-danger mt-2" id="note-error"></div>
     </div>
 
+    {# Champ Image #}
+    <div class="mb-4">
+        {{ form_label(form.image, 'Image (optionnel)', {
+            'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #013220; font-family: Poppins, sans-serif; font-size: 1rem;'}
+        }) }}
+        <div class="custom-file-upload">
+            {{ form_widget(form.image, {
+                'attr': {
+                    'class': 'form-control custom-file-input',
+                    'style': 'border: 1px solid #ACE1AF; border-radius: 8px; padding: 12px; font-family: Poppins, sans-serif;',
+                    'id': 'avis_image'
+                }
+            }) }}
+            <div class="file-preview mt-3 d-none" id="image-preview-container">
+                <img id="image-preview" src="#" alt="Aperçu de l'image" class="img-fluid rounded" style="max-height: 200px;">
+                <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="remove-image-btn">
+                    <i class="fas fa-times"></i> Supprimer
+                </button>
+            </div>
+        </div>
+        <small class="form-text text-muted">Formats acceptés: JPEG, PNG, GIF. Taille max: 5 Mo.</small>
+        <div class="error-message text-danger mt-2" id="image-error"></div>
+        {{ form_errors(form.image, {
+            'attr': {'class': 'alert alert-danger mt-2 py-2'}
+        }) }}
+    </div>
+
     {# Bouton de soumission #}
     <button type="submit" class="btn w-100 py-3 save-btn">
         <i class="fas fa-save btn-icon me-2"></i> {{ button_label|default('Enregistrer') }}
@@ -77,6 +104,34 @@
         box-shadow: 0 0 8px rgba(41, 171, 135, 0.3) !important;
         transform: scale(1.01);
         transition: all 0.3s ease;
+    }
+    
+    /* Custom file upload styling */
+    .custom-file-input::-webkit-file-upload-button {
+        visibility: hidden;
+        width: 0;
+    }
+    
+    .custom-file-input::before {
+        content: 'Choisir une image';
+        display: inline-block;
+        background: linear-gradient(145deg, #29AB87, #00693E);
+        color: white;
+        border-radius: 50px;
+        padding: 8px 20px;
+        outline: none;
+        white-space: nowrap;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .custom-file-input:hover::before {
+        background: linear-gradient(145deg, #00693E, #29AB87);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(41, 171, 135, 0.4);
     }
 
     /* Improved Save Button */
@@ -124,7 +179,7 @@
         left: 100%;
         top: 100%;
     }
-
+    
     .save-btn .btn-icon {
         margin-right: 10px;
         transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -157,3 +212,33 @@
         100% { box-shadow: 0 6px 25px rgba(41, 171, 135, 0.4); }
     }
 </style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('avis_image');
+        const previewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeButton = document.getElementById('remove-image-btn');
+        
+        // Show preview when file is selected
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.classList.remove('d-none');
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Remove image when button is clicked
+        removeButton.addEventListener('click', function() {
+            imageInput.value = '';
+            previewContainer.classList.add('d-none');
+            imagePreview.src = '#';
+        });
+    });
+</script>
