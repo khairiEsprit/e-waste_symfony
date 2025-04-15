@@ -14,20 +14,109 @@
             transform: translateY(30px);
         }
 
-        /* Carte principale */
-        .main-card {
-            background: #FEFEFA;
-            border-radius: 12px;
-            box-shadow: 0 6px 18px rgba(1, 50, 32, 0.12);
-            padding: 25px;
+        /* Conteneur des cartes */
+        .cards-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(320px, 1fr));
+            gap: 20px;
             margin-top: 30px;
-            border: 1px solid #ACE1AF;
-            transition: all 0.3s ease;
         }
 
-        .main-card:hover {
-            box-shadow: 0 8px 24px rgba(1, 50, 32, 0.15);
-            transform: translateY(-2px);
+        /* Design des cartes */
+        .participation-card {
+            background: linear-gradient(145deg, #F8F9FA, #E6ECEB);
+            border-radius: 16px;
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+            padding: 20px;
+            transition: all 0.3s ease-in-out;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid rgba(41, 171, 135, 0.3);
+        }
+
+        .participation-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            border-color: #2ECC71;
+        }
+
+        .participation-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 4px;
+            height: 100%;
+            background: linear-gradient(180deg, #2ECC71, #27AE60);
+            opacity: 0;
+            transition: opacity 0.3s ease;
+        }
+
+        .participation-card:hover::before {
+            opacity: 1;
+        }
+
+        .card-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 15px;
+        }
+
+        .card-title {
+            font-size: 1.25rem;
+            font-weight: 600;
+            color: #1A3C34;
+            margin: 0;
+        }
+
+        .card-id {
+            font-size: 0.85rem;
+            color: #FFFFFF;
+            background: linear-gradient(135deg, #2ECC71, #27AE60);
+            padding: 4px 8px;
+            border-radius: 12px;
+        }
+
+        .card-content {
+            display: grid;
+            gap: 10px;
+        }
+
+        .card-field {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            padding: 8px 0;
+            border-bottom: 1px solid rgba(41, 171, 135, 0.2);
+        }
+
+        .card-field:last-child {
+            border-bottom: none;
+        }
+
+        .field-label {
+            font-size: 0.9rem;
+            font-weight: 500;
+            color: #6B7280;
+        }
+
+        .field-value {
+            font-size: 0.95rem;
+            font-weight: 500;
+            color: #1A3C34;
+        }
+
+        .field-value.email {
+            color: #2ECC71;
+            font-weight: 600;
+        }
+
+        .card-actions {
+            display: flex;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 15px;
         }
 
         /* En-tête */
@@ -35,25 +124,24 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            margin-bottom: 25px;
-            gap: 15px;
+            margin-bottom: 30px;
+            gap: 20px;
             flex-wrap: wrap;
         }
 
         /* Titre */
         .page-title {
-            font-size: 1.8rem;
-            color: #00693E;
+            font-size: 2rem;
+            color: #1A3C34;
             margin: 0;
-            white-space: nowrap;
             font-weight: 700;
-            text-shadow: 1px 1px 2px rgba(0,0,0,0.05);
+            letter-spacing: -0.02em;
         }
 
         /* Barre de recherche */
         .search-form {
             flex-grow: 1;
-            max-width: 400px;
+            max-width: 450px;
             min-width: 250px;
         }
 
@@ -64,177 +152,79 @@
 
         .search-input {
             width: 100%;
-            padding: 10px 15px 10px 40px;
-            border: 1px solid #ACE1AF;
-            border-radius: 30px;
-            background-color: #F8FDFA;
-            color: #013220;
-            font-size: 0.95rem;
+            padding: 12px 20px 12px 48px;
+            border: 1px solid #E0E7E9;
+            border-radius: 12px;
+            background-color: #F9FAFB;
+            color: #1A3C34;
+            font-size: 1rem;
+            font-weight: 400;
             transition: all 0.3s ease;
-            box-shadow: inset 0 2px 4px rgba(0,0,0,0.05);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .search-input:focus {
             outline: none;
-            border-color: #29AB87;
-            box-shadow: 0 0 0 3px rgba(41, 171, 135, 0.2);
+            border-color: #2ECC71;
+            box-shadow: 0 0 0 4px rgba(41, 171, 135, 0.15);
+            background-color: #FFFFFF;
         }
 
-        .search-button {
+        .search-icon {
             position: absolute;
-            left: 15px;
+            left: 16px;
             top: 50%;
             transform: translateY(-50%);
-            background: none;
-            border: none;
-            color: #29AB87;
-            cursor: pointer;
-            transition: all 0.3s ease;
-        }
-
-        .search-button:hover {
-            color: #218838;
-            transform: translateY(-50%) scale(1.1);
+            color: #6B7280;
+            font-size: 1.2rem;
+            pointer-events: none;
         }
 
         /* Bouton Create New */
         .create-btn {
-            padding: 10px 20px;
-            background: linear-gradient(135deg, #29AB87 0%, #218838 100%);
+            padding: 12px 24px;
+            background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
             color: white;
-            border-radius: 30px;
+            border-radius: 12px;
             text-decoration: none;
-            font-size: 0.95rem;
-            white-space: nowrap;
+            font-size: 1rem;
+            font-weight: 600;
             border: none;
             cursor: pointer;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 4px 12px rgba(41, 171, 135, 0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 12px rgba(41, 171, 135, 0.2);
             display: inline-flex;
             align-items: center;
             gap: 8px;
-            font-weight: 600;
-            position: relative;
-            overflow: hidden;
-            z-index: 1;
         }
 
         .create-btn:hover {
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 8px 20px rgba(41, 171, 135, 0.4);
-        }
-
-        .create-btn::before {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: -100%;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.2), transparent);
-            transition: 0.6s;
-            z-index: -1;
-        }
-
-        .create-btn:hover::before {
-            left: 100%;
-        }
-
-        /* Tableau */
-        .table-responsive {
-            overflow-x: auto;
-            border-radius: 8px;
-        }
-
-        .participation-table {
-            width: 100%;
-            border-collapse: separate;
-            border-spacing: 0;
-            min-width: 900px;
-            font-size: 0.95rem;
-            background: white;
-            border-radius: 8px;
-            overflow: hidden;
-        }
-
-        .table-header {
-            background: linear-gradient(135deg, #013220 0%, #00693E 100%);
-            color: #FEFEFA;
-        }
-
-        .table-header th {
-            padding: 12px 15px;
-            text-align: left;
-            font-weight: 600;
-            position: relative;
-        }
-
-        .table-header th:after {
-            content: '';
-            position: absolute;
-            bottom: 0;
-            left: 0;
-            width: 100%;
-            height: 2px;
-            background: #29AB87;
-        }
-
-        .table-row {
-            transition: all 0.3s ease;
-        }
-
-        .table-row:nth-child(even) {
-            background: #F8FDFA;
-        }
-
-        .table-row:nth-child(odd) {
-            background: #FEFEFA;
-        }
-
-        .table-row:hover {
-            background: #E8F5EE;
-            transform: scale(1.005);
-            box-shadow: 0 2px 8px rgba(1, 50, 32, 0.1);
-        }
-
-        .table-row td {
-            padding: 10px 15px;
-            color: #013220;
-            border-bottom: 1px solid #E1F0E8;
-            transition: all 0.3s ease;
-        }
-
-        .email-cell {
-            color: #29AB87;
-            font-weight: 500;
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(41, 171, 135, 0.3);
+            background: linear-gradient(135deg, #27AE60 0%, #2ECC71 100%);
         }
 
         /* Boutons d'action */
-        .action-btns {
-            display: flex;
-            gap: 8px;
-            justify-content: flex-end;
-        }
-
         .action-btn {
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            border-radius: 8px;
             text-decoration: none;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            font-weight: 500;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .view-btn {
-            background: linear-gradient(135deg, #29AB87 0%, #218838 100%);
+            background: linear-gradient(135deg, #2ECC71 0%, #27AE60 100%);
             color: white;
         }
 
         .edit-btn {
-            background: linear-gradient(135deg, #013220 0%, #00693E 100%);
+            background: linear-gradient(135deg, #1A3C34 0%, #2E4F4A 100%);
             color: white;
         }
 
@@ -243,93 +233,55 @@
         }
 
         .delete-btn {
-            background: linear-gradient(135deg, #dc3545 0%, #c82333 100%);
+            background: linear-gradient(135deg, #E74C3C 0%, #C0392B 100%);
             color: white;
             border: none;
-            padding: 6px 12px;
-            border-radius: 20px;
+            padding: 8px 16px;
+            border-radius: 8px;
             cursor: pointer;
-            font-size: 0.85rem;
+            font-size: 0.9rem;
+            font-weight: 500;
             display: inline-flex;
             align-items: center;
-            gap: 5px;
+            gap: 6px;
             transition: all 0.3s ease;
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
         }
 
         .action-btn:hover, .delete-btn:hover {
             transform: translateY(-2px);
-            box-shadow: 0 4px 8px rgba(0,0,0,0.15);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
 
         /* Pied de page */
         .footer {
             margin-top: 40px;
             text-align: center;
-            color: #00693E;
+            color: #1A3C34;
             font-size: 0.95rem;
-            background: #F8FDFA;
-            padding: 15px;
-            border-radius: 8px;
-            border: 1px solid #ACE1AF;
+            background: #F9FAFB;
+            padding: 20px;
+            border-radius: 12px;
+            border: 1px solid #E5E7EB;
             box-shadow: 0 2px 8px rgba(1, 50, 32, 0.05);
-        }
-
-        /* Animation des icônes */
-        .action-btn i, .delete-btn i, .create-btn i {
-            transition: transform 0.3s ease;
-        }
-
-        .view-btn:hover i {
-            transform: scale(1.2) rotate(10deg);
-        }
-
-        .edit-btn:hover i {
-            transform: scale(1.2) rotate(-5deg);
-        }
-
-        .delete-btn:hover i {
-            transform: scale(1.2);
-        }
-
-        .create-btn:hover i {
-            transform: translateX(3px);
-        }
-
-        /* Effet de vague */
-        .ripple {
-            position: absolute;
-            border-radius: 50%;
-            background: rgba(255, 255, 255, 0.6);
-            transform: scale(0);
-            animation: ripple 0.6s linear;
-            pointer-events: none;
-        }
-
-        @keyframes ripple {
-            to {
-                transform: scale(3);
-                opacity: 0;
-            }
         }
 
         /* Message vide */
         .empty-message {
             padding: 20px;
             text-align: center;
-            color: #00693E;
+            color: #1A3C34;
             font-size: 1rem;
-            background: #F8FDFA;
-            border-radius: 8px;
+            background: #F9FAFB;
+            border-radius: 12px;
             margin: 10px 0;
         }
 
         /* Custom SweetAlert2 Styling */
         .swal2-title-custom {
-            color: #D32F2F !important;
+            color: #E74C3C !important;
             font-size: 1.5rem !important;
             font-weight: 600 !important;
-            margin-bottom: 1rem !important;
         }
 
         .swal2-html-custom {
@@ -337,54 +289,43 @@
         }
 
         .btn-confirm-delete {
-            background: linear-gradient(145deg, #dc3545, #c82333) !important;
+            background: linear-gradient(145deg, #E74C3C, #C0392B) !important;
             color: white !important;
             border: none !important;
             padding: 10px 24px !important;
-            border-radius: 50px !important;
+            border-radius: 8px !important;
             font-weight: 600 !important;
-            letter-spacing: 1px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
             transition: all 0.3s ease !important;
-            box-shadow: 0 4px 15px rgba(220, 53, 69, 0.3) !important;
         }
 
         .btn-confirm-delete:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 8px 25px rgba(220, 53, 69, 0.4) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(231, 76, 60, 0.3) !important;
         }
 
         .btn-cancel-delete {
-            background: linear-gradient(145deg, #6c757d, #495057) !important;
+            background: linear-gradient(145deg, #6B7280, #4B5563) !important;
             color: white !important;
             border: none !important;
             padding: 10px 24px !important;
-            border-radius: 50px !important;
+            border-radius: 8px !important;
             font-weight: 600 !important;
-            letter-spacing: 1px !important;
-            display: inline-flex !important;
-            align-items: center !important;
-            justify-content: center !important;
             transition: all 0.3s ease !important;
-            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3) !important;
         }
 
         .btn-cancel-delete:hover {
-            transform: translateY(-3px) !important;
-            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 8px rgba(108, 117, 125, 0.3) !important;
         }
 
         .swal2-close {
-            color: #666 !important;
+            color: #6B7280 !important;
             font-size: 1.5rem !important;
             transition: all 0.3s ease !important;
         }
 
         .swal2-close:hover {
-            color: #D32F2F !important;
-            transform: rotate(90deg) !important;
+            color: #E74C3C !important;
         }
 
         .swal2-popup {
@@ -396,90 +337,82 @@
 
 {% block body %}
     <div class="participation-container">
-        <!-- Carte principale avec tableau -->
-        <div class="main-card animate__animated animate__fadeIn">
-            <!-- En-tête avec bouton et recherche -->
-            <div class="header-container">
-                <div style="display: flex; align-items: center; gap: 20px; flex-grow: 1;">
-                    <h1 class="page-title animate__animated animate__fadeInLeft">Participation List</h1>
+        <!-- En-tête avec bouton et recherche -->
+        <div class="header-container">
+            <div style="display: flex; align-items: center; gap: 20px; flex-grow: 1;">
+                <h1 class="page-title animate__animated animate__fadeInLeft">Participation List</h1>
 
-                    <!-- Barre de recherche -->
-                    <form method="get" action="{{ path('app_participation_index') }}" class="search-form">
-                        <div class="search-container">
-                            <input type="text" name="search" placeholder="Search by name, email, phone..."
-                                   class="search-input" value="{{ search_term }}">
-                            <button type="submit" class="search-button">
-                                <i class="fas fa-search"></i>
-                            </button>
-                        </div>
-                    </form>
+                <!-- Barre de recherche -->
+                <div class="search-form">
+                    <div class="search-container">
+                        <i class="fas fa-search search-icon"></i>
+                        <input type="text" id="search-input" placeholder="Search by name, email, phone..."
+                               class="search-input" value="{{ search_term }}">
+                    </div>
                 </div>
-
-                <a href="{{ path('app_participation_new') }}"
-                   class="create-btn animate__animated animate__fadeInRight">
-                    <i class="fas fa-plus"></i> Create New
-                </a>
             </div>
 
-            <!-- Tableau responsive -->
-            <div class="table-responsive">
-                <table class="participation-table">
-                    <thead class="table-header">
-                    <tr>
-                        <th>ID</th>
-                        <th>First Name</th>
-                        <th>Last Name</th>
-                        <th>Email</th>
-                        <th>Phone</th>
-                        <th>City</th>
-                        <th>Zip Code</th>
-                        <th>Country</th>
-                        <th style="text-align: right;">Actions</th>
-                    </tr>
-                    </thead>
-                    <tbody>
-                    {% for participation in participations %}
-                        <tr class="table-row">
-                            <td>{{ participation.id }}</td>
-                            <td>{{ participation.firstName }}</td>
-                            <td>{{ participation.lastName }}</td>
-                            <td class="email-cell">{{ participation.email }}</td>
-                            <td>{{ participation.phone }}</td>
-                            <td>{{ participation.city }}</td>
-                            <td>{{ participation.zipCode }}</td>
-                            <td>{{ participation.country }}</td>
-                            <td>
-                                <div class="action-btns">
-                                    <a href="{{ path('app_participation_show', {'id': participation.id}) }}"
-                                       class="action-btn view-btn">
-                                        <i class="fas fa-eye"></i> View
-                                    </a>
-                                    <a href="{{ path('app_participation_edit', {'id': participation.id}) }}"
-                                       class="action-btn edit-btn">
-                                        <i class="fas fa-edit"></i> Edit
-                                    </a>
-                                    <form method="post" action="{{ path('app_participation_delete', {'id': participation.id}) }}"
-                                          class="delete-form"
-                                          onsubmit="return confirmDelete(event, this);">
-                                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participation.id) }}">
-                                        <button type="submit" class="delete-btn">
-                                            <i class="fas fa-trash"></i> Delete
-                                        </button>
-                                    </form>
-                                </div>
-                            </td>
-                        </tr>
-                    {% else %}
-                        <tr>
-                            <td colspan="9" class="empty-message">
-                                <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
-                                No records found
-                            </td>
-                        </tr>
-                    {% endfor %}
-                    </tbody>
-                </table>
-            </div>
+            <a href="{{ path('app_participation_new') }}"
+               class="create-btn animate__animated animate__fadeInRight">
+                <i class="fas fa-plus"></i> Create New
+            </a>
+        </div>
+
+        <!-- Conteneur des cartes -->
+        <div class="cards-container" id="cards-container">
+            {% for participation in participations %}
+                <div class="participation-card animate__animated animate__fadeInUp">
+                    <div class="card-header">
+                        <h3 class="card-title">{{ participation.firstName }} {{ participation.lastName }}</h3>
+                        <span class="card-id">ID: {{ participation.id }}</span>
+                    </div>
+                    <div class="card-content">
+                        <div class="card-field">
+                            <span class="field-label">Email</span>
+                            <span class="field-value email">{{ participation.email }}</span>
+                        </div>
+                        <div class="card-field">
+                            <span class="field-label">Phone</span>
+                            <span class="field-value">{{ participation.phone }}</span>
+                        </div>
+                        <div class="card-field">
+                            <span class="field-label">City</span>
+                            <span class="field-value">{{ participation.city }}</span>
+                        </div>
+                        <div class="card-field">
+                            <span class="field-label">Zip Code</span>
+                            <span class="field-value">{{ participation.zipCode }}</span>
+                        </div>
+                        <div class="card-field">
+                            <span class="field-label">Country</span>
+                            <span class="field-value">{{ participation.country }}</span>
+                        </div>
+                    </div>
+                    <div class="card-actions">
+                        <a href="{{ path('app_participation_show', {'id': participation.id}) }}"
+                           class="action-btn view-btn">
+                            <i class="fas fa-eye"></i> View
+                        </a>
+                        <a href="{{ path('app_participation_edit', {'id': participation.id}) }}"
+                           class="action-btn edit-btn">
+                            <i class="fas fa-edit"></i> Edit
+                        </a>
+                        <form method="post" action="{{ path('app_participation_delete', {'id': participation.id}) }}"
+                              class="delete-form"
+                              onsubmit="return confirmDelete(event, this);">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ participation.id) }}">
+                            <button type="submit" class="delete-btn">
+                                <i class="fas fa-trash"></i> Delete
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            {% else %}
+                <div class="empty-message">
+                    <i class="fas fa-info-circle" style="margin-right: 8px;"></i>
+                    No records found
+                </div>
+            {% endfor %}
         </div>
 
         <!-- Pied de page -->
@@ -500,33 +433,55 @@
             const buttons = document.querySelectorAll('.create-btn, .action-btn, .delete-btn');
             buttons.forEach(btn => {
                 btn.addEventListener('click', function(e) {
-                    // Créer l'effet de vague
                     const ripple = document.createElement('span');
                     ripple.classList.add('ripple');
-
                     const rect = btn.getBoundingClientRect();
                     const size = Math.max(rect.width, rect.height);
                     const x = e.clientX - rect.left - size/2;
                     const y = e.clientY - rect.top - size/2;
-
                     ripple.style.width = ripple.style.height = `${size}px`;
                     ripple.style.left = `${x}px`;
                     ripple.style.top = `${y}px`;
-
                     this.appendChild(ripple);
-
                     setTimeout(() => ripple.remove(), 600);
                 });
             });
 
-            // Animation au survol des lignes
-            const tableRows = document.querySelectorAll('.table-row');
-            tableRows.forEach(row => {
-                row.addEventListener('mouseenter', function() {
-                    this.classList.add('animate__animated', 'animate__pulse');
+            // Recherche dynamique
+            const searchInput = document.getElementById('search-input');
+            const cards = document.querySelectorAll('.participation-card');
+
+            searchInput.addEventListener('input', function() {
+                const searchTerm = this.value.toLowerCase();
+
+                cards.forEach(card => {
+                    const cardText = card.textContent.toLowerCase();
+                    if (cardText.includes(searchTerm)) {
+                        card.style.display = '';
+                        card.classList.add('animate__animated', 'animate__fadeInUp');
+                    } else {
+                        card.style.display = 'none';
+                        card.classList.remove('animate__animated', 'animate__fadeInUp');
+                    }
                 });
 
-                row.addEventListener('mouseleave', function() {
+                // Afficher le message "No records found" si aucune carte n'est visible
+                const visibleCards = Array.from(cards).filter(card => card.style.display !== 'none');
+                const emptyMessage = document.querySelector('.empty-message');
+                if (visibleCards.length === 0 && emptyMessage) {
+                    emptyMessage.style.display = 'block';
+                } else if (emptyMessage) {
+                    emptyMessage.style.display = 'none';
+                }
+            });
+
+            // Animation au survol des cartes
+            const participationCards = document.querySelectorAll('.participation-card');
+            participationCards.forEach(card => {
+                card.addEventListener('mouseenter', function() {
+                    this.classList.add('animate__animated', 'animate__pulse');
+                });
+                card.addEventListener('mouseleave', function() {
                     this.classList.remove('animate__animated', 'animate__pulse');
                 });
             });
@@ -544,18 +499,18 @@
                                 Êtes-vous sûr de vouloir supprimer cette participation ?
                             </p>
                             <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
-                                <strong>Attention :</strong> Cette action est irréversible. Toutes les données associées seront définitivement perdues.
+                                <strong>Attention :</strong> Cette action est irréversible.
                             </p>
                         </div>
                     `,
                     icon: 'warning',
-                    iconColor: '#D32F2F',
+                    iconColor: '#E74C3C',
                     showCancelButton: true,
-                    confirmButtonText: '<i class="fas fa-trash-alt mr-2"></i> Oui, Supprimer',
+                    confirmButtonText: '<i class="fas fa-trash-alt mr-2"></i> Supprimer',
                     cancelButtonText: '<i class="fas fa-times mr-2"></i> Annuler',
-                    confirmButtonColor: '#D32F2F',
-                    cancelButtonColor: '#6c757d',
-                    background: '#FEFEFA',
+                    confirmButtonColor: '#E74C3C',
+                    cancelButtonColor: '#6B7280',
+                    background: '#FFFFFF',
                     backdrop: 'rgba(0, 105, 62, 0.2)',
                     customClass: {
                         popup: 'animate__animated animate__zoomIn',
