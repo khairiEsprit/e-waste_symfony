@@ -6,60 +6,85 @@
 <br>
 <br>
 <div class="container mt-5">
-    <h1 class="mb-4 text-center">Liste des Demandes</h1>
+    <div class="title-container">
+        <h1 class="main-title">Liste des Demandes</h1>
+    </div>
 
     <div class="d-flex justify-content-end mb-4">
-        <a href="{{ path('app_demande_new') }}" class="btn btn-success">
-            <i class="bi bi-plus-circle"></i> Nouvelle demande
+        <a href="{{ path('app_demande_new') }}" class="custom-btn btn-edit">
+            <i class="fas fa-plus-circle"></i> Nouvelle demande
         </a>
     </div>
 
     {% if demandes is empty %}
         <div class="alert alert-info text-center">Aucune demande trouvée.</div>
     {% else %}
-        <div class="row row-cols-1 row-cols-md-3 g-4">
+        <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center">
             {% for demande in demandes %}
                 {% set dernierTraitement = demande.traitements|last %}
                 <div class="col">
-                    <div class="card h-100 shadow-gray bg-light">
+                    <div class="card custom-card h-100">
                         <div class="card-body">
-                            <h5 class="card-title">{{ demande.type }}</h5>
-                            <p class="card-text">
-                                <div class="d-flex align-items-center">
-                                    <h5 class="text-arial mb-0">Adresse :</h5>
-                                    <span class="ml-2">{{ demande.adresse }}</span>
+                            <h5 class="type-badge">{{ demande.type }}</h5>
+                            <div class="info-container">
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-map-marker-alt"></i>
+                                        <span>Adresse</span>
+                                    </div>
+                                    <div class="info-content">{{ demande.adresse }}</div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <h5 class="text-arial mb-0">Email :</h5>
-                                    <span class="ml-2">{{ demande.emailUtilisateur }}</span>
+                                
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-envelope"></i>
+                                        <span>Email</span>
+                                    </div>
+                                    <div class="info-content">{{ demande.emailUtilisateur }}</div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <h5 class="text-arial mb-0">Message :</h5>
-                                    <span class="ml-2">{{ demande.message }}</span>
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-comment-alt"></i>
+                                        <span>Message</span>
+                                    </div>
+                                    <div class="info-content">{{ demande.message }}</div>
                                 </div>
-                                <div class="d-flex align-items-center">
-                                    <h5 class="text-arial mb-0">État :</h5>
-                                    <span class="ml-2">
+
+                                <div class="info-item">
+                                    <div class="info-label">
+                                        <i class="fas fa-info-circle"></i>
+                                        <span>État</span>
+                                    </div>
+                                    <div class="info-content">
                                         {% if dernierTraitement and dernierTraitement.status == 'Traité' %}
-                                            <span class="badge bg-success">Traité</span>
+                                            <span class="status-badge success"><i class="fas fa-check-circle"></i> Traité</span>
                                         {% elseif dernierTraitement and dernierTraitement.status == 'Refusé' %}
-                                            <span class="badge bg-danger">Refusé</span>
+                                            <span class="status-badge danger"><i class="fas fa-times-circle"></i> Refusé</span>
                                         {% else %}
-                                            <span class="badge bg-warning">En cours de traitement</span>
+                                            <span class="status-badge warning"><i class="fas fa-clock"></i> En cours de traitement</span>
                                         {% endif %}
-                                    </span>
+                                    </div>
                                 </div>
+
                                 {% if dernierTraitement and dernierTraitement.commentaire %}
-                                    <div class="d-flex align-items-center">
-                                        <h5 class="text-arial mb-0">Commentaire Admin :</h5>
-                                        <span class="ml-2">{{ dernierTraitement.commentaire }}</span>
+                                    <div class="info-item">
+                                        <div class="info-label">
+                                            <i class="fas fa-comments"></i>
+                                            <span>Commentaire Admin</span>
+                                        </div>
+                                        <div class="info-content">{{ dernierTraitement.commentaire }}</div>
                                     </div>
                                 {% endif %}
-                            </p>
+                            </div>
                         </div>
-                        <div class="card-footer bg-white border-top-0 d-flex justify-content-between">
-                            <a href="{{ path('app_demande_show', {'id': demande.id}) }}" class="btn btn-secondary btn-sm">Voir</a>
-                            <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="btn btn-primary btn-sm">Modifier</a>
+                        <div class="card-footer">
+                            <a href="{{ path('app_demande_show', {'id': demande.id}) }}" class="custom-btn btn-back">
+                                <i class="fas fa-eye"></i> Voir
+                            </a>
+                            <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="custom-btn btn-edit">
+                                <i class="fas fa-edit"></i> Modifier
+                            </a>
                         </div>
                     </div>
                 </div>
@@ -71,14 +96,172 @@
 
 {% block stylesheets %}
 {{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
-    .shadow-gray {
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1), 0 1px 3px rgba(0, 0, 0, 0.08);
+    .title-container {
+        text-align: center;
+        margin-bottom: 40px;
     }
 
-    .text-arial {
+    .main-title {
+        color: #333;
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin: 0;
+        padding: 0;
         font-family: Arial, sans-serif;
-        color: black;
+    }
+
+    .custom-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        border: none;
+        overflow: hidden;
+        height: 100%;
+        max-width: 400px;
+        margin: 0 auto;
+    }
+
+    .type-badge {
+        display: inline-block;
+        background: linear-gradient(145deg, #2C5E1A, #000000);
+        color: white;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-size: 1rem;
+        margin-bottom: 20px;
+        transition: all 0.3s ease;
+    }
+
+    .type-badge:hover {
+        background: linear-gradient(145deg, #000000, #2C5E1A);
+        transform: translateY(-2px);
+    }
+
+    .info-container {
+        display: flex;
+        flex-direction: column;
+        gap: 15px;
+    }
+
+    .info-item {
+        display: flex;
+        align-items: flex-start;
+        padding: 8px;
+        background: #f8f9fa;
+        border-radius: 10px;
+        transition: all 0.3s ease;
+    }
+
+    .info-item:hover {
+        background: #f0f2f5;
+        transform: translateX(5px);
+    }
+
+    .info-label {
+        flex: 0 0 120px;
+        display: flex;
+        align-items: center;
+        gap: 6px;
+        color: #2C5E1A;
+        font-weight: bold;
+        font-size: 0.9rem;
+    }
+
+    .info-label i {
+        width: 20px;
+        text-align: center;
+        color: #2C5E1A;
+    }
+
+    .info-content {
+        flex: 1;
+        padding-left: 8px;
+        font-size: 0.9rem;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 5px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-weight: 500;
+    }
+
+    .status-badge.success {
+        background-color: #d4edda;
+        color: #155724;
+    }
+
+    .status-badge.danger {
+        background-color: #f8d7da;
+        color: #721c24;
+    }
+
+    .status-badge.warning {
+        background-color: #fff3cd;
+        color: #856404;
+    }
+
+    .card-footer {
+        background: white;
+        border-top: 1px solid #eee;
+        padding: 12px;
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+    }
+
+    .custom-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 8px 20px;
+        border-radius: 25px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 14px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+    }
+
+    .btn-back {
+        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        color: white;
+    }
+
+    .btn-back:hover {
+        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Adjust card layout for better responsiveness */
+    @media (min-width: 768px) {
+        .row-cols-md-3 > * {
+            flex: 0 0 33.333333%;
+            max-width: 33.333333%;
+        }
+    }
+
+    /* Ensure content doesn't overflow */
+    .info-content {
+        word-break: break-word;
     }
 </style>
 {% endblock %}

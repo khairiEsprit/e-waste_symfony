@@ -15,6 +15,7 @@ use Symfony\Component\Routing\Attribute\Route;
 #[Route('/traitement')]
 final class TraitementController extends AbstractController
 {
+    //Créer un nouveau traitement pour une demande
     #[Route('/new/{demandeId}', name: 'app_traitement_new', methods: ['GET', 'POST'])]
     public function new(Request $request, EntityManagerInterface $entityManager, DemandeRepository $demandeRepository, int $demandeId): Response
     {
@@ -43,7 +44,7 @@ final class TraitementController extends AbstractController
         // Redirect back to the Demande index page
         return $this->redirectToRoute('app_demande_indexback');
     }
-    
+    // Afficher tous les traitements-index
     #[Route(name: 'app_traitement_index', methods: ['GET'])]
     public function index(TraitementRepository $traitementRepository): Response
     {
@@ -52,7 +53,7 @@ final class TraitementController extends AbstractController
         ]);
     }
 
-
+    //Voir les détails d’un traitement-show
     #[Route(path: '/{id}', name: 'app_traitement_show', methods: ['GET'])]
     public function show(Traitement $traitement): Response
     {
@@ -60,7 +61,7 @@ final class TraitementController extends AbstractController
             'traitement' => $traitement,
         ]);
     }
-
+   //Modifier un traitement-edit
     #[Route('/{id}/edit', name: 'app_traitement_edit', methods: ['GET', 'POST'])]
     public function edit(Request $request, Traitement $traitement, EntityManagerInterface $entityManager): Response
     {
@@ -78,7 +79,7 @@ final class TraitementController extends AbstractController
             'form' => $form,
         ]);
     }
-
+   //Supprimer un traitement
     #[Route('/{id}', name: 'app_traitement_delete', methods: ['POST'])]
     public function delete(Request $request, Traitement $traitement, EntityManagerInterface $entityManager): Response
     {
