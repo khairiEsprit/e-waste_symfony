@@ -1,0 +1,165 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Détails de l'événement{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow" style="border-radius: 15px; overflow: hidden;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #013220; color: white;">
+                    <h4 class="mb-0">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Détails de l'événement #{{ historique.id }}
+                    </h4>
+                    <span class="badge rounded-pill" 
+                        style="font-size: 0.9rem; padding: 8px 15px; background-color: 
+                        {% if historique.typeEvenement == 'Collecte' %}#198754
+                        {% elseif historique.typeEvenement == 'Traitement' %}#0dcaf0
+                        {% elseif historique.typeEvenement == 'Recyclage' %}#0d6efd
+                        {% else %}#6c757d{% endif %};">
+                        <i class="bi 
+                            {% if historique.typeEvenement == 'Collecte' %}bi-trash
+                            {% elseif historique.typeEvenement == 'Traitement' %}bi-gear
+                            {% elseif historique.typeEvenement == 'Recyclage' %}bi-recycle
+                            {% else %}bi-tools{% endif %} me-1"></i>
+                        {{ historique.typeEvenement }}
+                    </span>
+                </div>
+                <div class="card-body" style="background-color: #FEFEFA;">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100" style="border-color: #ACE1AF;">
+                                <div class="card-header" style="background-color: #ACE1AF; color: #013220;">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-info-square me-2"></i>
+                                        Informations générales
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="small text-muted">ID de l'événement</div>
+                                        <div class="fw-bold">{{ historique.id }}</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Type d'événement</div>
+                                        <div class="fw-bold">
+                                            <span class="badge rounded-pill" 
+                                                style="background-color: 
+                                                {% if historique.typeEvenement == 'Collecte' %}#198754
+                                                {% elseif historique.typeEvenement == 'Traitement' %}#0dcaf0
+                                                {% elseif historique.typeEvenement == 'Recyclage' %}#0d6efd
+                                                {% else %}#6c757d{% endif %};">
+                                                <i class="bi 
+                                                    {% if historique.typeEvenement == 'Collecte' %}bi-trash
+                                                    {% elseif historique.typeEvenement == 'Traitement' %}bi-gear
+                                                    {% elseif historique.typeEvenement == 'Recyclage' %}bi-recycle
+                                                    {% else %}bi-tools{% endif %} me-1"></i>
+                                                {{ historique.typeEvenement }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Date de l'événement</div>
+                                        <div class="fw-bold">{{ historique.dateEvenement ? historique.dateEvenement|date('Y-m-d H:i:s') : '' }}</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Description</div>
+                                        <div class="fw-bold">{{ historique.description }}</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Quantité de déchets</div>
+                                        <div class="fw-bold">{{ historique.quantiteDechets }}</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100" style="border-color: #ACE1AF;">
+                                <div class="card-header" style="background-color: #ACE1AF; color: #013220;">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-trash me-2"></i>
+                                        Informations sur la poubelle
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Poubelle concernée</div>
+                                        <div class="fw-bold">
+                                            <i class="bi bi-trash me-1"></i>
+                                            Poubelle #{{ historique.poubelle.id }}
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Adresse</div>
+                                        <div class="fw-bold">{{ historique.poubelle.adresse }}</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Quantité de déchets</div>
+                                        <div class="d-flex align-items-center">
+                                            <span class="badge bg-warning me-2">{{ historique.quantiteDechets }} kg</span>
+                                            <div class="progress flex-grow-1" style="height: 10px;">
+                                                <div class="progress-bar" role="progressbar" 
+                                                     style="width: {{ historique.quantiteDechets > 100 ? 100 : historique.quantiteDechets }}%; 
+                                                        background-color: 
+                                                        {% if historique.quantiteDechets < 10 %}#28a745
+                                                        {% elseif historique.quantiteDechets < 50 %}#ffc107
+                                                        {% else %}#dc3545{% endif %};"
+                                                     aria-valuenow="{{ historique.quantiteDechets }}" 
+                                                     aria-valuemin="0" 
+                                                     aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('app_historique_index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                        <div>
+                            <a href="{{ path('app_historique_edit', {'id': historique.id}) }}" class="btn btn-primary" style="background-color: #00693E; border-color: #00693E;">
+                                <i class="bi bi-pencil me-1"></i> Modifier
+                            </a>
+                            <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="bi bi-trash me-1"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #dc3545; color: white;">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Confirmation de suppression
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cet événement ? Cette action est irréversible.</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle me-2"></i>
+                    L'événement #{{ historique.id }} ({{ historique.typeEvenement }}) du {{ historique.dateEvenement|date('d/m/Y') }} sera définitivement supprimé.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Annuler
+                </button>
+                {{ include('back/historique/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

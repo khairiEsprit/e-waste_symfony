@@ -1,0 +1,165 @@
+{% block title %}Formulaire d'historique{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header" style="background-color: #00693E; color: white;">
+                    <h4 class="mb-0">{{ button_label|default('Enregistrer') == 'Update' ? 'Modifier l\'événement' : 'Nouvel événement' }}</h4>
+                </div>
+                <div class="card-body" style="background-color: #FEFEFA;">
+                    {{ form_start(form, {'attr': {'id': 'event-form', 'novalidate': 'novalidate'}}) }}
+                    
+                    <div class="alert alert-info bg-light border-left border-info" style="border-left: 4px solid #00693E !important; background-color: #ACE1AF !important; color: #013220;">
+                        <i class="bi bi-info-circle me-2"></i>
+                        Veuillez remplir tous les champs obligatoires marqués d'un astérisque (*).
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.date_evenement) }}
+                                {{ form_widget(form.date_evenement) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.date_evenement) }}
+                                </div>
+                                <small class="form-text text-muted">Format: YYYY-MM-DD HH:MM</small>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.type_evenement) }}
+                                {{ form_widget(form.type_evenement) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.type_evenement) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="form-group mb-3">
+                        {{ form_label(form.description) }}
+                        {{ form_widget(form.description) }}
+                        <div class="invalid-feedback">
+                            {{ form_errors(form.description) }}
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-3">
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.quantite_dechets) }}
+                                <div class="input-group">
+                                    {{ form_widget(form.quantite_dechets) }}
+                                    <span class="input-group-text">kg</span>
+                                </div>
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.quantite_dechets) }}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="form-group">
+                                {{ form_label(form.poubelle) }}
+                                {{ form_widget(form.poubelle) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.poubelle) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('app_historique_index') }}" class="btn btn-outline-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                        <button type="submit" class="btn text-white" id="save-button" style="background-color: #00693E;">
+                            <i class="bi bi-check-circle me-1"></i> 
+                            {{ button_label|default('Enregistrer') == 'Update' ? 'Mettre à jour' : 'Enregistrer' }}
+                        </button>
+                    </div>
+                    
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# SweetAlert2 pour les confirmations #}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const form = document.getElementById('event-form');
+    const saveButton = document.getElementById('save-button');
+    
+    // Validation côté client
+    form.addEventListener('submit', function(event) {
+        event.preventDefault();
+        let isValid = true;
+        
+        // Validation basique des champs
+        const requiredFields = form.querySelectorAll('[required]');
+        requiredFields.forEach(field => {
+            if (!field.value.trim()) {
+                field.classList.add('is-invalid');
+                isValid = false;
+            } else {
+                field.classList.remove('is-invalid');
+                field.classList.add('is-valid');
+            }
+        });
+        
+        // Validation de la quantité
+        const quantityField = form.querySelector('[name$="[quantite_dechets]"]');
+        if (quantityField && quantityField.value) {
+            const quantity = parseFloat(quantityField.value);
+            if (isNaN(quantity) || quantity <= 0 || quantity > 1000) {
+                quantityField.classList.add('is-invalid');
+                isValid = false;
+            }
+        }
+        
+        if (isValid) {
+            // Afficher la boîte de dialogue de confirmation
+            Swal.fire({
+                title: 'Êtes-vous sûr?',
+                text: "Veuillez confirmer l'enregistrement de cet événement",
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: '#00693E',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, enregistrer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Afficher un loader pendant l'enregistrement
+                    Swal.fire({
+                        title: 'Enregistrement...',
+                        text: 'Veuillez patienter',
+                        allowOutsideClick: false,
+                        showConfirmButton: false,
+                        willOpen: () => {
+                            Swal.showLoading();
+                        }
+                    });
+                    
+                    // Soumettre le formulaire
+                    form.submit();
+                }
+            });
+        } else {
+            // Afficher un message d'erreur
+            Swal.fire({
+                title: 'Attention!',
+                text: 'Veuillez corriger les erreurs dans le formulaire',
+                icon: 'error',
+                confirmButtonColor: '#00693E'
+            });
+        }
+    });
+});
+</script>
+{% endblock %}

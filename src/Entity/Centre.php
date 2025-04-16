@@ -5,6 +5,8 @@
 namespace App\Entity;
 
 use App\Repository\CentreRepository;
+use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
 use Symfony\Component\Validator\Constraints as Assert;
 
@@ -65,6 +67,17 @@ class Centre
     #[Assert\NotBlank(message: "L'adresse email ne peut pas être vide.")]
     #[Assert\Email(message: "L'email '{{ value }}' n'est pas valide.")]
     private ?string $email = null;
+
+    
+        /**
+     * @var Collection<int, Poubelle>
+     */
+    #[ORM\OneToMany(targetEntity: Poubelle::class, mappedBy: 'centre')]
+    private Collection $poubelles;
+    public function __construct()
+    {
+        $this->poubelles = new ArrayCollection();
+    }
 
     public function getId(): ?int
     {
@@ -127,6 +140,36 @@ class Centre
     public function setEmail(string $email): static
     {
         $this->email = $email;
+
+        return $this;
+    }
+
+    /**
+     * @return Collection<int, Poubelle>
+     */
+    public function getPoubelles(): Collection
+    {
+        return $this->poubelles;
+    }
+
+    public function addPoubelle(Poubelle $poubelle): static
+    {
+        if (!$this->poubelles->contains($poubelle)) {
+            $this->poubelles->add($poubelle);
+            $poubelle->setCentre($this);
+        }
+
+        return $this;
+    }
+
+    public function removePoubelle(Poubelle $poubelle): static
+    {
+        if ($this->poubelles->removeElement($poubelle)) {
+            // set the owning side to null (unless already changed)
+            if ($poubelle->getCentre() === $this) {
+                $poubelle->setCentre(null);
+            }
+        }
 
         return $this;
     }

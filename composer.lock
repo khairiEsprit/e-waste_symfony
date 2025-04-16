@@ -4,6 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
+<<<<<<< HEAD
     "content-hash": "f0cbc1e3718ae0b0731d0333eede5213",
     "packages": [
         {
@@ -131,6 +132,11 @@
             "time": "2025-02-03T11:14:03+00:00"
         },
         {
+=======
+    "content-hash": "61759990c261cc5adde9eb93beaeec03",
+    "packages": [
+        {
+>>>>>>> origin/gestion_poubelle
             "name": "composer/semver",
             "version": "3.4.3",
             "source": {

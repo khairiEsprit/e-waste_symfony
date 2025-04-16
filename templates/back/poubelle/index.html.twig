@@ -1,0 +1,176 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Gestion des Poubelles{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #013220; color: white;">
+                    <h4 class="m-0">
+                        <i class="bi bi-trash-fill me-2"></i>
+                        Gestion des Poubelles
+                    </h4>
+                    <a href="{{ path('app_poubelle_new') }}" class="btn" style="background-color: #00693E; color: white;">
+                        <i class="bi bi-plus-circle me-1"></i> Nouvelle poubelle
+                    </a>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead style="background-color: #ACE1AF;">
+                                <tr>
+                                    <th class="px-3">ID</th>
+                                    <th>Adresse</th>
+                                    <th>Niveau</th>
+                                    <th>État</th>
+                                    <th>Installation</th>
+                                    <th>Hauteur</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background-color: #FEFEFA;">
+                            {% if poubelles|length > 0 %}
+                                {% for poubelle in poubelles %}
+                                    <tr class="clickable-row" data-href="{{ path('app_poubelle_show', {'id': poubelle.id}) }}">
+                                        <td class="px-3">{{ poubelle.id }}</td>
+                                        <td>{{ poubelle.adresse }}</td>
+                                        <td>
+                                            <div class="progress" style="height: 20px; position: relative;">
+                                                <div class="progress-bar 
+                                                    {% if poubelle.niveau > 80 %}bg-danger
+                                                    {% elseif poubelle.niveau > 50 %}bg-warning
+                                                    {% else %}bg-success{% endif %}" 
+                                                    role="progressbar" 
+                                                    style="width: {{ poubelle.niveau }}%" 
+                                                    aria-valuenow="{{ poubelle.niveau }}" 
+                                                    aria-valuemin="0" 
+                                                    aria-valuemax="100">
+                                                    <span class="progress-bar-label">{{ poubelle.niveau }}%</span>
+                                                </div>
+                                            </div>
+                                        </td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {% if poubelle.etat == 'Fonctionnel' %}text-bg-success
+                                                {% else %}text-bg-danger{% endif %} px-3 py-2">
+                                                <i class="bi 
+                                                    {% if poubelle.etat == 'Fonctionnel' %}bi-check-circle
+                                                    {% else %}bi-exclamation-triangle{% endif %} me-1"></i>
+                                                {{ poubelle.etat }}
+                                            </span>
+                                        </td>
+                                        <td>{{ poubelle.dateInstallation ? poubelle.dateInstallation|date('d/m/Y') : 'N/A' }}</td>
+                                        <td>{{ poubelle.hauteurTotale }} cm</td>
+                                        <td class="text-center">
+                                            <div class="btn-group action-buttons">
+                                                <a href="{{ path('app_poubelle_show', {'id': poubelle.id}) }}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Voir les détails">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="{{ path('app_poubelle_edit', {'id': poubelle.id}) }}" 
+                                                   class="btn btn-sm btn-outline-success" 
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Modifier">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-danger delete-item"
+                                                        data-id="{{ poubelle.id }}"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-title="Supprimer">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="7" class="text-center py-5">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="bi bi-trash text-muted" style="font-size: 3rem;"></i>
+                                            <p class="mt-3 mb-1 fw-bold">Aucune poubelle enregistrée</p>
+                                            <p class="text-muted">Commencez par ajouter une nouvelle poubelle</p>
+                                            <a href="{{ path('app_poubelle_new') }}" class="btn mt-2" style="background-color: #00693E; color: white;">
+                                                <i class="bi bi-plus-circle me-1"></i> Ajouter une poubelle
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Total: {{ poubelles|length }} poubelle(s)</small>
+                    </div>
+                    <div class="d-none"> {# Pagination à ajouter ici si nécessaire #} </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+{# SweetAlert2 pour les confirmations de suppression #}
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activer les tooltips Bootstrap
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    
+    // Gestion des boutons de suppression
+    const deleteButtons = document.querySelectorAll('.delete-item');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            
+            Swal.fire({
+                title: 'Êtes-vous sûr?',
+                text: "Cette action est irréversible!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#00693E',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, supprimer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Créer et soumettre un formulaire de suppression
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "{{ path('app_poubelle_delete', {'id': 'ID'}) }}".replace('ID', id);
+                    form.style.display = 'none';
+                    
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = "{{ csrf_token('delete') }}" + id;
+                    
+                    form.appendChild(csrfToken);
+                    document.body.appendChild(form);
+                    
+                    form.submit();
+                }
+            });
+        });
+    });
+
+    // Rendre les lignes du tableau cliquables
+    const clickableRows = document.querySelectorAll('.clickable-row');
+    clickableRows.forEach(row => {
+        row.addEventListener('click', function() {
+            window.location.href = this.getAttribute('data-href');
+        });
+    });
+});
+</script>
+{% endblock %}

@@ -1,0 +1,225 @@
+<div class="card shadow">
+    <div class="card-header" style="background-color: #00693E; color: white;">
+        <h4 class="mb-0">{{ button_label|default('Save') == 'Save' ? 'Nouvelle poubelle' : 'Modifier la poubelle' }}</h4>
+    </div>
+    <div class="card-body" style="background-color: #FEFEFA;">
+        <div class="alert alert-info bg-light border-left border-info" style="border-left: 4px solid #00693E !important; background-color: #ACE1AF !important; color: #013220;">
+            <i class="bi bi-info-circle me-2"></i>
+            Veuillez remplir tous les champs obligatoires marqués d'un astérisque (*).
+        </div>
+        
+        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': '', 'id': 'poubelle-form'}}) }}
+        <div class="row g-3">
+            {% for field in form %}
+                <div class="col-md-6">
+                    <div class="form-group mb-3">
+                        {{ form_label(field, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                        {% if field.vars.name == 'etat' %}
+                            {{ form_widget(field, {'attr': {'class': 'form-select' ~ (form_errors(field) ? ' is-invalid' : '')}}) }}
+                        {% elseif field.vars.name == 'centre' %}
+                            {{ form_widget(field, {'attr': {'class': 'form-select' ~ (form_errors(field) ? ' is-invalid' : '')}}) }}
+                        {% else %}
+                            {{ form_widget(field, {'attr': {'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : '')}}) }}
+                        {% endif %}
+                        <div class="invalid-feedback">
+                            {{ form_errors(field) }}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+
+        <div class="d-flex justify-content-between mt-4">
+            <a href="{{ path('app_poubelle_index') }}" class="btn btn-outline-secondary">
+                <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+            </a>
+            <button type="submit" class="btn text-white" id="save-button" style="background-color: #00693E;">
+                <i class="bi bi-check-circle me-1"></i> 
+                {{ button_label|default('Save') == 'Save' ? 'Enregistrer' : 'Mettre à jour' }}
+            </button>
+        </div>
+        {{ form_end(form) }}
+    </div>
+</div>
+
+{# Loading Overlay #}
+<div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="z-index: 9999; background-color: rgba(255,255,255,0.5); backdrop-filter: blur(4px);">
+    <div class="d-flex justify-content-center align-items-center h-100">
+        <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
+            <span class="visually-hidden">Loading...</span>
+        </div>
+    </div>
+</div>
+
+{# Notification Toast #}
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="formToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="d-flex">
+            <div class="toast-body">
+                <i class="fas fa-exclamation-circle me-2"></i>
+                <span id="toastMessage"></span>
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const toastEl = document.getElementById('formToast');
+    const toastMessage = document.getElementById('toastMessage');
+    const toast = new bootstrap.Toast(toastEl, {
+        autohide: true,
+        delay: 5000
+    });
+
+    const form = document.getElementById('poubelle-form');
+    const submitBtn = document.getElementById('submitBtn');
+    const loadingOverlay = document.getElementById('loadingOverlay');
+
+    // Real-time required field validation
+    document.querySelectorAll('.form-control').forEach(function(input) {
+        input.addEventListener('input', function() {
+            if (input.value.trim() !== '') {
+                input.classList.remove('is-invalid');
+                input.classList.add('is-valid');
+            } else {
+                input.classList.remove('is-valid');
+            }
+        });
+
+        input.addEventListener('blur', function() {
+            if (input.value.trim() === '') {
+                input.classList.add('is-invalid');
+                toastMessage.textContent = 'Ce champ est requis';
+                toast.show();
+            }
+        });
+    });
+
+    // Form submission with loading state
+    form.addEventListener('submit', function(event) {
+        // Check if all required fields are filled
+        let allFilled = true;
+        document.querySelectorAll('.form-control[required]').forEach(input => {
+            if (input.value.trim() === '') {
+                allFilled = false;
+                input.classList.add('is-invalid');
+            }
+        });
+
+        if (!allFilled) {
+            event.preventDefault();
+            toastMessage.textContent = 'Veuillez remplir tous les champs requis';
+            toast.show();
+            return;
+        }
+
+        // Show loading overlay
+        submitBtn.disabled = true;
+        loadingOverlay.classList.remove('d-none');
+    });
+
+    if (form) {
+        form.addEventListener('submit', function(event) {
+            if (!form.checkValidity()) {
+                event.preventDefault();
+                event.stopPropagation();
+                
+                // Mise en évidence des champs invalides
+                const invalidFields = form.querySelectorAll(':invalid');
+                invalidFields.forEach(field => {
+                    field.classList.add('is-invalid');
+                });
+                
+                // Afficher un message d'erreur
+                Swal.fire({
+                    title: 'Attention!',
+                    text: 'Veuillez corriger les erreurs dans le formulaire',
+                    icon: 'error',
+                    confirmButtonColor: '#00693E'
+                });
+            } else {
+                // Afficher la boîte de dialogue de confirmation
+                event.preventDefault();
+                
+                Swal.fire({
+                    title: 'Êtes-vous sûr?',
+                    text: "Voulez-vous {{ button_label|default('Save') == 'Save' ? 'créer' : 'modifier' }} cette poubelle?",
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00693E',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Oui, {{ button_label|default('Save') == 'Save' ? 'créer' : 'modifier' }}',
+                    cancelButtonText: 'Annuler'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Afficher un loader pendant l'enregistrement
+                        Swal.fire({
+                            title: 'Enregistrement...',
+                            text: 'Veuillez patienter',
+                            allowOutsideClick: false,
+                            showConfirmButton: false,
+                            willOpen: () => {
+                                Swal.showLoading();
+                            }
+                        });
+                        
+                        // Soumettre le formulaire
+                        form.submit();
+                    }
+                });
+            }
+            
+            form.classList.add('was-validated');
+        });
+        
+        // Validation en temps réel
+        form.querySelectorAll('.form-control, .form-select').forEach(input => {
+            input.addEventListener('input', function() {
+                if (input.checkValidity()) {
+                    input.classList.remove('is-invalid');
+                    input.classList.add('is-valid');
+                } else {
+                    input.classList.remove('is-valid');
+                    input.classList.add('is-invalid');
+                }
+            });
+        });
+    }
+});
+</script>
+
+<style>
+    .form-control.is-valid {
+        border-color: #198754;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
+    }
+    
+    .form-control.is-invalid {
+        border-color: #dc3545;
+        background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+    }
+    
+    .toast {
+        box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+        border-radius: 0.5rem;
+    }
+
+    /* Animation for the spinner */
+    @keyframes spinner-border {
+        to { transform: rotate(360deg); }
+    }
+    
+    .spinner-border {
+        display: inline-block;
+        width: 2rem;
+        height: 2rem;
+        vertical-align: text-bottom;
+        border: 0.25em solid currentColor;
+        border-right-color: transparent;
+        border-radius: 50%;
+        animation: spinner-border .75s linear infinite;
+    }
+</style>

@@ -1,0 +1,55 @@
+{# templates/poubelle/_poubelles.html.twig #}
+
+{% if poubelles is empty %}
+    <div class="col-12">
+        <div class="alert alert-info">Aucune poubelle trouvée</div>
+    </div>
+{% else %}
+    {% for poubelle in poubelles %}
+        <div class="card poubelle-card">
+            <div class="card-header status-{{ poubelle.etat|default('inconnu')|lower == 'fonctionnel' ? 'fonctionnel' : 'panne' }}">
+                {{ poubelle.etat|default('Statut inconnu') }}
+            </div>
+            <div class="card-body">
+                <h5 class="card-title">{{ poubelle.adresse|default('Adresse non spécifiée') }}</h5>
+                <div class="card-body-content">
+                    <p class="card-text"><strong>Centre :</strong> 
+                        {% if poubelle.centre is defined and poubelle.centre %}
+                            {{ poubelle.centre.nom|default('Non spécifié') }}
+                        {% else %}
+                            Non spécifié
+                        {% endif %}
+                    </p>
+                    
+                    {# Simplifiez l'accès aux propriétés #}
+                    <p class="card-text"><strong>Capacité :</strong> Non spécifiée</p>
+                    
+                    {# Remplacez la partie sur le remplissage #}
+                    <p class="card-text"><strong>Niveau de remplissage :</strong></p>
+                    <div class="progress mb-3">
+                        <div class="progress-bar bg-success" 
+                             role="progressbar" 
+                             style="width: 0%" 
+                             aria-valuenow="0" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            0%
+                        </div>
+                    </div>
+                    <div class="d-flex justify-content-between">
+                        <span class="badge bg-info info-badge">ID: {{ poubelle.id|default('N/A') }}</span>
+                        <span class="badge bg-secondary info-badge">Dernière mise à jour: 
+                            {% if poubelle.updatedAt is defined %}
+                                {{ poubelle.updatedAt|date('d/m/Y H:i') }}
+                            {% elseif poubelle.updated_at is defined %}
+                                {{ poubelle.updated_at|date('d/m/Y H:i') }}
+                            {% else %}
+                                N/A
+                            {% endif %}
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}
