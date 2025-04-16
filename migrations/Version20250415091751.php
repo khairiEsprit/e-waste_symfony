@@ -10,7 +10,7 @@ use Doctrine\Migrations\AbstractMigration;
 /**
  * Auto-generated Migration: Please modify to your needs!
  */
-final class Version20250402185555 extends AbstractMigration
+final class Version20250415091751 extends AbstractMigration
 {
     public function getDescription(): string
     {
@@ -20,16 +20,16 @@ final class Version20250402185555 extends AbstractMigration
     public function up(Schema $schema): void
     {
         // this up() migration is auto-generated, please modify it to your needs
-        $this->addSql('ALTER TABLE contrat ADD centre_id INT DEFAULT NULL');
+        $this->addSql('CREATE TABLE contrat (id INT AUTO_INCREMENT NOT NULL, employe_id INT NOT NULL, centre_id INT DEFAULT NULL, date_debut DATE NOT NULL, date_fin DATE NOT NULL, signature_path VARCHAR(700) NOT NULL, INDEX IDX_603499931B65292 (employe_id), INDEX IDX_60349993463CD7C3 (centre_id), PRIMARY KEY(id)) DEFAULT CHARACTER SET utf8mb4 COLLATE `utf8mb4_unicode_ci` ENGINE = InnoDB');
+        $this->addSql('ALTER TABLE contrat ADD CONSTRAINT FK_603499931B65292 FOREIGN KEY (employe_id) REFERENCES user (id)');
         $this->addSql('ALTER TABLE contrat ADD CONSTRAINT FK_60349993463CD7C3 FOREIGN KEY (centre_id) REFERENCES centre (id)');
-        $this->addSql('CREATE INDEX IDX_60349993463CD7C3 ON contrat (centre_id)');
     }
 
     public function down(Schema $schema): void
     {
         // this down() migration is auto-generated, please modify it to your needs
+        $this->addSql('ALTER TABLE contrat DROP FOREIGN KEY FK_603499931B65292');
         $this->addSql('ALTER TABLE contrat DROP FOREIGN KEY FK_60349993463CD7C3');
-        $this->addSql('DROP INDEX IDX_60349993463CD7C3 ON contrat');
-        $this->addSql('ALTER TABLE contrat DROP centre_id');
+        $this->addSql('DROP TABLE contrat');
     }
 }

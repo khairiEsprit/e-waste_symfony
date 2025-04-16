@@ -16,9 +16,9 @@ class Contrat
     #[ORM\Column]
     private ?int $id = null;
 
-    #[ORM\Column]
-   
-    private ?int $id_employe = null;
+#[ORM\ManyToOne(inversedBy: 'contrats')]
+#[ORM\JoinColumn(nullable: false)]
+private ?User $employe = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
     private ?\DateTimeInterface $date_debut = null;
@@ -41,17 +41,18 @@ class Contrat
 
    
 
-    public function getIdEmploye(): ?int
-    {
-        return $this->id_employe;
-    }
+   
+public function getEmploye(): ?User
+{
+    return $this->employe;
+}
 
-    public function setIdEmploye(int $id_employe): static
-    {
-        $this->id_employe = $id_employe;
+public function setEmploye(?User $employe): static
+{
+    $this->employe = $employe;
 
-        return $this;
-    }
+    return $this;
+}
 
     public function getDateDebut(): ?\DateTimeInterface
     {

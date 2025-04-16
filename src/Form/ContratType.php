@@ -3,6 +3,7 @@
 namespace App\Form;
 
 use App\Entity\Contrat;
+use App\Entity\User;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
@@ -18,7 +19,11 @@ class ContratType extends AbstractType
             'class' => Centre::class,
             'choice_label' => 'nom', // Affiche le nom du centre dans le formulaire
         ])
-            ->add('id_employe')
+        ->add('employe', EntityType::class, [
+            'class' => User::class,
+            'choice_label' => 'first_name', // Affiche le nom du centre dans le formulaire
+        ])
+            
             ->add('date_debut', null, [
                 'widget' => 'single_text'
             ])
@@ -26,6 +31,7 @@ class ContratType extends AbstractType
                 'widget' => 'single_text'
             ])
             ->add('signaturePath')
+           
         ;
     }
 

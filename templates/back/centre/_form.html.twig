@@ -1,98 +1,187 @@
 {% extends 'back/base.html.twig' %}
 
-{% block title %}Ajouter un Centre{% endblock %}
+{% block title %}Ajouter un Contrat{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --primary-green: #2e7d32;
+            --light-green: #4caf50;
+            --dark-green: #1b5e20;
+            --accent-green: #8bc34a;
+            --text-dark: #263238;
+            --text-light: #f5f5f5;
+        }
+        
+        .form-container {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 30px;
+            margin-bottom: 30px;
+        }
+        
+        .form-header {
+            color: var(--primary-green);
+            font-weight: 600;
+            margin-bottom: 25px;
+            padding-bottom: 15px;
+            border-bottom: 2px solid var(--accent-green);
+        }
+        
+        .form-label {
+            font-weight: 500;
+            color: var(--text-dark);
+            margin-bottom: 8px;
+        }
+        
+        .form-control {
+            border-radius: 6px;
+            border: 1px solid #ddd;
+            padding: 10px 15px;
+            transition: all 0.3s ease;
+        }
+        
+        .form-control:focus {
+            border-color: var(--light-green);
+            box-shadow: 0 0 0 0.25rem rgba(76, 175, 80, 0.25);
+        }
+        
+        .btn-submit {
+            background: linear-gradient(135deg, var(--primary-green), var(--light-green));
+            border: none;
+            border-radius: 25px;
+            padding: 10px 25px;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+            color: white;
+            box-shadow: 0 4px 15px rgba(46, 125, 50, 0.3);
+            transition: all 0.3s ease;
+        }
+        
+        .btn-submit:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(46, 125, 50, 0.4);
+            background: linear-gradient(135deg, var(--dark-green), var(--primary-green));
+        }
+        
+        .btn-back {
+            color: var(--primary-green);
+            background: white;
+            border: 1px solid var(--primary-green);
+            border-radius: 25px;
+            padding: 8px 20px;
+            font-weight: 500;
+            text-decoration: none;
+            transition: all 0.3s ease;
+            display: inline-flex;
+            align-items: center;
+        }
+        
+        .btn-back:hover {
+            color: white;
+            background-color: var(--primary-green);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-back i {
+            margin-right: 5px;
+        }
+        
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.85rem;
+            margin-top: 5px;
+        }
+        
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        
+        .is-valid {
+            border-color: #28a745 !important;
+        }
+        
+        /* Loading overlay */
+        #loadingOverlay {
+            background-color: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(5px);
+        }
+        
+        /* Toast notification */
+        .toast {
+            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
+            border-radius: 0.5rem;
+            background-color: var(--dark-green);
+        }
+        
+        @media (max-width: 768px) {
+            .form-container {
+                padding: 20px;
+            }
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
-    <h1 class="mb-4">Ajouter un Centre</h1>
+<div class="container-fluid py-4">
+    <div class="form-container">
+        <h1 class="form-header">
+            <i class="bi bi-file-earmark-plus me-2"></i>Ajouter un nouveau contrat
+        </h1>
 
-    <div class="container px-3">
         {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': ''}}) }}
-        <div class="row g-3">
-            {% for field in form %}
-                {% if field.vars.name != '_token' %} {# Exclure le token CSRF #}
-                    <div class="col-md-6">
-                        <div class="form-group">
-                            {{ form_label(field, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
-                            {{ form_widget(field, {'attr': {'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : ''), 'required': 'required'}}) }}
-                            <div class="invalid-feedback">
-                                {{ form_errors(field) }}
+            <div class="row g-3">
+                {% for field in form %}
+                    {% if field.vars.name != '_token' %}
+                        <div class="col-md-6">
+                            <div class="form-group mb-4">
+                                {{ form_label(field, null, {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(field, {'attr': {'class': 'form-control' ~ (form_errors(field) ? ' is-invalid' : ''), 'required': 'required'}}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(field) }}
+                                </div>
                             </div>
                         </div>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </div>
-        <div class="mt-4 text-center">
-            <button class="btn btn-primary" type="submit" id="submitBtn">
-                {{ button_label|default('Enregistrer') }}
-            </button>
-        </div>
+                    {% endif %}
+                {% endfor %}
+            </div>
+            
+            <div class="d-flex justify-content-between mt-4">
+                <a href="{{ path('app_contrat_index') }}" class="btn-back">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+                <button type="submit" class="btn-submit" id="submitBtn">
+                    <i class="bi bi-check-circle me-2"></i> Enregistrer
+                </button>
+            </div>
         {{ form_end(form) }}
     </div>
 
     {# Loading Overlay #}
-    <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="z-index: 9999; background-color: rgba(255,255,255,0.5); backdrop-filter: blur(5px);">
+    <div id="loadingOverlay" class="position-fixed top-0 start-0 w-100 h-100 d-none" style="z-index: 9999;">
         <div class="d-flex justify-content-center align-items-center h-100">
             <div class="spinner-border text-primary" style="width: 3rem; height: 3rem;" role="status">
-                <span class="visually-hidden">Loading...</span>
+                <span class="visually-hidden">Chargement...</span>
             </div>
         </div>
     </div>
 
     {# Notification Toast #}
     <div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
-        <div id="formToast" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+        <div id="formToast" class="toast align-items-center text-white border-0" role="alert" aria-live="assertive" aria-atomic="true">
             <div class="d-flex">
                 <div class="toast-body">
-                    <i class="fas fa-exclamation-circle me-2"></i>
+                    <i class="bi bi-exclamation-triangle-fill me-2"></i>
                     <span id="toastMessage"></span>
                 </div>
                 <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
             </div>
         </div>
     </div>
-
-    <a href="{{ path('app_centre_index') }}" class="btn btn-secondary mt-3">Retour à la liste</a>
-{% endblock %}
-
-{% block stylesheets %}
-    {{ parent() }}
-    <style>
-        .form-control.is-valid {
-            border-color: #198754;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 8 8'%3e%3cpath fill='%23198754' d='M2.3 6.73L.6 4.53c-.4-1.04.46-1.4 1.1-.8l1.1 1.4 3.4-3.8c.6-.63 1.6-.27 1.2.7l-4 4.6c-.43.5-.8.4-1.1.1z'/%3e%3c/svg%3e");
-        }
-        
-        .form-control.is-invalid {
-            border-color: #dc3545;
-            background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'#%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
-        }
-        
-        .toast {
-            box-shadow: 0 0.5rem 1rem rgba(0, 0, 0, 0.15);
-            border-radius: 0.5rem;
-        }
-
-        @keyframes spinner-border {
-            to { transform: rotate(360deg); }
-        }
-        
-        .spinner-border {
-            display: inline-block;
-            width: 2rem;
-            height: 2rem;
-            vertical-align: text-bottom;
-            border: 0.25em solid currentColor;
-            border-right-color: transparent;
-            border-radius: 50%;
-            animation: spinner-border .75s linear infinite;
-        }
-        
-        #submitBtn:disabled {
-            cursor: not-allowed;
-            opacity: 0.65;
-        }
-    </style>
+</div>
 {% endblock %}
 
 {% block javascripts %}
@@ -110,7 +199,7 @@
         const submitBtn = document.getElementById('submitBtn');
         const loadingOverlay = document.getElementById('loadingOverlay');
 
-        // Real-time required field validation
+        // Real-time validation
         document.querySelectorAll('.form-control').forEach(function(input) {
             input.addEventListener('input', function() {
                 if (input.value.trim() !== '') {
@@ -124,26 +213,44 @@
             input.addEventListener('blur', function() {
                 if (input.value.trim() === '' && input.hasAttribute('required')) {
                     input.classList.add('is-invalid');
-                    toastMessage.textContent = 'Ce champ est requis';
+                    toastMessage.textContent = 'Veuillez remplir ce champ obligatoire';
                     toast.show();
                 }
             });
         });
 
-        // Form submission with loading state
+        // Form submission
         form.addEventListener('submit', function(event) {
-            let allFilled = true;
+            let isValid = true;
+            
             document.querySelectorAll('.form-control[required]').forEach(input => {
                 if (input.value.trim() === '') {
-                    allFilled = false;
+                    isValid = false;
                     input.classList.add('is-invalid');
                 }
             });
 
-            if (!allFilled) {
+            // Validate date range
+            const dateDebut = document.querySelector('input[name="contrat[date_debut]"]');
+            const dateFin = document.querySelector('input[name="contrat[date_fin]"]');
+            
+            if (dateDebut && dateFin && dateDebut.value && dateFin.value) {
+                const debut = new Date(dateDebut.value);
+                const fin = new Date(dateFin.value);
+                
+                if (fin <= debut) {
+                    isValid = false;
+                    dateFin.classList.add('is-invalid');
+                    toastMessage.textContent = 'La date de fin doit être postérieure à la date de début';
+                    toast.show();
+                }
+            }
+
+            if (!isValid) {
                 event.preventDefault();
-                toastMessage.textContent = 'Veuillez remplir tous les champs requis';
+                toastMessage.textContent = 'Veuillez corriger les erreurs dans le formulaire';
                 toast.show();
+                window.scrollTo({ top: 0, behavior: 'smooth' });
                 return;
             }
 

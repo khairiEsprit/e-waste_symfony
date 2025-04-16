@@ -16,6 +16,11 @@ class CentreRepository extends ServiceEntityRepository
         parent::__construct($registry, Centre::class);
     }
 
+    public function findOneById(int $id): ?Centre
+{
+    return $this->findOneBy(['id' => $id]);
+}
+
 //    /**
 //     * @return Centre[] Returns an array of Centre objects
 //     */

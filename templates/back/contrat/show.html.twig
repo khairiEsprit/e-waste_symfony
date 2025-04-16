@@ -1,42 +1,146 @@
 {% extends 'back/base.html.twig' %}
 
-{% block title %}Détails du Centre{% endblock %}
+{% block title %}Détails du Contrat{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.8.1/font/bootstrap-icons.css">
+    <style>
+        :root {
+            --primary-green: #2e7d32;
+            --light-green: #4caf50;
+            --dark-green: #1b5e20;
+            --text-dark: #263238;
+        }
+
+        body {
+            font-family: 'Montserrat', sans-serif;
+            color: var(--text-dark);
+        }
+
+        .card-contrat {
+            background: white;
+            border-radius: 10px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08);
+            padding: 25px;
+            margin-bottom: 30px;
+        }
+
+        .card-title {
+            font-weight: 600;
+            font-size: 1.5rem;
+            color: var(--primary-green);
+            margin-bottom: 20px;
+        }
+
+        .info-row {
+            margin-bottom: 15px;
+        }
+
+        .info-label {
+            font-weight: 600;
+            color: var(--dark-green);
+        }
+
+        .btn-custom {
+            border-radius: 20px;
+            padding: 8px 16px;
+            font-weight: 500;
+            margin-right: 10px;
+        }
+
+        .btn-back {
+            background-color: #607d8b;
+            color: white;
+        }
+
+        .btn-edit {
+            background-color: #ffc107;
+            color: var(--text-dark);
+        }
+
+        .btn-delete {
+            background-color: #e53935;
+            color: white;
+        }
+
+        .btn-back:hover {
+            background-color: #455a64;
+        }
+
+        .btn-edit:hover {
+            background-color: #ffb300;
+        }
+
+        .btn-delete:hover {
+            background-color: #c62828;
+        }
+
+        .action-buttons {
+            display: flex;
+            gap: 10px;
+            flex-wrap: wrap;
+        }
+
+        .badge-signature {
+            padding: 5px 10px;
+            border-radius: 12px;
+            font-size: 0.85rem;
+            font-weight: 600;
+        }
+
+        .badge-signed {
+            background-color: var(--light-green);
+            color: white;
+        }
+        
+
+        .badge-unsigned {
+            background-color: #ff9800;
+            color: white;
+        }
+    </style>
+{% endblock %}
 
 {% block content %}
-    <h1>Contrat</h1>
+<div class="container-fluid py-4">
+    <div class="card-contrat">
+        <h1 class="card-title"><i class="bi bi-file-earmark-text me-2"></i>Détails du Contrat</h1>
 
-    <table class="table">
-        <tbody>
-            <tr>
-                <th>Id</th>
-                <td>{{ contrat.id }}</td>
-            </tr>
-            <tr>
-                <th>Id_centre</th>
-                <td>{{ contrat.idCentre }}</td>
-            </tr>
-            <tr>
-                <th>Id_employe</th>
-                <td>{{ contrat.idEmploye }}</td>
-            </tr>
-            <tr>
-                <th>Date_debut</th>
-                <td>{{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>Date_fin</th>
-                <td>{{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '' }}</td>
-            </tr>
-            <tr>
-                <th>SignaturePath</th>
-                <td>{{ contrat.signaturePath }}</td>
-            </tr>
-        </tbody>
-    </table>
+        <div class="info-row">
+            <span class="info-label">ID :</span> {{ contrat.id }}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Centre :</span> {{ contrat.centre.nom }}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Employé :</span> {{ contrat.employe.firstName }} {{ contrat.employe.lastName }}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Date de début :</span> {{ contrat.dateDebut ? contrat.dateDebut|date('Y-m-d') : '' }}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Date de fin :</span> {{ contrat.dateFin ? contrat.dateFin|date('Y-m-d') : '' }}
+        </div>
+        <div class="info-row">
+            <span class="info-label">Signature :</span> 
+            {% if contrat.signaturePath %}
+                <span class="badge-signature badge-signed">Signé</span>
+            {% else %}
+                <span class="badge-signature badge-unsigned">Non signé</span>
+            {% endif %}
+        </div>
 
-    <a href="{{ path('app_contrat_index') }}" class="btn btn-secondary">back to list</a>
-
-    <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}"class="btn btn-primary">edit</a>
-
-    {{ include('back/contrat/_delete_form.html.twig') }}
+        <div class="mt-4 action-buttons">
+            <a href="{{ path('app_contrat_index') }}" class="btn btn-custom btn-back">
+                <i class="bi bi-arrow-left"></i> Retour à la liste
+            </a>
+            <a href="{{ path('app_contrat_edit', {'id': contrat.id}) }}" class="btn btn-custom btn-edit">
+                <i class="bi bi-pencil-fill"></i> Modifier
+            </a>
+            {{ include('back/contrat/_delete_form.html.twig', {'button_class': 'btn-custom btn-delete'}) }}
+        </div>
+    </div>
+</div>
 {% endblock %}
