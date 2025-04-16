@@ -8,5 +8,7 @@
 
     {{ include('back/plannificationtache/_form.html.twig') }}
 
-    <a href="{{ path('app_plannificationtache_index') }}">back to list</a>
+    <div class="text-center mb-3">
+    <a href="{{ path('app_plannificationtache_index') }}" class="btn btn-success rounded-pill px-4">Retour à la liste</a>
+</div>
 {% endblock %}

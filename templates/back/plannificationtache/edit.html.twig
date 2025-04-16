@@ -1,80 +1,19 @@
 {% extends 'back/base.html.twig' %}
-
-{% block title %}Modifier Plannification{% endblock %}
-
+{% block title %}Modifier Tâche{% endblock %}
 {% block content %}
-    <div class="container mt-5">
-        <div class="card shadow">
-            <div class="card-header bg-primary text-white">
-                <h1 class="text-center mb-0">Modifier la Tâche</h1>
-            </div>
-            
-            <div class="card-body form-container">
-                <form>
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="id_centre" class="form-label">Id centre</label>
-                                <input type="text" class="form-control" id="id_centre" value="2">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="id_employe" class="form-label">Id employe</label>
-                                <input type="text" class="form-control" id="id_employe" value="2">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="row">
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="altitude" class="form-label">Altitude</label>
-                                <input type="text" class="form-control" id="altitude" value="18">
-                            </div>
-                        </div>
-                        <div class="col-md-6">
-                            <div class="form-group">
-                                <label for="longitude" class="form-label">Longitude</label>
-                                <input type="text" class="form-control" id="longitude" value="1.22">
-                            </div>
-                        </div>
-                    </div>
-
-                    <div class="form-group">
-                        <label for="message" class="form-label">Message</label>
-                        <input type="text" class="form-control" id="message" value="TestCruci1223">
-                    </div>
-
-                    <div class="form-group">
-                        <label for="etat" class="form-label">Etat</label>
-                        <select class="form-select" id="etat">
-                            <option value="accomplie" selected>Accomplie</option>
-                            <option value="en_cours">En cours</option>
-                            <option value="annulee">Annulée</option>
-                        </select>
-                    </div>
-
-                    <div class="token-display">
-                        <strong>Token</strong>
-                        <div class="mt-2">[Votre token ici]</div>
-                    </div>
-
-                    <div class="d-flex justify-content-between mt-4">
-                        <button type="submit" class="btn btn-primary">Update</button>
-                        <div>
-                            <a href="#" class="btn btn-secondary me-2">
-                                <i class="bi bi-arrow-left"></i> Retour à la liste
-                            </a>
-                            <button type="button" class="btn btn-danger">Delete</button>
-                        </div>
-                    </div>
-                </form>
-            </div>
+<body class="container mt-5">
+    <div class="card shadow p-4">
+        <h1 class="text-center mb-4">Modifier la Tâche</h1>
+        <div class="mb-3">
+            {{ include('back/plannificationtache/_form.html.twig', {'button_label': 'Update'}) }}
+        </div>
+        <div class="text-center mb-3">
+            <a href="{{ path('app_plannificationtache_index') }}" class="btn btn-success rounded-pill px-4">Retour à la liste</a>
+        </div>
+        <div class="text-center">
+            {{ include('back/plannificationtache/_delete_form.html.twig') }}
         </div>
     </div>
-
-    <!-- Bootstrap JS -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js" integrity="sha384-YvpcrYf0tY3lHB60NNkmXc5s9fDVZLESaAA55NDzOxhy9GkcIdslK1eN7N6jIeHz" crossorigin="anonymous"></script>
-
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 {% endblock %}

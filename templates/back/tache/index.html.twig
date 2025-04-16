@@ -389,6 +389,12 @@
         .table-container::-webkit-scrollbar-thumb:hover {
             background: #a8a8a8;
         }
+
+        /* Highlight pour les résultats de recherche */
+        .highlight {
+            background-color: #ffeb3b;
+            font-weight: 600;
+        }
     </style>
 {% endblock %}
 
@@ -480,7 +486,7 @@
                             </td>
                             <td>
                                 <div class="d-flex flex-column">
-                                    <small class="text-muted">Lat: {{ tache.altitude }}</small>
+                                    <small class="text-muted">Alt: {{ tache.altitude }}</small>
                                     <small class="text-muted">Lng: {{ tache.longitude }}</small>
                                 </div>
                             </td>
@@ -695,11 +701,11 @@
                 });
             });
 
-            // Gestion de la recherche avancée
+            // Gestion de la recherche avec filtrage et mise en surbrillance
             const searchInput = document.getElementById('searchInput');
             const table = document.getElementById('tasksTable');
             const rows = table.querySelectorAll('tbody tr.task-row');
-            const noResultsDiv = document.querySelector('.no-results');
+            let noResultsDiv = document.querySelector('.no-results');
 
             function filterTable(searchTerm) {
                 let hasVisibleRows = false;
@@ -709,9 +715,17 @@
                     const cells = row.querySelectorAll('td');
                     let rowText = '';
                     
-                    cells.forEach(cell => {
-                        if (cell !== cells[cells.length - 1] && cell !== cells[0]) {
-                            rowText += ' ' + cell.textContent.toLowerCase();
+                    // Concaténer le texte de toutes les colonnes sauf la première (drag handle) et la dernière (actions)
+                    cells.forEach((cell, index) => {
+                        if (index !== 0 && index !== cells.length - 1) {
+                            // Pour la colonne de localisation, inclure altitude et longitude
+                            if (index === 5) { // Colonne localisation
+                                const altitude = cell.querySelector('small:nth-child(1)')?.textContent.toLowerCase() || '';
+                                const longitude = cell.querySelector('small:nth-child(2)')?.textContent.toLowerCase() || '';
+                                rowText += ` ${altitude} ${longitude}`;
+                            } else {
+                                rowText += ` ${cell.textContent.toLowerCase()}`;
+                            }
                         }
                     });
                     
@@ -728,42 +742,59 @@
                     }
                 });
 
+                // Mettre à jour la pagination-info
+                const visibleRows = Array.from(rows).filter(row => row.style.display !== 'none').length;
+                const paginationInfo = document.querySelector('.pagination-info');
+                paginationInfo.innerHTML = `Affichage de <span class="fw-bold">${visibleRows}</span> tâches`;
+
+                // Gérer l'affichage du message "Aucune tâche"
                 if (!hasVisibleRows && rows.length > 0) {
                     if (!noResultsDiv) {
-                        const newNoResults = document.createElement('div');
-                        newNoResults.className = 'no-results my-4';
-                        newNoResults.innerHTML = `
+                        noResultsDiv = document.createElement('div');
+                        noResultsDiv.className = 'no-results my-4';
+                        noResultsDiv.innerHTML = `
                             <i class="bi bi-exclamation-circle fs-3"></i>
                             <p class="mt-2 mb-0">AUCUNE TÂCHE NE CORRESPOND À VOTRE RECHERCHE</p>
                         `;
-                        tbody.parentNode.insertBefore(newNoResults, tbody.nextSibling);
+                        table.parentNode.insertBefore(noResultsDiv, table.nextSibling);
                     }
                 } else if (noResultsDiv && hasVisibleRows) {
                     noResultsDiv.remove();
+                    noResultsDiv = null;
                 }
             }
 
             function highlightText(row, term) {
                 const cells = row.querySelectorAll('td');
-                const regex = new RegExp(term, 'gi');
+                const regex = new RegExp(`(${term})`, 'gi');
                 
-                cells.forEach(cell => {
-                    if (cell !== cells[cells.length - 1] && cell !== cells[0]) {
-                        const originalText = cell.textContent;
-                        const highlightedText = originalText.replace(regex, match => 
-                            `<span class="highlight">${match}</span>`);
-                        
-                        if (cell.innerHTML === cell.textContent) {
-                            cell.innerHTML = highlightedText;
+                cells.forEach((cell, index) => {
+                    if (index !== 0 && index !== cells.length - 1) {
+                        if (index === 5) { // Colonne localisation
+                            const smalls = cell.querySelectorAll('small');
+                            smalls.forEach(small => {
+                                const originalText = small.textContent;
+                                const highlightedText = originalText.replace(regex, '<span class="highlight">$1</span>');
+                                small.innerHTML = highlightedText;
+                            });
+                        } else {
+                            const originalText = cell.textContent;
+                            const highlightedText = originalText.replace(regex, '<span class="highlight">$1</span>');
+                            if (cell.innerHTML === cell.textContent) {
+                                cell.innerHTML = highlightedText;
+                            }
                         }
                     }
                 });
             }
 
             function removeHighlights(row) {
-                const highlights = row.querySelectorAll('.highlight');
-                highlights.forEach(highlight => {
-                    highlight.outerHTML = highlight.textContent;
+                const cells = row.querySelectorAll('td');
+                cells.forEach(cell => {
+                    const highlights = cell.querySelectorAll('.highlight');
+                    highlights.forEach(highlight => {
+                        highlight.outerHTML = highlight.textContent;
+                    });
                 });
             }
 
@@ -783,15 +814,15 @@
             });
 
             function sortTable(columnIndex) {
-                const rowsArray = Array.from(rows);
-                const isAsc = !table.querySelector('th').classList.contains('sorted-asc');
+                const rowsArray = Array.from(rows).filter(row => row.style.display !== 'none');
+                const isAsc = !table.querySelector('th')?.classList.contains('sorted-asc');
                 
                 rowsArray.sort((a, b) => {
                     const aText = a.querySelectorAll('td')[columnIndex].textContent.trim();
                     const bText = b.querySelectorAll('td')[columnIndex].textContent.trim();
                     
-                    if (columnIndex === 1) {
-                        return isAsc ? aText - bText : bText - aText;
+                    if (columnIndex === 1) { // Colonne ID
+                        return isAsc ? parseInt(aText) - parseInt(bText) : parseInt(bText) - parseInt(aText);
                     }
                     
                     return isAsc 
@@ -862,6 +893,11 @@
                         // Restaurer l'ordre après rafraîchissement
                         restoreOrder();
                         initializeEventListeners();
+                        
+                        // Réappliquer le filtre si un terme de recherche existe
+                        if (searchInput.value) {
+                            filterTable(searchInput.value);
+                        }
                     }
                 })
                 .catch(error => {
@@ -881,6 +917,19 @@
                         
                         const modalBody = document.querySelector('.modal-body p:first-child');
                         modalBody.textContent = `Êtes-vous sûr de vouloir supprimer la tâche #${taskId} ?`;
+                    });
+                });
+
+                // Réinitialiser les écouteurs pour le survol des lignes
+                const newRows = table.querySelectorAll('tbody tr.task-row');
+                newRows.forEach(row => {
+                    row.addEventListener('mouseenter', () => {
+                        row.style.transform = 'translateX(5px)';
+                        row.style.transition = 'transform 0.2s ease';
+                    });
+                    
+                    row.addEventListener('mouseleave', () => {
+                        row.style.transform = '';
                     });
                 });
             }
@@ -969,10 +1018,7 @@
                     },
                     cutout: '70%',
                     onHover: (event, chartElement) => {
-                        if (event.native) {
-                            const target = event.native.target;
-                            target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-                        }
+                        event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
                     },
                     onClick: (event, elements) => {
                         if (elements && elements.length > 0) {
@@ -1066,10 +1112,7 @@
                         intersect: false
                     },
                     onHover: (event, chartElement) => {
-                        if (event.native) {
-                            const target = event.native.target;
-                            target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-                        }
+                        event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
                     }
                 }
             });
@@ -1147,10 +1190,7 @@
                         },
                         cutout: type === 'doughnut' ? '70%' : undefined,
                         onHover: (event, chartElement) => {
-                            if (event.native) {
-                                const target = event.native.target;
-                                target.style.cursor = chartElement[0] ? 'pointer' : 'default';
-                            }
+                            event.native.target.style.cursor = chartElement[0] ? 'pointer' : 'default';
                         },
                         onClick: (event, elements) => {
                             if (elements && elements.length > 0) {
