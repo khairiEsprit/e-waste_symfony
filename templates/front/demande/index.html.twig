@@ -10,96 +10,97 @@
         <h1 class="main-title">Liste des Demandes</h1>
     </div>
 
-    <div class="search-container mb-4">
-        <div class="input-group">
-            <span class="input-group-text">
-                <i class="fas fa-search"></i>
-            </span>
-            <input type="text" id="searchInput" class="form-control" placeholder="Rechercher une demande...">
+    <div class="demandes-container">
+        <div class="demandes-header">
+            <div class="search-container">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Rechercher une demande...">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+            </div>
+
+            <div class="actions-container">
+                <a href="{{ path('app_demande_new') }}" class="custom-btn btn-edit">
+                    <i class="fas fa-plus-circle"></i> Nouvelle demande
+                </a>
+            </div>
         </div>
-    </div>
 
-    <div class="d-flex justify-content-end mb-4">
-        <a href="{{ path('app_demande_new') }}" class="custom-btn btn-edit">
-            <i class="fas fa-plus-circle"></i> Nouvelle demande
-        </a>
-    </div>
-
-    {% if demandes is empty %}
-        <div class="alert alert-info text-center">Aucune demande trouvée.</div>
-    {% else %}
-        <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center" id="demandesContainer">
-            {% for demande in demandes %}
-                {% set dernierTraitement = demande.traitements|last %}
-                <div class="col demande-card" data-search="{{ demande.type|lower }} {{ demande.adresse|lower }} {{ demande.emailUtilisateur|lower }} {{ demande.message|lower }}">
-                    <div class="card custom-card">
-                        <div class="card-body">
-                            <h5 class="type-badge">{{ demande.type }}</h5>
-                            <div class="info-container">
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="fas fa-map-marker-alt"></i>
-                                        <span>Adresse</span>
-                                    </div>
-                                    <div class="info-content">{{ demande.adresse }}</div>
-                                </div>
-                                
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="fas fa-envelope"></i>
-                                        <span>Email</span>
-                                    </div>
-                                    <div class="info-content">{{ demande.emailUtilisateur }}</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="fas fa-comment-alt"></i>
-                                        <span>Message</span>
-                                    </div>
-                                    <div class="info-content">{{ demande.message }}</div>
-                                </div>
-
-                                <div class="info-item">
-                                    <div class="info-label">
-                                        <i class="fas fa-info-circle"></i>
-                                        <span>État</span>
-                                    </div>
-                                    <div class="info-content">
+        {% if demandes is empty %}
+            <div class="alert alert-info text-center">Aucune demande trouvée.</div>
+        {% else %}
+            <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center" id="demandesContainer">
+                {% for demande in demandes %}
+                    {% set dernierTraitement = demande.traitements|last %}
+                    <div class="col demande-card" data-search="{{ demande.type|lower }} {{ demande.adresse|lower }} {{ demande.emailUtilisateur|lower }} {{ demande.message|lower }}">
+                        <div class="card custom-card">
+                            <div class="card-body">
+                                <div class="card-header">
+                                    <h5 class="type-badge">{{ demande.type }}</h5>
+                                    <div class="status-badge-container">
                                         {% if dernierTraitement and dernierTraitement.status == 'Traité' %}
                                             <span class="status-badge success"><i class="fas fa-check-circle"></i> Traité</span>
                                         {% elseif dernierTraitement and dernierTraitement.status == 'Refusé' %}
                                             <span class="status-badge danger"><i class="fas fa-times-circle"></i> Refusé</span>
                                         {% else %}
-                                            <span class="status-badge warning"><i class="fas fa-clock"></i> En cours de traitement</span>
+                                            <span class="status-badge warning"><i class="fas fa-clock"></i> En cours</span>
                                         {% endif %}
                                     </div>
                                 </div>
-
-                                {% if dernierTraitement and dernierTraitement.commentaire %}
-                                    <div class="info-item">
-                                        <div class="info-label">
-                                            <i class="fas fa-comments"></i>
-                                            <span>Commentaire Admin</span>
+                                <div class="info-container">
+                                    <div class="info-row">
+                                        <div class="info-item">
+                                            <div class="info-label">
+                                                <i class="fas fa-map-marker-alt"></i>
+                                                <span>Adresse</span>
+                                            </div>
+                                            <div class="info-content">{{ demande.adresse }}</div>
                                         </div>
-                                        <div class="info-content">{{ dernierTraitement.commentaire }}</div>
+                                        
+                                        <div class="info-item">
+                                            <div class="info-label">
+                                                <i class="fas fa-envelope"></i>
+                                                <span>Email</span>
+                                            </div>
+                                            <div class="info-content">{{ demande.emailUtilisateur }}</div>
+                                        </div>
                                     </div>
-                                {% endif %}
+
+                                    <div class="info-item message-item">
+                                        <div class="info-label">
+                                            <i class="fas fa-comment-alt"></i>
+                                            <span>Message</span>
+                                        </div>
+                                        <div class="info-content message-preview">{{ demande.message }}</div>
+                                    </div>
+
+                                    {% if dernierTraitement and dernierTraitement.commentaire %}
+                                        <div class="info-item comment-item">
+                                            <div class="info-label">
+                                                <i class="fas fa-comments"></i>
+                                                <span>Commentaire Admin</span>
+                                            </div>
+                                            <div class="info-content">{{ dernierTraitement.commentaire }}</div>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                            <div class="card-footer">
+                                <a href="{{ path('app_demande_show', {'id': demande.id}) }}" class="custom-btn btn-back">
+                                    <i class="fas fa-eye"></i> Voir
+                                </a>
+                                <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="custom-btn btn-edit">
+                                    <i class="fas fa-edit"></i> Modifier
+                                </a>
                             </div>
                         </div>
-                        <div class="card-footer">
-                            <a href="{{ path('app_demande_show', {'id': demande.id}) }}" class="custom-btn btn-back">
-                                <i class="fas fa-eye"></i> Voir
-                            </a>
-                            <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="custom-btn btn-edit">
-                                <i class="fas fa-edit"></i> Modifier
-                            </a>
-                        </div>
                     </div>
-                </div>
-            {% endfor %}
-        </div>
-    {% endif %}
+                {% endfor %}
+            </div>
+        {% endif %}
+    </div>
 </div>
 {% endblock %}
 
@@ -107,100 +108,293 @@
 {{ parent() }}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
+    :root {
+        --primary-color: #2C5E1A;
+        --primary-light: #1a7718;
+        --secondary-color: #f8f9fa;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #e0e0e0;
+        /* Status Colors */
+        --success-bg: #e8f5e9;
+        --success-color: #2e7d32;
+        --success-border: #a5d6a7;
+        --danger-bg: #ffebee;
+        --danger-color: #c62828;
+        --danger-border: #ef9a9a;
+        --warning-bg: #fff3e0;
+        --warning-color: #ef6c00;
+        --warning-border: #ffcc80;
+    }
+
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
     .title-container {
         text-align: center;
         margin-bottom: 40px;
+        position: relative;
     }
 
     .main-title {
-        color: #333;
-        font-size: 2.5rem;
-        font-weight: 600;
+        color: var(--text-color);
+        font-size: 2.8rem;
+        font-weight: 700;
         margin: 0;
         padding: 0;
-        font-family: Arial, sans-serif;
+        position: relative;
+        display: inline-block;
+    }
+
+    .main-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        border-radius: 2px;
+    }
+
+    .demandes-container {
+        background: white;
+        border-radius: 15px;
+        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
+        padding: 20px;
+        margin-top: 30px;
+    }
+
+    .demandes-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 25px;
+        gap: 20px;
+        flex-wrap: wrap;
     }
 
     .search-container {
-        max-width: 600px;
-        margin: 0 auto 30px;
+        flex: 1;
+        min-width: 300px;
     }
 
-    .input-group-text {
-        background: linear-gradient(145deg, #2C5E1A, #1a7718);
-        border: none;
-        color: white;
+    .input-group {
+        background: var(--secondary-color);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .input-group:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(44, 94, 26, 0.1);
     }
 
     .input-group .form-control {
-        border-radius: 10px;
-        border: 1px solid #e0e0e0;
-        padding: 0.75rem;
+        border: none;
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        background: transparent;
     }
 
     .input-group .form-control:focus {
-        border-color: #2C5E1A;
-        box-shadow: 0 0 0 0.2rem rgba(44, 94, 26, 0.25);
+        box-shadow: none;
+    }
+
+    .input-group .form-control::placeholder {
+        color: var(--text-light);
+        opacity: 0.7;
+    }
+
+    .input-group-text {
+        background: transparent;
+        border: none;
+        color: var(--primary-color);
+        padding: 0 15px;
+    }
+
+    .input-group-text i {
+        font-size: 1.1rem;
+    }
+
+    .actions-container {
+        display: flex;
+        gap: 10px;
     }
 
     .custom-card {
-        background: #ffffff;
-        border-radius: 15px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
         border: none;
         overflow: hidden;
         height: 100%;
         max-width: 400px;
         margin: 0 auto;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .custom-card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 15px;
+        padding-bottom: 10px;
+        border-bottom: 1px solid var(--border-color);
     }
 
     .type-badge {
         display: inline-block;
-        background: linear-gradient(145deg, #2C5E1A, #000000);
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
         color: white;
         padding: 8px 15px;
         border-radius: 20px;
         font-size: 1rem;
-        margin-bottom: 20px;
+        font-weight: 600;
+        letter-spacing: 0.5px;
+        box-shadow: 0 2px 10px rgba(44, 94, 26, 0.2);
         transition: all 0.3s ease;
     }
 
     .type-badge:hover {
-        background: linear-gradient(145deg, #000000, #2C5E1A);
-        transform: translateY(-2px);
+        transform: translateY(-1px);
+        box-shadow: 0 4px 15px rgba(44, 94, 26, 0.3);
+    }
+
+    .status-badge-container {
+        display: flex;
+        align-items: center;
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 8px 15px;
+        border-radius: 20px;
+        font-weight: 600;
+        font-size: 0.9rem;
+        border: 1px solid transparent;
+        transition: all 0.3s ease;
+    }
+
+    .status-badge i {
+        font-size: 1rem;
+    }
+
+    .status-badge.success {
+        background: var(--success-bg);
+        color: var(--success-color);
+        border-color: var(--success-border);
+        box-shadow: 0 2px 8px rgba(46, 125, 50, 0.1);
+    }
+
+    .status-badge.success:hover {
+        background: #d7ffd9;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(46, 125, 50, 0.15);
+    }
+
+    .status-badge.danger {
+        background: var(--danger-bg);
+        color: var(--danger-color);
+        border-color: var(--danger-border);
+        box-shadow: 0 2px 8px rgba(198, 40, 40, 0.1);
+    }
+
+    .status-badge.danger:hover {
+        background: #ffd5d5;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(198, 40, 40, 0.15);
+    }
+
+    .status-badge.warning {
+        background: var(--warning-bg);
+        color: var(--warning-color);
+        border-color: var(--warning-border);
+        box-shadow: 0 2px 8px rgba(239, 108, 0, 0.1);
+    }
+
+    .status-badge.warning:hover {
+        background: #ffe0b2;
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(239, 108, 0, 0.15);
     }
 
     .info-container {
         display: flex;
         flex-direction: column;
-        gap: 15px;
+        gap: 12px;
+    }
+
+    .info-row {
+        display: flex;
+        gap: 12px;
     }
 
     .info-item {
+        flex: 1;
         display: flex;
         flex-direction: column;
         gap: 5px;
+        padding: 10px;
+        border-radius: 10px;
+        background: var(--secondary-color);
+        border: 1px solid var(--border-color);
+    }
+
+    .message-item, .comment-item {
+        flex: none;
+        width: 100%;
     }
 
     .info-label {
         display: flex;
         align-items: center;
         gap: 8px;
-        color: #2C5E1A;
+        color: var(--primary-color);
         font-weight: 600;
+        font-size: 0.9rem;
+    }
+
+    .info-label i {
+        color: var(--primary-color);
+        font-size: 1rem;
     }
 
     .info-content {
-        color: #666;
+        color: var(--text-light);
         padding-left: 25px;
+        line-height: 1.4;
+        font-size: 0.9rem;
+    }
+
+    .message-preview {
+        max-height: 60px;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        display: -webkit-box;
+        -webkit-line-clamp: 2;
+        -webkit-box-orient: vertical;
     }
 
     .card-footer {
         display: flex;
         justify-content: space-between;
         padding: 15px;
-        background: #f8f9fa;
-        border-top: 1px solid #eee;
+        background: var(--secondary-color);
+        border-top: 1px solid var(--border-color);
+        margin-top: 10px;
     }
 
     .custom-btn {
@@ -209,63 +403,66 @@
         gap: 8px;
         padding: 8px 15px;
         border-radius: 20px;
-        text-decoration: none;
-        transition: all 0.3s ease;
-        border: none;
-        font-size: 14px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-size: 0.9rem;
+        font-weight: 500;
     }
 
     .btn-back {
-        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
         color: white;
     }
 
     .btn-edit {
-        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
         color: white;
     }
 
     .custom-btn:hover {
         transform: translateY(-2px);
-        box-shadow: 0 4px 8px rgba(0,0,0,0.2);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
     }
 
-    .status-badge {
-        display: inline-flex;
-        align-items: center;
-        gap: 5px;
-        padding: 6px 12px;
-        border-radius: 20px;
-        font-weight: 500;
-    }
-
-    .status-badge.success {
-        background-color: #d4edda;
-        color: #155724;
-    }
-
-    .status-badge.danger {
-        background-color: #f8d7da;
-        color: #721c24;
-    }
-
-    .status-badge.warning {
-        background-color: #fff3cd;
-        color: #856404;
-    }
-
-    /* Adjust card layout for better responsiveness */
-    @media (min-width: 768px) {
-        .row-cols-md-3 > * {
-            flex: 0 0 33.333333%;
-            max-width: 33.333333%;
+    @media (max-width: 768px) {
+        .main-title {
+            font-size: 2.2rem;
         }
-    }
-
-    /* Ensure content doesn't overflow */
-    .info-content {
-        word-break: break-word;
+        
+        .demandes-header {
+            flex-direction: column;
+            gap: 15px;
+        }
+        
+        .search-container {
+            width: 100%;
+        }
+        
+        .actions-container {
+            width: 100%;
+        }
+        
+        .actions-container .custom-btn {
+            width: 100%;
+            justify-content: center;
+        }
+        
+        .info-row {
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .info-item {
+            width: 100%;
+        }
+        
+        .card-footer {
+            flex-direction: column;
+            gap: 8px;
+        }
+        
+        .custom-btn {
+            width: 100%;
+            justify-content: center;
+        }
     }
 </style>
 {% endblock %}
@@ -278,6 +475,14 @@ document.addEventListener('DOMContentLoaded', function() {
     const demandesContainer = document.getElementById('demandesContainer');
     const demandeCards = document.querySelectorAll('.demande-card');
 
+    // Add animation class to cards on load
+    demandeCards.forEach((card, index) => {
+        setTimeout(() => {
+            card.style.opacity = '1';
+            card.style.transform = 'translateY(0)';
+        }, index * 100);
+    });
+
     searchInput.addEventListener('input', function() {
         const searchTerm = this.value.toLowerCase();
         
@@ -285,12 +490,17 @@ document.addEventListener('DOMContentLoaded', function() {
             const searchableText = card.getAttribute('data-search');
             if (searchableText.includes(searchTerm)) {
                 card.style.display = '';
+                card.style.opacity = '1';
+                card.style.transform = 'translateY(0)';
             } else {
-                card.style.display = 'none';
+                card.style.opacity = '0';
+                card.style.transform = 'translateY(20px)';
+                setTimeout(() => {
+                    card.style.display = 'none';
+                }, 300);
             }
         });
 
-        // Check if any cards are visible
         const visibleCards = Array.from(demandesContainer.querySelectorAll('.demande-card'))
             .filter(card => card.style.display !== 'none');
 

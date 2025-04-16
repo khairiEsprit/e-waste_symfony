@@ -22,25 +22,29 @@
                     <div class="row">
                         <div class="col-md-6">
                             <div class="info-section mb-4">
-                                <h5 class="text-muted mb-3">Informations du Traitement</h5>
+                                <h5 class="section-title">
+                                    <i class="fas fa-info-circle text-success me-2"></i>
+                                    Informations du Traitement
+                                </h5>
                                 <div class="table-responsive">
                                     <table class="table table-borderless">
                                         <tbody>
                                             <tr>
                                                 <th class="text-muted" style="width: 40%">ID</th>
-                                                <td>{{ traitement.id }}</td>
+                                                <td class="fw-semibold">{{ traitement.id }}</td>
                                             </tr>
                                             <tr>
                                                 <th class="text-muted">Statut</th>
                                                 <td>
-                                                    <span class="badge bg-{{ traitement.status == 'Traité' ? 'success' : (traitement.status == 'Refusé' ? 'danger' : 'warning') }}">
+                                                    <span class="status-badge {{ traitement.status == 'Traité' ? 'success' : (traitement.status == 'Refusé' ? 'danger' : 'warning') }}">
+                                                        <i class="fas {{ traitement.status == 'Traité' ? 'fa-check-circle' : (traitement.status == 'Refusé' ? 'fa-times-circle' : 'fa-clock') }} me-1"></i>
                                                         {{ traitement.status }}
                                                     </span>
                                                 </td>
                                             </tr>
                                             <tr>
                                                 <th class="text-muted">Date de traitement</th>
-                                                <td>{{ traitement.dateTraitement ? traitement.dateTraitement|date('d/m/Y') : 'Non spécifiée' }}</td>
+                                                <td class="fw-semibold">{{ traitement.dateTraitement ? traitement.dateTraitement|date('d/m/Y H:i') : 'Non spécifiée' }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -49,25 +53,28 @@
                         </div>
                         <div class="col-md-6">
                             <div class="info-section mb-4">
-                                <h5 class="text-muted mb-3">Détails de la Demande</h5>
+                                <h5 class="section-title">
+                                    <i class="fas fa-file-alt text-success me-2"></i>
+                                    Détails de la Demande
+                                </h5>
                                 <div class="table-responsive">
                                     <table class="table table-borderless">
                                         <tbody>
                                             <tr>
                                                 <th class="text-muted" style="width: 40%">Email Utilisateur</th>
-                                                <td>{{ traitement.demande.emailUtilisateur }}</td>
+                                                <td class="fw-semibold">{{ traitement.demande.emailUtilisateur }}</td>
                                             </tr>
                                             <tr>
                                                 <th class="text-muted">Type</th>
-                                                <td>{{ traitement.demande.type }}</td>
+                                                <td class="fw-semibold">{{ traitement.demande.type }}</td>
                                             </tr>
                                             <tr>
                                                 <th class="text-muted">Adresse</th>
-                                                <td>{{ traitement.demande.adresse }}</td>
+                                                <td class="fw-semibold">{{ traitement.demande.adresse }}</td>
                                             </tr>
                                             <tr>
                                                 <th class="text-muted">Message</th>
-                                                <td>{{ traitement.demande.message }}</td>
+                                                <td class="fw-semibold">{{ traitement.demande.message }}</td>
                                             </tr>
                                         </tbody>
                                     </table>
@@ -79,9 +86,12 @@
                     <div class="row">
                         <div class="col-12">
                             <div class="info-section">
-                                <h5 class="text-muted mb-3">Commentaire</h5>
-                                <div class="card bg-light">
-                                    <div class="card-body">
+                                <h5 class="section-title">
+                                    <i class="fas fa-comment text-success me-2"></i>
+                                    Commentaire
+                                </h5>
+                                <div class="comment-card">
+                                    <div class="comment-content">
                                         {{ traitement.commentaire ? traitement.commentaire : 'Aucun commentaire' }}
                                     </div>
                                 </div>
@@ -91,7 +101,10 @@
                 </div>
                 <div class="card-footer bg-white">
                     <div class="d-flex justify-content-between align-items-center">
-                        <small class="text-muted">Dernière mise à jour: {{ traitement.dateTraitement ? traitement.dateTraitement|date('d/m/Y H:i') : 'Non spécifiée' }}</small>
+                        <small class="text-muted">
+                            <i class="fas fa-clock me-1"></i>
+                            Dernière mise à jour: {{ traitement.dateTraitement ? traitement.dateTraitement|date('d/m/Y H:i') : 'Non spécifiée' }}
+                        </small>
                         <button type="button" class="btn btn-outline-danger" data-bs-toggle="modal" data-bs-target="#deleteModal">
                             <i class="fas fa-trash"></i> Supprimer
                         </button>
@@ -126,43 +139,138 @@
 {% block stylesheets %}
 {{ parent() }}
 <style>
-    .info-section {
-        background-color: #f8f9fa;
-        border-radius: 8px;
-        padding: 1.5rem;
-        margin-bottom: 1.5rem;
+    :root {
+        --primary-color: #2C5E1A;
+        --primary-light: #1a7718;
+        --secondary-color: #f8f9fa;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #e0e0e0;
+        --success-color: #2C5E1A;
+        --warning-color: #ffc107;
+        --danger-color: #dc3545;
     }
 
     .card {
         border: none;
-        border-radius: 10px;
-        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        border-radius: 12px;
+        box-shadow: 0 4px 6px rgba(0,0,0,0.1);
     }
 
     .card-header {
-        border-bottom: 1px solid rgba(0,0,0,0.1);
+        border-bottom: 1px solid var(--border-color);
+        padding: 1.25rem 1.5rem;
+    }
+
+    .section-title {
+        color: var(--text-color);
+        font-size: 1.1rem;
+        font-weight: 600;
+        margin-bottom: 1.25rem;
+        padding-bottom: 0.75rem;
+        border-bottom: 2px solid var(--primary-color);
+    }
+
+    .info-section {
+        background-color: var(--secondary-color);
+        border-radius: 10px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
     }
 
     .table-borderless th {
         font-weight: 500;
+        color: var(--text-light);
     }
 
-    .badge {
-        padding: 0.5em 0.75em;
+    .table-borderless td {
+        color: var(--text-color);
+    }
+
+    .status-badge {
+        display: inline-flex;
+        align-items: center;
+        padding: 0.5rem 0.75rem;
+        border-radius: 6px;
         font-weight: 500;
+        font-size: 0.9rem;
     }
 
-    .btn-group .btn {
-        margin-left: 0.5rem;
+    .status-badge.success {
+        background-color: rgba(44, 94, 26, 0.1);
+        color: var(--success-color);
+    }
+
+    .status-badge.warning {
+        background-color: rgba(255, 193, 7, 0.1);
+        color: var(--warning-color);
+    }
+
+    .status-badge.danger {
+        background-color: rgba(220, 53, 69, 0.1);
+        color: var(--danger-color);
+    }
+
+    .comment-card {
+        background-color: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05);
+    }
+
+    .comment-content {
+        color: var(--text-color);
+        line-height: 1.6;
     }
 
     .btn-success {
-        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
         border: none;
+        padding: 0.5rem 1rem;
     }
 
     .btn-success:hover {
-        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(44, 94, 26, 0.15);
+    }
+
+    .btn-outline-secondary {
+        border: 1px solid var(--border-color);
+        color: var(--text-color);
+    }
+
+    .btn-outline-secondary:hover {
+        background-color: var(--secondary-color);
+        color: var(--text-color);
+    }
+
+    .btn-outline-danger {
+        border: 1px solid var(--danger-color);
+        color: var(--danger-color);
+    }
+
+    .btn-outline-danger:hover {
+        background-color: var(--danger-color);
+        color: white;
+    }
+
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .btn-group {
+            width: 100%;
+            justify-content: space-between;
+        }
+
+        .btn {
+            flex: 1;
+            margin: 0 0.25rem;
+        }
     }
 </style>
 {% endblock %}
