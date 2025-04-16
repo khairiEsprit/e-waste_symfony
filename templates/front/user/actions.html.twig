@@ -2,69 +2,90 @@
 
 {% block title %}Submit Actions{% endblock %}
 
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('assets/front/assets/css/gamification.css') }}" rel="stylesheet">
+{% endblock %}
+
 {% block body %}
-<div class="container py-5">
-    <div class="row">
-        <div class="col-md-8 mx-auto">
-            <div class="card shadow-sm">
-                <div class="card-header bg-primary text-white">
-                    <h3 class="mb-0">Submit Waste Disposal Action</h3>
-                </div>
-                <div class="card-body">
-                    {% for label, messages in app.flashes %}
-                        {% for message in messages %}
-                            <div class="alert alert-{{ label }} alert-dismissible fade show">
-                                {{ message }}
-                                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                            </div>
-                        {% endfor %}
+<div class="gamification-container">
+    <div class="container">
+        <h1 class="page-title animate-fadeIn">Submit Recycling Actions</h1>
+        <p class="page-subtitle animate-fadeIn delay-100">Complete eco-friendly actions to earn points and badges!</p>
+
+        <div class="row">
+            <div class="col-md-8 mx-auto">
+                {% for label, messages in app.flashes %}
+                    {% for message in messages %}
+                        <div class="alert alert-{{ label }} alert-dismissible fade show animate-fadeIn">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
                     {% endfor %}
-                    
-                    <p class="lead">Select an action you've completed to earn points!</p>
-                    
-                    {{ form_start(form, {'action': path('user_action_submit'), 'method': 'POST'}) }}
-                        <div class="mb-3">
-                            {{ form_label(form.action) }}
-                            {{ form_widget(form.action) }}
-                            {{ form_errors(form.action) }}
-                        </div>
-                        
-                        <div class="mb-3">
-                            {{ form_label(form.comment) }}
-                            {{ form_widget(form.comment) }}
-                            {{ form_errors(form.comment) }}
-                        </div>
-                        
-                        <button type="submit" class="btn btn-primary">Submit Action</button>
-                    {{ form_end(form) }}
+                {% endfor %}
+
+                <div class="gamification-card animate-fadeIn delay-200">
+                    <div class="card-header bg-primary text-white">
+                        <h3 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Submit Waste Disposal Action</h3>
+                    </div>
+                    <div class="card-body">
+                        <p class="lead">Select an action you've completed to earn points and climb the leaderboard!</p>
+
+                        {{ form_start(form, {'action': path('user_action_submit'), 'method': 'POST'}) }}
+                            <div class="mb-3">
+                                {{ form_label(form.action, 'Select Your Action', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.action, {'attr': {'class': 'form-control form-select'}}) }}
+                                {{ form_errors(form.action) }}
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.comment, 'Add Details (Optional)', {'label_attr': {'class': 'form-label'}}) }}
+                                {{ form_widget(form.comment, {'attr': {'class': 'form-control', 'placeholder': 'Tell us more about your recycling action...'}}) }}
+                                {{ form_errors(form.comment) }}
+                            </div>
+
+                            <button type="submit" class="btn btn-gamification btn-primary">
+                                <i class="bi bi-check-circle me-2"></i>Submit Action
+                            </button>
+                        {{ form_end(form) }}
+                    </div>
                 </div>
-            </div>
-            
-            <div class="card shadow-sm mt-4">
-                <div class="card-header bg-success text-white">
-                    <h3 class="mb-0">Available Actions</h3>
-                </div>
-                <div class="card-body">
-                    <div class="row">
-                        {% for action in actions %}
-                            <div class="col-md-6 mb-3">
-                                <div class="card h-100">
-                                    <div class="card-body">
-                                        <h5 class="card-title">{{ action.name }}</h5>
-                                        <h6 class="card-subtitle mb-2 text-muted">{{ action.points }} points</h6>
-                                        <p class="card-text">{{ action.description }}</p>
+
+                <div class="gamification-card animate-fadeIn delay-300">
+                    <div class="card-header bg-success text-white">
+                        <h3 class="mb-0"><i class="bi bi-list-check me-2"></i>Available Actions</h3>
+                    </div>
+                    <div class="card-body">
+                        <div class="row">
+                            {% for action in actions %}
+                                <div class="col-md-6 mb-3">
+                                    <div class="action-card">
+                                        <div class="card-body">
+                                            <h5 class="card-title">{{ action.name }}</h5>
+                                            <h6 class="card-subtitle mb-2">{{ action.points }} points</h6>
+                                            <p class="card-text">{{ action.description }}</p>
+                                            <div class="progress" data-bs-toggle="tooltip" title="Earn {{ action.points }} points">
+                                                <div class="progress-bar" role="progressbar" style="width: 100%"
+                                                     aria-valuenow="100" aria-valuemin="0" aria-valuemax="100"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
-                            </div>
-                        {% else %}
-                            <div class="col-12">
-                                <p class="text-center">No actions available at this time.</p>
-                            </div>
-                        {% endfor %}
+                            {% else %}
+                                <div class="col-12">
+                                    <p class="text-center">No actions available at this time.</p>
+                                </div>
+                            {% endfor %}
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
 </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="{{ asset('assets/front/assets/js/gamification.js') }}"></script>
 {% endblock %}
