@@ -1,0 +1,167 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Our Centres | ASD{% endblock %}
+
+{% block body %}
+<!-- ======= Centres Header Section ======= -->
+<section id="centres-header" class="centres-header">
+  <div class="container" data-aos="fade-up">
+    <div class="section-title">
+      <h2>Our Centres</h2>
+      <p>Discover our network of professional centres across the country, each offering top-quality services and facilities.</p>
+    </div>
+  </div>
+</section><!-- End Centres Header Section -->
+
+<!-- ======= Centres Grid Section ======= -->
+<section id="centres" class="centres wrapper">
+  <div class="container" data-aos="fade-up">
+    <div class="row">
+      {% for centre in centres %}
+        <div class="col-sm-12 col-md-6 col-lg-4 mb-4">
+                  <a href="{{ path('app_centre_detailsFront', {'id': centre.id}) }}" class="card-link">
+
+          <div class="card text-white card-has-bg click-col" style="background-image:url('{{ asset('assets/front/assets/img/centres/centre1.jpeg') }}');">
+            <img class="card-img d-none" src="{{ asset('assets/front/assets/img/centres/centre1.jpeg') }}" alt="{{ centre.nom }}">
+            <div class="card-img-overlay d-flex flex-column">
+              <div class="card-body">
+                <h4 class="card-title mt-0">{{ centre.nom }}</h4>
+                <p><i class="bi bi-geo-alt"></i> Coordinates: {{ centre.longitude }}, {{ centre.altitude }}</p>
+                <p><i class="bi bi-telephone"></i> {{ centre.telephone|slice(0, 2) }} {{ centre.telephone|slice(2, 2) }} {{ centre.telephone|slice(4, 2) }} {{ centre.telephone|slice(6, 2) }}</p>
+              </div>
+              <div class="card-footer">
+                <a href="{{ path('app_centre_detailsFront', {'id': centre.id}) }}" class="btn btn-custom">View Details</a>
+              </div>
+            </div>
+          </div>
+        </div>
+      {% else %}
+        <div class="col-12">
+          <div class="no-centres text-center py-5">
+            <i class="bi bi-building-exclamation" style="font-size: 3rem; color: #ccc;"></i>
+            <h4 class="mt-3">No centres available at the moment</h4>
+            <p>Please check back later or contact our support team.</p>
+          </div>
+        </div>
+      {% endfor %}
+    </div>
+  </div>
+</section><!-- End Centres Grid Section -->
+
+<style>
+body {
+  background: rgb(255, 255, 255);
+}
+
+.wrapper {
+  margin: 10vh;
+}
+
+.card {
+  border: none;
+  transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+  overflow: hidden;
+  border-radius: 20px;
+  min-height: 350px;
+  box-shadow: 0 0 12px 0 rgba(0,0,0,0.2);
+}
+
+.card-title {
+  font-weight: 1000;
+  color: #f8f9fa; /* Couleur de texte claire */
+  text-shadow: 1px 1px 3px rgba(0,0,0,0.5); /* Ombre pour améliorer la lisibilité */
+  transition: all 0.3s ease;
+}
+
+.card:hover .card-title {
+  color: #ffffff; /* Un blanc plus vif au survol */
+  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
+}
+
+.card.card-has-bg {
+  transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+  background-size: 120%;
+  background-repeat: no-repeat;
+  background-position: center center;
+}
+
+.card.card-has-bg:before {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  background: inherit;
+  filter: grayscale(100%);
+}
+
+.card.card-has-bg:hover {
+  transform: scale(0.98);
+  box-shadow: 0 0 5px -2px rgba(0,0,0,0.3);
+  background-size: 130%;
+  transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card.card-has-bg:hover .card-img-overlay {
+  transition: all 800ms cubic-bezier(0.19, 1, 0.22, 1);
+  background: rgb(34, 139, 34);
+  background: linear-gradient(0deg, rgba(34, 139, 34, 0.3) 0%, rgba(34, 139, 34, 0.8) 100%);
+}
+
+.card-footer {
+  background: transparent;
+  border-top: none;
+}
+
+.card-title {
+  font-weight: 1000;
+}
+
+.card-body {
+  transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card:hover .card-body {
+  margin-top: 30px;
+  transition: all 800ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card:hover {
+  cursor: pointer;
+  transition: all 800ms cubic-bezier(0.19, 1, 0.22, 1);
+}
+
+.card-img-overlay {
+  transition: all 800ms cubic-bezier(0.19, 1, 0.22, 1);
+  background: rgb(34, 139, 34);
+  background: linear-gradient(0deg, rgba(34, 139, 34, 0.2) 0%, rgba(34, 139, 34, 0.7) 100%);
+}
+
+.btn-custom {
+  background: linear-gradient(90deg, rgba(34, 139, 34, 0.7) 0%, rgba(34, 139, 34, 1) 100%);
+  color: white;
+  border: none;
+  border-radius: 25px;
+  padding: 10px 20px;
+  transition: all 0.3s ease;
+}
+
+.btn-custom:hover {
+  background: linear-gradient(90deg, rgba(34, 139, 34, 1) 0%, rgba(34, 139, 34, 0.7) 100%);
+  color: white;
+}
+
+@media (max-width: 768px) {
+  .card {
+    min-height: 300px;
+  }
+}
+
+@media (max-width: 420px) {
+  .card {
+    min-height: 250px;
+  }
+}
+</style>
+{% endblock %}
