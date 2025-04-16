@@ -1,0 +1,7 @@
+# framework:
+#     scheduler:
+#         tasks:
+#             send_event_reminders:
+#                 command: 'app:send-event-reminders'
+#                 cron: '0 9 * * *'  # Run daily at 9:00 AM
+#                 description: 'Send reminder emails to participants one day before their events'

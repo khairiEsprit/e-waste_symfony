@@ -1,0 +1,492 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier Avis{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        :root {
+            --dark-green: #013220;
+            --deep-green: #00693E;
+            --medium-green: #29AB87;
+            --light-green: #ACE1AF;
+            --cream-white: #FEFEFA;
+            --orange: #FF6B35;
+            --red: #D64045;
+            --blue: #3A86FF;
+            --light-gray: #F8F9FA;
+            --dark-gray: #343A40;
+        }
+        
+        /* Custom file upload styling */
+        .custom-file-input::-webkit-file-upload-button {
+            visibility: hidden;
+            width: 0;
+        }
+        
+        .custom-file-input::before {
+            content: 'Choisir une image';
+            display: inline-block;
+            background: linear-gradient(145deg, var(--medium-green), var(--deep-green));
+            color: white;
+            border-radius: 50px;
+            padding: 8px 20px;
+            outline: none;
+            white-space: nowrap;
+            cursor: pointer;
+            font-weight: 600;
+            font-size: 0.9rem;
+            margin-right: 10px;
+            transition: all 0.3s ease;
+        }
+        
+        .custom-file-input:hover::before {
+            background: linear-gradient(145deg, var(--deep-green), var(--medium-green));
+            transform: translateY(-2px);
+            box-shadow: 0 4px 15px rgba(41, 171, 135, 0.4);
+        }
+        
+        .current-image {
+            padding: 15px;
+            border-radius: 8px;
+            background-color: rgba(172, 225, 175, 0.2);
+            border: 1px dashed var(--medium-green);
+        }
+
+        .main-content {
+            transform: translateY(70px);
+            margin-bottom: 70px;
+        }
+
+        .edit-container {
+            max-width: 800px;
+            margin: 40px auto;
+        }
+
+        .edit-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            background: white;
+        }
+
+        .edit-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 105, 62, 0.15);
+        }
+
+        .edit-card .card-header {
+            background: linear-gradient(135deg, var(--deep-green), var(--medium-green));
+            color: white;
+            padding: 25px;
+            border-bottom: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .edit-card .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .edit-card .card-title {
+            font-weight: 600;
+            margin: 0;
+            display: flex;
+            align-items: center;
+            font-size: 1.5rem;
+        }
+
+        .edit-card .card-title i {
+            margin-right: 15px;
+            font-size: 1.8rem;
+        }
+
+        .edit-card .card-body {
+            padding: 30px;
+            background-color: var(--light-gray);
+        }
+
+        .edit-card .card-footer {
+            background-color: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding: 20px 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Boutons améliorés */
+        .btn-back {
+            background: white;
+            color: var(--deep-green);
+            border: 2px solid var(--deep-green);
+            padding: 10px 25px;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-back:hover {
+            background: var(--deep-green);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 105, 62, 0.3);
+        }
+
+        .btn-update {
+            background: var(--medium-green);
+            color: white;
+            padding: 12px 30px;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            font-weight: 600;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(41, 171, 135, 0.3);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .btn-update:hover {
+            background: var(--deep-green);
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 7px 20px rgba(0, 105, 62, 0.4);
+        }
+
+        .btn-delete {
+            background: white;
+            color: var(--red);
+            border: 2px solid var(--red);
+            padding: 10px 25px;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-delete:hover {
+            background: var(--red);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(214, 64, 69, 0.3);
+        }
+
+        /* Style pour les champs du formulaire */
+        .form-group {
+            margin-bottom: 1.5rem;
+        }
+
+        .form-control {
+            border-radius: 8px;
+            border: 1px solid #ddd;
+            padding: 12px 15px;
+            transition: all 0.3s;
+        }
+
+        .form-control:focus {
+            border-color: var(--medium-green);
+            box-shadow: 0 0 0 0.25rem rgba(41, 171, 135, 0.25);
+        }
+
+        .form-label {
+            font-weight: 600;
+            color: var(--dark-green);
+            margin-bottom: 8px;
+        }
+
+        /* Style pour la boîte de dialogue SweetAlert */
+        .swal2-popup {
+            border-radius: 16px !important;
+            font-family: inherit !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .swal2-title {
+            color: var(--dark-gray) !important;
+            font-size: 1.5rem !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-html-container {
+            color: #555 !important;
+            font-size: 1.1rem !important;
+        }
+
+        .swal2-confirm {
+            background-color: var(--medium-green) !important;
+            border: none !important;
+            padding: 10px 25px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-confirm:hover {
+            background-color: var(--deep-green) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 10px rgba(0, 105, 62, 0.3) !important;
+        }
+
+        .swal2-cancel {
+            border: 2px solid var(--dark-gray) !important;
+            color: var(--dark-gray) !important;
+            padding: 10px 25px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-cancel:hover {
+            background-color: var(--light-gray) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .edit-container {
+                margin: 20px auto;
+                padding: 0 15px;
+            }
+            
+            .edit-card .card-body {
+                padding: 20px;
+            }
+            
+            .edit-card .card-footer {
+                flex-direction: column;
+                gap: 10px;
+            }
+            
+            .btn-back {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 10px;
+            }
+            
+            .btn-group {
+                width: 100%;
+                justify-content: center;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        // Fonction pour confirmer la suppression
+        function confirmDelete(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            
+            Swal.fire({
+                title: 'Confirmer la suppression',
+                html: 'Êtes-vous sûr de vouloir supprimer cet avis ?<br><small>Cette action est irréversible</small>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--red)',
+                cancelButtonColor: 'var(--dark-gray)',
+                confirmButtonText: 'Oui, supprimer',
+                cancelButtonText: 'Annuler',
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    htmlContainer: 'swal2-html-container',
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                },
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+
+        // Fonction pour confirmer la modification
+        function confirmUpdate(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            
+            Swal.fire({
+                title: 'Confirmer la modification',
+                html: 'Voulez-vous vraiment enregistrer les modifications apportées à cet avis ?',
+                icon: 'question',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--medium-green)',
+                cancelButtonColor: 'var(--dark-gray)',
+                confirmButtonText: 'Oui, enregistrer',
+                cancelButtonText: 'Annuler',
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    htmlContainer: 'swal2-html-container',
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                },
+                buttonsStyling: false,
+                reverseButtons: true
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+
+        // Attacher l'événement au formulaire de modification
+        document.addEventListener('DOMContentLoaded', function() {
+            const updateForm = document.querySelector('form[name="avi"]');
+            if (updateForm) {
+                updateForm.addEventListener('submit', confirmUpdate);
+            }
+        });
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main-content">
+        <div class="edit-container">
+            <div class="edit-card card">
+                <div class="card-header">
+                    <h1 class="card-title">
+                        <i class="fas fa-edit"></i>
+                        Modifier l'avis #{{ avi.id }}
+                    </h1>
+                </div>
+
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'class': 'edit-form'}}) }}
+                        <div class="form-group">
+                            {{ form_label(form.nom, 'Nom', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.nom, {'attr': {'class': 'form-control'}}) }}
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form_label(form.avis, 'Avis', {'label_attr': {'class': 'form-label'}}) }}
+                            {{ form_widget(form.avis, {'attr': {'class': 'form-control', 'rows': 5}}) }}
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form_label(form.note, 'Note', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="star-rating">
+                                {% for i in 1..5 %}
+                                    <i class="far fa-star star-selector" data-value="{{ i }}" style="font-size: 1.8rem; cursor: pointer; margin-right: 5px; color: {{ i <= form.note.vars.value ? '#FFC107' : '#E0E0E0' }}"></i>
+                                {% endfor %}
+                                {{ form_widget(form.note, {'attr': {'class': 'd-none'}}) }}
+                            </div>
+                        </div>
+                        
+                        <div class="form-group">
+                            {{ form_label(form.image, 'Image (optionnel)', {'label_attr': {'class': 'form-label'}}) }}
+                            <div class="custom-file-upload">
+                                {{ form_widget(form.image, {'attr': {'class': 'form-control custom-file-input'}}) }}
+                                <small class="form-text text-muted">Formats acceptés: JPEG, PNG, GIF. Taille max: 5 Mo.</small>
+                                
+                                {% if avi.image %}
+                                <div class="current-image mt-3">
+                                    <p class="mb-2"><strong>Image actuelle:</strong></p>
+                                    <img src="{{ asset('uploads/avis/' ~ avi.image) }}" alt="Image de l'avis" class="img-fluid rounded" style="max-height: 200px; max-width: 100%;">
+                                    <p class="text-muted mt-2 small">Téléchargez une nouvelle image pour remplacer celle-ci.</p>
+                                </div>
+                                {% endif %}
+                                
+                                <div class="file-preview mt-3 d-none" id="image-preview-container">
+                                    <p class="mb-2"><strong>Nouvelle image:</strong></p>
+                                    <img id="image-preview" src="#" alt="Aperçu de l'image" class="img-fluid rounded" style="max-height: 200px; max-width: 100%;">
+                                    <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="remove-image-btn">
+                                        <i class="fas fa-times"></i> Annuler
+                                    </button>
+                                </div>
+                            </div>
+                            {{ form_errors(form.image, {'attr': {'class': 'text-danger mt-2'}}) }}
+                        </div>
+                        
+                        <div class="d-flex justify-content-end mt-4">
+                            <button type="submit" class="btn btn-update">
+                                <i class="fas fa-save me-2"></i> Mettre à jour
+                            </button>
+                        </div>
+                    {{ form_end(form) }}
+                </div>
+
+                <div class="card-footer">
+                    <a href="{{ path('app_avis_index') }}" class="btn-back">
+                        <i class="fas fa-arrow-left me-2"></i> Retour à la liste
+                    </a>
+
+                    <form method="post" action="{{ path('app_avis_delete', {'id': avi.id}) }}" onsubmit="return false;" class="d-inline">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ avi.id) }}">
+                        <button class="btn-delete" onclick="confirmDelete(event)">
+                            <i class="fas fa-trash me-2"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Script pour la sélection des étoiles
+        document.querySelectorAll('.star-selector').forEach(star => {
+            star.addEventListener('click', function() {
+                const value = this.getAttribute('data-value');
+                document.getElementById('{{ form.note.vars.id }}').value = value;
+                
+                document.querySelectorAll('.star-selector').forEach(s => {
+                    s.style.color = s.getAttribute('data-value') <= value ? '#FFC107' : '#E0E0E0';
+                    s.classList.toggle('far', s.getAttribute('data-value') > value);
+                    s.classList.toggle('fas', s.getAttribute('data-value') <= value);
+                });
+            });
+        });
+        
+        // Script pour l'aperçu de l'image
+        document.addEventListener('DOMContentLoaded', function() {
+            const imageInput = document.querySelector('input[type="file"]');
+            const previewContainer = document.getElementById('image-preview-container');
+            const imagePreview = document.getElementById('image-preview');
+            const removeButton = document.getElementById('remove-image-btn');
+            
+            if (imageInput && previewContainer && imagePreview && removeButton) {
+                // Afficher l'aperçu lorsqu'une image est sélectionnée
+                imageInput.addEventListener('change', function() {
+                    if (this.files && this.files[0]) {
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(e) {
+                            imagePreview.src = e.target.result;
+                            previewContainer.classList.remove('d-none');
+                        }
+                        
+                        reader.readAsDataURL(this.files[0]);
+                    }
+                });
+                
+                // Supprimer l'image lorsque le bouton est cliqué
+                removeButton.addEventListener('click', function() {
+                    imageInput.value = '';
+                    previewContainer.classList.add('d-none');
+                    imagePreview.src = '#';
+                });
+            }
+        });
+    </script>
+{% endblock %} 

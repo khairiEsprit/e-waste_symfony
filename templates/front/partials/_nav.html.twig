@@ -10,7 +10,7 @@
         <nav id="navbar" class="navbar">
             <ul>
                 <li><a class="nav-link scrollto active" href="#hero"><span class="fa fa-home"> Home </span></a></li>
-                <li><a class="nav-link scrollto" href="#about"><span class="fa fa-info-circle" aria-hidden="true"> About us</span></a></li>
+                <li><a class="nav-link scrollto" href="{{ path('app_front_event_list') }}"><span class="fa fa-info-circle" aria-hidden="true">Evenements</span></a></li>
                 <li><a class="nav-link scrollto" href="{{ path('app_centreFront') }}"><span class="fa fa-trash"> Centres</span></a></li>
                 <li><a class="nav-link scrollto" href="{{ path('chat') }}"><span class="fa fa-comment"> Chat </span></a></li>
                 <li><a class="nav-link scrollto" href="{{ path('user_leaderboard') }}"><span class="fa fa-trophy"> Leaderboard </span></a></li>
@@ -45,6 +45,8 @@
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{ path('app_profile') }}">Profile</a></li>
             <li><a class="dropdown-item" href="{{ path('user_rewards') }}">My Rewards</a></li>
+                        <li><a class="dropdown-item" href="{{ path('app_avis_index') }}">Avis</a></li>
+
             <li><a class="dropdown-item" href="{{ path('user_actions') }}">Submit Actions</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="#">Dashboard</a></li>

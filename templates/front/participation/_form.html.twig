@@ -1,0 +1,30 @@
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+<div class="card shadow-sm mb-4">
+    <div class="card-body">
+        {% for child in form %}
+            {% if child.vars.name != '_token' %}
+                <div class="mb-3">
+                    {{ form_label(child, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                    {{ form_widget(child, {'attr': {'class': 'form-control' ~ (child.vars.valid ? '' : ' is-invalid')}}) }}
+                    <div class="invalid-feedback">
+                        {{ form_errors(child) }}
+                    </div>
+                </div>
+            {% endif %}
+        {% endfor %}
+    </div>
+    <div class="card-footer bg-white d-flex justify-content-between flex-wrap gap-2">
+        <div class="d-flex gap-2 flex-wrap">
+            <a href="{{ path('app_participation_index') }}" class="btn btn-outline-secondary btn-magnetic px-4 py-2">
+                <i class="fas fa-list me-2"></i> Back to list
+            </a>
+            <a href="{{ path('app_front_event_list') }}" class="btn btn-outline-primary btn-magnetic px-4 py-2">
+                <i class="fas fa-calendar-alt me-2"></i> Retour aux événements
+            </a>
+        </div>
+        <button type="submit" class="btn btn-primary btn-magnetic px-4 py-2">
+            <i class="fas fa-paper-plane me-2"></i> {{ button_label|default('Envoyer la participation') }}
+        </button>
+    </div>
+</div>
+{{ form_end(form) }}

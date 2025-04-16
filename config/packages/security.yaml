@@ -47,6 +47,8 @@ security:
                 oauth_user_provider:
                     service: App\Security\MyOAuthUserProvider
                 failure_handler: security.authentication.failure_handler
+                default_target_path: back_dashboard
+
             access_denied_handler: App\Controller\SecurityExceptionController
     access_control:
         # Public access routes

@@ -1,19 +1,38 @@
 # config/services.yaml
 
 parameters:
-  # Define the user class as a parameter (replace with your actual User entity class)
+  # User and application parameters
   app.user_class: 'App\Entity\User'
+  app.sender_email: "no-reply@eco-byte.com"
+  app.sender_name: "Eco-Byte"
+
+  # Upload directories
   profile_images_directory: "%kernel.project_dir%/public/uploads/profile_images"
   upload_directory: "%kernel.project_dir%/public/uploads/waste_classification"
+  events_directory: "%kernel.project_dir%/public/uploads/events"
+  avis_images_directory: "%kernel.project_dir%/public/uploads/avis"
+
+  # API configuration
   openrouter_api_url: "%env(OPENROUTER_API_URL)%"
   openrouter_api_key: "%env(OPENROUTER_API_KEY)%"
   cloudinary_url: "%env(CLOUDINARY_URL)%"
 
 services:
+  # Default configuration for services in *this* file
+  _defaults:
+    autowire: true # Automatically injects dependencies in your services
+    autoconfigure: true # Automatically registers services as commands, event subscribers, etc.
+    bind:
+      $userClass: "%app.user_class%"
+      $apiUrl: "%openrouter_api_url%"
+      $apiKey: "%openrouter_api_key%"
+      $senderEmail: "%app.sender_email%"
+      $senderName: "%app.sender_name%"
+
+  # Controllers that need special configuration
   App\Controller\Back\ChatbotController:
     autowire: true
     tags: ["controller.service_arguments"]
-
   Cloudinary\Cloudinary:
     arguments:
       - "%cloudinary_url%"
@@ -41,13 +60,6 @@ services:
   App\EventListener\UserActionListener:
     tags:
       - { name: kernel.event_subscriber }
-
-  # Default configuration for services in *this* file
-  _defaults:
-    autowire: true # Automatically injects dependencies in your services.
-    autoconfigure: true
-    bind:
-      $userClass: "%user_class%" # Automatically registers your services as commands, event subscribers, etc.
 
   # Makes classes in src/ available to be used as services
   App\:

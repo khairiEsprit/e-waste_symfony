@@ -1,0 +1,521 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Détails de l'Avis #{{ avi.id }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        /* Translation pour le contenu principal */
+        .main-content {
+            transform: translateY(70px);
+            margin-bottom: 70px;
+        }
+
+        :root {
+            --dark-green: #013220;
+            --deep-green: #00693E;
+            --medium-green: #29AB87;
+            --light-green: #ACE1AF;
+            --cream-white: #FEFEFA;
+            --orange: #FF6B35;
+            --red: #D64045;
+            --blue: #3A86FF;
+            --light-gray: #F8F9FA;
+            --dark-gray: #343A40;
+        }
+
+        /* Carte principale */
+        .detail-card {
+            border: none;
+            border-radius: 16px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
+            overflow: hidden;
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
+            background: white;
+        }
+
+        .detail-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 105, 62, 0.15);
+        }
+
+        .detail-card .card-header {
+            background: linear-gradient(135deg, var(--deep-green), var(--medium-green));
+            color: white;
+            padding: 25px;
+            border-bottom: none;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .detail-card .card-header::before {
+            content: '';
+            position: absolute;
+            top: -50%;
+            left: -50%;
+            width: 200%;
+            height: 200%;
+            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
+            transform: rotate(30deg);
+        }
+
+        .detail-card .card-body {
+            padding: 30px;
+            background-color: var(--light-gray);
+        }
+
+        .detail-card .card-footer {
+            background-color: white;
+            border-top: 1px solid rgba(0,0,0,0.05);
+            padding: 20px 30px;
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: space-between;
+            align-items: center;
+            gap: 15px;
+        }
+
+        /* Éléments de détail */
+        .detail-item {
+            margin-bottom: 25px;
+            padding-bottom: 20px;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+            transition: all 0.3s ease;
+        }
+
+        .detail-item:hover {
+            border-bottom-color: var(--medium-green);
+        }
+
+        .detail-item:last-child {
+            border-bottom: none;
+            margin-bottom: 0;
+            padding-bottom: 0;
+        }
+
+        .detail-label {
+            color: var(--dark-green);
+            font-weight: 600;
+            display: flex;
+            align-items: center;
+            margin-bottom: 8px;
+            font-size: 0.95rem;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .detail-label i {
+            margin-right: 10px;
+            font-size: 1.1rem;
+            color: var(--medium-green);
+        }
+
+        .detail-value {
+            color: var(--dark-gray);
+            font-size: 1.1rem;
+            padding-left: 28px;
+        }
+
+        /* Étoiles */
+        .star-rating {
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .star-rating .fa-star {
+            font-size: 1.3rem;
+            margin-right: 5px;
+            transition: all 0.2s ease;
+        }
+
+        .star-rating .fa-star:hover {
+            transform: scale(1.2);
+        }
+
+        .star-rating .text-warning {
+            color: #FFC107 !important;
+            text-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
+        }
+
+        .star-rating .text-secondary {
+            color: #E0E0E0 !important;
+        }
+
+        /* Section Avis */
+        .avis-content {
+            background: white;
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
+            border-left: 4px solid var(--medium-green);
+            font-style: italic;
+            position: relative;
+        }
+
+        .avis-content::before {
+            content: '"';
+            position: absolute;
+            top: 10px;
+            left: 10px;
+            font-size: 4rem;
+            color: rgba(0, 105, 62, 0.1);
+            font-family: serif;
+            line-height: 1;
+        }
+        
+        .avis-image {
+            padding: 15px;
+            border-radius: 12px;
+            background-color: rgba(172, 225, 175, 0.1);
+            border: 1px dashed rgba(0, 105, 62, 0.2);
+            text-align: center;
+            transition: all 0.3s ease;
+        }
+        
+        .avis-image:hover {
+            transform: scale(1.02);
+            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
+            border: 1px dashed rgba(0, 105, 62, 0.4);
+        }
+        
+        .avis-image img {
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            max-width: 100%;
+        }
+        
+        .avis-image img:hover {
+            transform: scale(1.03);
+            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+        }
+
+        /* Boutons améliorés */
+        .btn-glass {
+            background: rgba(255, 255, 255, 0.1);
+            backdrop-filter: blur(10px);
+            -webkit-backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            overflow: hidden;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+        }
+
+        .btn-glass:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
+            background: rgba(255, 255, 255, 0.2);
+            color: white;
+        }
+
+        .btn-glass::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
+            transform: translateX(-100%);
+            transition: 0.6s;
+        }
+
+        .btn-glass:hover::after {
+            transform: translateX(100%);
+        }
+
+        .btn-return {
+            background: white;
+            color: var(--deep-green);
+            border: 2px solid var(--deep-green);
+            padding: 10px 25px;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-return:hover {
+            background: var(--deep-green);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 105, 62, 0.3);
+        }
+
+        .btn-edit {
+            background: var(--blue);
+            color: white;
+            padding: 10px 25px;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            font-weight: 600;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            box-shadow: 0 4px 15px rgba(58, 134, 255, 0.3);
+        }
+
+        .btn-edit:hover {
+            background: #2a75e6;
+            transform: translateY(-3px) scale(1.03);
+            box-shadow: 0 7px 20px rgba(58, 134, 255, 0.4);
+        }
+
+        .btn-delete {
+            background: white;
+            color: var(--red);
+            border: 2px solid var(--red);
+            padding: 10px 25px;
+            border-radius: 50px;
+            transition: all 0.4s ease;
+            font-weight: 600;
+            display: inline-flex;
+            align-items: center;
+        }
+
+        .btn-delete:hover {
+            background: var(--red);
+            color: white;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(214, 64, 69, 0.3);
+        }
+
+        /* Groupe de boutons */
+        .btn-group {
+            display: flex;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        /* Badge date */
+        .date-badge {
+            background: rgba(255, 255, 255, 0.2);
+            padding: 5px 15px;
+            border-radius: 50px;
+            font-weight: 600;
+            backdrop-filter: blur(5px);
+            -webkit-backdrop-filter: blur(5px);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        /* Style pour la boîte de dialogue SweetAlert */
+        .swal2-popup {
+            border-radius: 16px !important;
+            font-family: inherit !important;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+        }
+
+        .swal2-title {
+            color: var(--dark-gray) !important;
+            font-size: 1.5rem !important;
+            font-weight: 600 !important;
+        }
+
+        .swal2-html-container {
+            color: #555 !important;
+            font-size: 1.1rem !important;
+        }
+
+        .swal2-confirm {
+            background-color: var(--red) !important;
+            border: none !important;
+            padding: 10px 25px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-confirm:hover {
+            background-color: #c23338 !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 10px rgba(214, 64, 69, 0.3) !important;
+        }
+
+        .swal2-cancel {
+            border: 2px solid var(--dark-gray) !important;
+            color: var(--dark-gray) !important;
+            padding: 10px 25px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-cancel:hover {
+            background-color: var(--light-gray) !important;
+            transform: translateY(-2px) !important;
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+        }
+
+        /* Responsive */
+        @media (max-width: 768px) {
+            .detail-card .card-body {
+                padding: 20px;
+            }
+            
+            .card-footer {
+                flex-direction: column;
+            }
+            
+            .btn-group {
+                width: 100%;
+                justify-content: center;
+            }
+            
+            .btn-return {
+                width: 100%;
+                justify-content: center;
+                margin-bottom: 15px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        function confirmDelete(event) {
+            event.preventDefault();
+            const form = event.target.closest('form');
+            
+            Swal.fire({
+                title: 'Confirmer la suppression',
+                html: 'Êtes-vous sûr de vouloir supprimer cet avis ?<br><small>Cette action est irréversible</small>',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: 'var(--red)',
+                cancelButtonColor: 'var(--dark-gray)',
+                confirmButtonText: 'Oui, supprimer',
+                cancelButtonText: 'Annuler',
+                customClass: {
+                    popup: 'swal2-popup',
+                    title: 'swal2-title',
+                    htmlContainer: 'swal2-html-container',
+                    confirmButton: 'swal2-confirm',
+                    cancelButton: 'swal2-cancel'
+                },
+                buttonsStyling: false,
+                reverseButtons: true,
+                backdrop: `
+                    rgba(0,0,0,0.4)
+                    url("/images/leaf-animation.gif")
+                    left top
+                    no-repeat
+                `
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    form.submit();
+                }
+            });
+        }
+    </script>
+{% endblock %}
+
+{% block body %}
+    <div class="main-content">
+        <div class="container py-5">
+            <div class="detail-card card">
+                <div class="card-header">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h2 class="h4 mb-0">
+                            <i class="fas fa-file-alt me-2"></i>
+                            Détails de l'avis #{{ avi.id }}
+                        </h2>
+                        <span class="date-badge">
+                            {{ avi.createdAt|date('d/m/Y') }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="card-body">
+                    <!-- Section ID et Date -->
+                    <div class="row detail-item">
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <span class="detail-label">
+                                <i class="fas fa-id-card"></i>Identifiant
+                            </span>
+                            <span class="detail-value">{{ avi.id }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="detail-label">
+                                <i class="far fa-clock"></i>Créé le
+                            </span>
+                            <span class="detail-value">{{ avi.createdAt|date('d/m/Y à H:i') }}</span>
+                        </div>
+                    </div>
+
+                    <!-- Section Nom et Note -->
+                    <div class="row detail-item">
+                        <div class="col-md-6 mb-4 mb-md-0">
+                            <span class="detail-label">
+                                <i class="fas fa-user"></i>Nom
+                            </span>
+                            <span class="detail-value">{{ avi.nom ?? 'Anonyme' }}</span>
+                        </div>
+                        <div class="col-md-6">
+                            <span class="detail-label">
+                                <i class="fas fa-star"></i>Note
+                            </span>
+                            <div class="detail-value">
+                                <div class="star-rating">
+                                    {% for i in 1..5 %}
+                                        <i class="fas fa-star {{ i <= avi.note ? 'text-warning' : 'text-secondary' }}"></i>
+                                    {% endfor %}
+                                    <span class="ms-2">({{ avi.note }}/5)</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Section Avis -->
+                    <div class="detail-item">
+                        <span class="detail-label">
+                            <i class="fas fa-comment"></i>Avis
+                        </span>
+                        <div class="avis-content mt-3">
+                            {{ avi.avis }}
+                        </div>
+                    </div>
+                    
+                    {% if avi.image %}
+                    <!-- Section Image -->
+                    <div class="detail-item mt-4">
+                        <span class="detail-label">
+                            <i class="fas fa-image"></i>Image
+                        </span>
+                        <div class="avis-image mt-3">
+                            <img src="{{ asset('uploads/avis/' ~ avi.image) }}" alt="Image de l'avis" class="img-fluid rounded shadow-sm" style="max-height: 300px;">
+                        </div>
+                    </div>
+                    {% endif %}
+                </div>
+
+                <div class="card-footer">
+                    <a href="{{ path('app_avis_index') }}" class="btn-return">
+                        <i class="fas fa-arrow-left me-2"></i> Retour à la liste
+                    </a>
+
+                    <div class="btn-group">
+                        <a href="{{ path('app_avis_edit', {'id': avi.id}) }}" class="btn-edit">
+                            <i class="fas fa-edit me-2"></i> Modifier
+                        </a>
+                        <form method="post" action="{{ path('app_avis_delete', {'id': avi.id}) }}" onsubmit="return false;" class="d-inline">
+                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ avi.id) }}">
+                            <button class="btn-delete" onclick="confirmDelete(event)">
+                                <i class="fas fa-trash me-2"></i> Supprimer
+                            </button>
+                        </form>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

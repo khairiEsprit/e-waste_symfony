@@ -1,0 +1,220 @@
+{% extends 'back/index.html.twig' %}
+
+{% block content %}
+    <div class="app-content">
+        <div class="container-fluid">
+            <!-- Affichage des messages flash -->
+            {% for type, messages in app.flashes %}
+                {% for message in messages %}
+                    <div class="alert alert-{{ type }} alert-dismissible fade show mb-4">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                    </div>
+                {% endfor %}
+            {% endfor %}
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0" style="color: #013220;">Détails de la suggestion</h1>
+                <div>
+                    <a href="{{ path('app_event_ai_suggestions') }}" class="btn me-2" style="background-color: #29AB87; color: #FEFEFA;">
+                        <i class="fas fa-arrow-left me-1"></i> Retour aux suggestions
+                    </a>
+                    <a href="{{ path('app_event_new') }}" class="btn" style="background-color: #013220; color: #FEFEFA;" id="use-suggestion-btn">
+                        <i class="fas fa-check me-1"></i> Utiliser cette suggestion
+                    </a>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm mb-4">
+                <div class="card-body p-4">
+                    <div id="suggestion-details">
+                        <div class="text-center py-5">
+                            <div class="spinner-border" style="color: #29AB87; width: 3rem; height: 3rem;" role="status">
+                                <span class="visually-hidden">Chargement...</span>
+                            </div>
+                            <p class="mt-3 text-muted">Chargement des détails de la suggestion...</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-control:focus {
+            border-color: #29AB87;
+            box-shadow: 0 0 0 0.25rem rgba(41, 171, 135, 0.25);
+        }
+        .card {
+            border-radius: 10px;
+            background-color: #FEFEFA;
+        }
+        .event-detail-label {
+            color: #00693E;
+            font-weight: 600;
+            margin-bottom: 0.5rem;
+        }
+        .event-detail-value {
+            background-color: #f8f9fa;
+            padding: 1rem;
+            border-radius: 8px;
+            margin-bottom: 1.5rem;
+        }
+        .badge-eco {
+            background-color: rgba(41, 171, 135, 0.2);
+            color: #00693E;
+            font-weight: 500;
+            padding: 0.5rem 1rem;
+            border-radius: 50px;
+            margin-right: 0.5rem;
+            margin-bottom: 0.5rem;
+            display: inline-block;
+        }
+    </style>
+
+    <!-- Template pour l'affichage des détails -->
+    <template id="suggestion-details-template">
+        <div class="row">
+            <div class="col-md-8">
+                <h2 class="suggestion-title mb-4" style="color: #013220;"></h2>
+                
+                <div class="mb-4">
+                    <h5 class="event-detail-label">Description</h5>
+                    <div class="event-detail-value suggestion-description"></div>
+                </div>
+                
+                <div class="row mb-4">
+                    <div class="col-md-6">
+                        <h5 class="event-detail-label">Lieu</h5>
+                        <div class="event-detail-value suggestion-location"></div>
+                    </div>
+                    <div class="col-md-6">
+                        <h5 class="event-detail-label">Capacité</h5>
+                        <div class="event-detail-value suggestion-capacity"></div>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="col-md-4">
+                <div class="card border-0 shadow-sm mb-4">
+                    <div class="card-body">
+                        <h5 class="card-title" style="color: #00693E;">Actions</h5>
+                        <div class="d-grid gap-2 mt-3">
+                            <button class="btn btn-success w-100" id="use-this-suggestion">
+                                <i class="fas fa-check me-2"></i> Utiliser cette suggestion
+                            </button>
+                            <button class="btn btn-outline-secondary w-100" id="back-to-suggestions">
+                                <i class="fas fa-arrow-left me-2"></i> Retour aux suggestions
+                            </button>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="card border-0 shadow-sm">
+                    <div class="card-body">
+                        <h5 class="card-title" style="color: #00693E;">Thèmes associés</h5>
+                        <div class="mt-3 suggestion-tags">
+                            <!-- Les tags seront ajoutés ici -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </template>
+
+    <!-- Intégration de SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const suggestionId = '{{ id }}';
+            const suggestionDetails = document.getElementById('suggestion-details');
+            const suggestionDetailsTemplate = document.getElementById('suggestion-details-template');
+            const useBtn = document.getElementById('use-suggestion-btn');
+            
+            // Récupérer les suggestions du localStorage
+            const storedSuggestions = localStorage.getItem('event_suggestions');
+            if (storedSuggestions) {
+                try {
+                    const suggestions = JSON.parse(storedSuggestions);
+                    const suggestion = suggestions[suggestionId] || suggestions;
+                    
+                    if (suggestion) {
+                        displaySuggestionDetails(suggestion);
+                    } else {
+                        showError('Suggestion non trouvée.');
+                    }
+                } catch (e) {
+                    showError('Erreur lors du chargement des détails: ' + e.message);
+                }
+            } else {
+                showError('Aucune suggestion disponible.');
+            }
+            
+            // Fonction pour afficher les détails de la suggestion
+            function displaySuggestionDetails(suggestion) {
+                // Cloner le template
+                const detailsClone = suggestionDetailsTemplate.content.cloneNode(true);
+                
+                // Remplir les données
+                detailsClone.querySelector('.suggestion-title').textContent = suggestion.title || 'Événement sans titre';
+                detailsClone.querySelector('.suggestion-description').textContent = suggestion.description || 'Aucune description disponible.';
+                detailsClone.querySelector('.suggestion-location').textContent = suggestion.location || 'À déterminer';
+                detailsClone.querySelector('.suggestion-capacity').textContent = (suggestion.capacity || suggestion.remainingPlaces || '50') + ' places';
+                
+                // Ajouter des tags basés sur le contenu
+                const tagsContainer = detailsClone.querySelector('.suggestion-tags');
+                const possibleTags = ['recyclage', 'e-déchets', 'environnement', 'sensibilisation', 'éducation', 'communauté', 'technologie', 'développement durable'];
+                
+                // Sélectionner aléatoirement 3-5 tags
+                const numTags = Math.floor(Math.random() * 3) + 3; // 3 à 5 tags
+                const shuffledTags = possibleTags.sort(() => 0.5 - Math.random());
+                const selectedTags = shuffledTags.slice(0, numTags);
+                
+                selectedTags.forEach(tag => {
+                    const tagElement = document.createElement('span');
+                    tagElement.className = 'badge-eco';
+                    tagElement.innerHTML = `<i class="fas fa-tag me-1"></i> ${tag}`;
+                    tagsContainer.appendChild(tagElement);
+                });
+                
+                // Ajouter les événements pour les boutons
+                detailsClone.querySelector('#use-this-suggestion').addEventListener('click', function() {
+                    useSuggestion(suggestion);
+                });
+                
+                detailsClone.querySelector('#back-to-suggestions').addEventListener('click', function() {
+                    window.location.href = '{{ path("app_event_ai_suggestions") }}';
+                });
+                
+                // Vider le conteneur et ajouter les détails
+                suggestionDetails.innerHTML = '';
+                suggestionDetails.appendChild(detailsClone);
+                
+                // Mettre à jour le bouton d'utilisation
+                useBtn.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    useSuggestion(suggestion);
+                });
+            }
+            
+            // Fonction pour utiliser la suggestion
+            function useSuggestion(suggestion) {
+                // Stocker la suggestion dans le localStorage pour la récupérer sur la page de création
+                localStorage.setItem('event_suggestion', JSON.stringify(suggestion));
+                
+                // Rediriger vers la page de création
+                window.location.href = '{{ path("app_event_new") }}';
+            }
+            
+            // Fonction pour afficher une erreur
+            function showError(message) {
+                suggestionDetails.innerHTML = `
+                    <div class="alert alert-danger" role="alert">
+                        <i class="fas fa-exclamation-triangle me-2"></i> ${message}
+                    </div>
+                `;
+            }
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,244 @@
+{# avis/_form.html.twig #}
+
+<div>
+    {{ form_start(form, {'attr': {'id': 'avis-form', 'novalidate': 'novalidate'}}) }}
+
+    {# Champ Nom #}
+    <div class="mb-4">
+        {{ form_label(form.nom, 'Votre nom', {
+            'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #013220; font-family: Poppins, sans-serif; font-size: 1rem;'}
+        }) }}
+        {{ form_widget(form.nom, {
+            'attr': {
+                'class': 'form-control',
+                'style': 'border: 1px solid #ACE1AF; border-radius: 8px; padding: 12px; font-family: Poppins, sans-serif; transition: all 0.3s ease;',
+                'placeholder': 'Votre nom',
+                'id': 'avis_nom'
+            }
+        }) }}
+        <div class="error-message text-danger mt-2" id="nom-error"></div>
+    </div>
+
+    {# Champ Avis #}
+    <div class="mb-4">
+        {{ form_label(form.avis, 'Votre avis', {
+            'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #013220; font-family: Poppins, sans-serif; font-size: 1rem;'}
+        }) }}
+        {{ form_widget(form.avis, {
+            'attr': {
+                'class': 'form-control',
+                'style': 'border: 1px solid #ACE1AF; border-radius: 8px; padding: 12px; font-family: Poppins, sans-serif; transition: all 0.3s ease;',
+                'rows': 5,
+                'placeholder': 'Décrivez votre expérience en détail...',
+                'id': 'avis_avis'
+            }
+        }) }}
+        <div class="error-message text-danger mt-2" id="avis-error"></div>
+        {{ form_errors(form.avis, {
+            'attr': {'class': 'alert alert-danger mt-2 py-2'}
+        }) }}
+    </div>
+
+    {# Champ Note #}
+    <div class="mb-4">
+        <label class="form-label fw-bold" style="color: #013220; font-family: Poppins, sans-serif; font-size: 1rem;">
+            Note <span class="text-danger">*</span>
+        </label>
+        <div class="star-rating-form">
+            {% for i in 5..1 %}
+                <input type="radio" id="{{ form.note.vars.id }}_{{ i }}"
+                       name="{{ form.note.vars.full_name }}"
+                       value="{{ i }}"
+                       {{ form.note.vars.value == i ? 'checked' : '' }}
+                       class="star-rating-input"
+                       required>
+                <label for="{{ form.note.vars.id }}_{{ i }}" title="{{ i }} étoiles">★</label>
+            {% endfor %}
+        </div>
+        
+        {# Hidden field to ensure the note value is always included in the form #}
+        {{ form_widget(form.note, {'attr': {'class': 'd-none', 'id': 'avis_note_hidden'}}) }}
+       
+        <div class="error-message text-danger mt-2" id="note-error"></div>
+    </div>
+
+    {# Champ Image #}
+    <div class="mb-4">
+        {{ form_label(form.image, 'Image (optionnel)', {
+            'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #013220; font-family: Poppins, sans-serif; font-size: 1rem;'}
+        }) }}
+        <div class="custom-file-upload">
+            {{ form_widget(form.image, {
+                'attr': {
+                    'class': 'form-control custom-file-input',
+                    'style': 'border: 1px solid #ACE1AF; border-radius: 8px; padding: 12px; font-family: Poppins, sans-serif;',
+                    'id': 'avis_image'
+                }
+            }) }}
+            <div class="file-preview mt-3 d-none" id="image-preview-container">
+                <img id="image-preview" src="#" alt="Aperçu de l'image" class="img-fluid rounded" style="max-height: 200px;">
+                <button type="button" class="btn btn-sm btn-outline-danger mt-2" id="remove-image-btn">
+                    <i class="fas fa-times"></i> Supprimer
+                </button>
+            </div>
+        </div>
+        <small class="form-text text-muted">Formats acceptés: JPEG, PNG, GIF. Taille max: 5 Mo.</small>
+        <div class="error-message text-danger mt-2" id="image-error"></div>
+        {{ form_errors(form.image, {
+            'attr': {'class': 'alert alert-danger mt-2 py-2'}
+        }) }}
+    </div>
+
+    {# Bouton de soumission #}
+    <button type="submit" class="btn w-100 py-3 save-btn">
+        <i class="fas fa-save btn-icon me-2"></i> {{ button_label|default('Enregistrer') }}
+    </button>
+
+    {{ form_end(form) }}
+</div>
+
+<style>
+    /* Form field focus effect */
+    input:focus, textarea:focus {
+        border-color: #29AB87 !important;
+        box-shadow: 0 0 8px rgba(41, 171, 135, 0.3) !important;
+        transform: scale(1.01);
+        transition: all 0.3s ease;
+    }
+    
+    /* Custom file upload styling */
+    .custom-file-input::-webkit-file-upload-button {
+        visibility: hidden;
+        width: 0;
+    }
+    
+    .custom-file-input::before {
+        content: 'Choisir une image';
+        display: inline-block;
+        background: linear-gradient(145deg, #29AB87, #00693E);
+        color: white;
+        border-radius: 50px;
+        padding: 8px 20px;
+        outline: none;
+        white-space: nowrap;
+        cursor: pointer;
+        font-weight: 600;
+        font-size: 0.9rem;
+        margin-right: 10px;
+        transition: all 0.3s ease;
+    }
+    
+    .custom-file-input:hover::before {
+        background: linear-gradient(145deg, #00693E, #29AB87);
+        transform: translateY(-2px);
+        box-shadow: 0 4px 15px rgba(41, 171, 135, 0.4);
+    }
+
+    /* Improved Save Button */
+    .save-btn {
+        position: relative;
+        overflow: hidden;
+        border: none;
+        font-weight: 600;
+        letter-spacing: 1px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        cursor: pointer;
+        transition: all 0.5s ease;
+        border-radius: 50px;
+        padding: 12px 30px;
+        font-size: 1rem;
+        font-family: 'Poppins', sans-serif;
+        background: linear-gradient(145deg, #29AB87, #00693E);
+        color: white;
+        box-shadow: 0 6px 25px rgba(41, 171, 135, 0.4);
+    }
+
+    .save-btn:hover {
+        background: linear-gradient(145deg, #00693E, #29AB87);
+        transform: translateY(-3px) scale(1.05);
+        box-shadow: 0 10px 35px rgba(41, 171, 135, 0.6);
+        animation: glow 1.5s infinite;
+    }
+
+    .save-btn::after {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -60%;
+        width: 200%;
+        height: 200%;
+        background: rgba(255, 255, 255, 0.15);
+        transform: rotate(45deg);
+        transition: all 0.6s ease;
+        pointer-events: none;
+    }
+
+    .save-btn:hover::after {
+        left: 100%;
+        top: 100%;
+    }
+    
+    .save-btn .btn-icon {
+        margin-right: 10px;
+        transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+    }
+
+    .save-btn:hover .btn-icon {
+        transform: rotate(360deg) scale(1.2);
+    }
+
+    /* Effet de vague */
+    .ripple-wave {
+        position: absolute;
+        border-radius: 50%;
+        background: rgba(255, 255, 255, 0.7);
+        transform: scale(0);
+        animation: ripple 0.6s linear;
+        pointer-events: none;
+    }
+
+    @keyframes ripple {
+        to {
+            transform: scale(4);
+            opacity: 0;
+        }
+    }
+
+    @keyframes glow {
+        0% { box-shadow: 0 6px 25px rgba(41, 171, 135, 0.4); }
+        50% { box-shadow: 0 10px 35px rgba(41, 171, 135, 0.6); }
+        100% { box-shadow: 0 6px 25px rgba(41, 171, 135, 0.4); }
+    }
+</style>
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const imageInput = document.getElementById('avis_image');
+        const previewContainer = document.getElementById('image-preview-container');
+        const imagePreview = document.getElementById('image-preview');
+        const removeButton = document.getElementById('remove-image-btn');
+        
+        // Show preview when file is selected
+        imageInput.addEventListener('change', function() {
+            if (this.files && this.files[0]) {
+                const reader = new FileReader();
+                
+                reader.onload = function(e) {
+                    imagePreview.src = e.target.result;
+                    previewContainer.classList.remove('d-none');
+                }
+                
+                reader.readAsDataURL(this.files[0]);
+            }
+        });
+        
+        // Remove image when button is clicked
+        removeButton.addEventListener('click', function() {
+            imageInput.value = '';
+            previewContainer.classList.add('d-none');
+            imagePreview.src = '#';
+        });
+    });
+</script>

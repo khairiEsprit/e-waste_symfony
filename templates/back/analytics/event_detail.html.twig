@@ -1,0 +1,357 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Analyse détaillée: {{ event.title }}{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css">
+    <style>
+        .event-header {
+            background: linear-gradient(135deg, #013220, #00693E);
+            color: white;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        .event-title {
+            font-size: 1.8rem;
+            margin-bottom: 10px;
+        }
+        
+        .event-meta {
+            display: flex;
+            flex-wrap: wrap;
+            gap: 15px;
+        }
+        
+        .event-meta-item {
+            background-color: rgba(255, 255, 255, 0.2);
+            padding: 5px 10px;
+            border-radius: 5px;
+            font-size: 0.9rem;
+        }
+        
+        .analytics-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+            margin-bottom: 20px;
+        }
+        
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-value {
+            font-size: 2rem;
+            font-weight: bold;
+            color: #00693E;
+        }
+        
+        .stat-label {
+            color: #666;
+            font-size: 0.9rem;
+        }
+        
+        .progress {
+            height: 10px;
+            border-radius: 5px;
+        }
+        
+        .progress-bar {
+            background-color: #29AB87;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .demographic-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 8px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .demographic-item:last-child {
+            border-bottom: none;
+        }
+        
+        .demographic-label {
+            font-weight: 500;
+        }
+        
+        .demographic-value {
+            background-color: #e9f7ef;
+            color: #00693E;
+            padding: 2px 8px;
+            border-radius: 4px;
+            font-weight: 500;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="app-content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1>Analyse d'événement</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="{{ path('back_dashboard') }}">Accueil</a></li>
+                        <li class="breadcrumb-item"><a href="{{ path('back_analytics_dashboard') }}">SmartEvent Vision</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">{{ event.title }}</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-content">
+        <div class="container-fluid">
+            <!-- Event Header -->
+            <div class="event-header">
+                <h2 class="event-title">{{ event.title }}</h2>
+                <div class="event-meta">
+                    <div class="event-meta-item">
+                        <i class="bi bi-geo-alt"></i> {{ event.location }}
+                    </div>
+                    <div class="event-meta-item">
+                        <i class="bi bi-calendar"></i> {{ event.date|date('d/m/Y H:i') }}
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Event Statistics -->
+            <div class="row">
+                <div class="col-lg-3 col-md-6">
+                    <div class="analytics-card">
+                        <div class="card-body text-center">
+                            <div class="stat-value">{{ eventStats.participationCount }}</div>
+                            <div class="stat-label">Participations totales</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="analytics-card">
+                        <div class="card-body text-center">
+                            <div class="stat-value">{{ eventStats.capacity }}</div>
+                            <div class="stat-label">Capacité totale</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="analytics-card">
+                        <div class="card-body text-center">
+                            <div class="stat-value">{{ eventStats.remainingPlaces }}</div>
+                            <div class="stat-label">Places restantes</div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6">
+                    <div class="analytics-card">
+                        <div class="card-body">
+                            <div class="text-center mb-2">
+                                <div class="stat-value">{{ eventStats.fillRate }}%</div>
+                                <div class="stat-label">Taux de remplissage</div>
+                            </div>
+                            <div class="progress">
+                                <div class="progress-bar" role="progressbar" style="width: {{ eventStats.fillRate }}%" 
+                                     aria-valuenow="{{ eventStats.fillRate }}" aria-valuemin="0" aria-valuemax="100"></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Demographics -->
+            <div class="row mt-4">
+                <div class="col-lg-6">
+                    <div class="analytics-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Distribution par ville</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="cityChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="analytics-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Distribution par pays</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="countryChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Detailed Demographics -->
+            <div class="row mt-4">
+                <div class="col-lg-6">
+                    <div class="analytics-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Top villes</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if demographics.cityDistribution|length > 0 %}
+                                {% for city in demographics.cityDistribution %}
+                                    <div class="demographic-item">
+                                        <span class="demographic-label">{{ city.city }}</span>
+                                        <span class="demographic-value">{{ city.participantCount }} participants</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted">Aucune donnée disponible</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-6">
+                    <div class="analytics-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Top pays</h5>
+                        </div>
+                        <div class="card-body">
+                            {% if demographics.countryDistribution|length > 0 %}
+                                {% for country in demographics.countryDistribution %}
+                                    <div class="demographic-item">
+                                        <span class="demographic-label">{{ country.country }}</span>
+                                        <span class="demographic-value">{{ country.participantCount }} participants</span>
+                                    </div>
+                                {% endfor %}
+                            {% else %}
+                                <p class="text-muted">Aucune donnée disponible</p>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Actions -->
+            <div class="row mt-4">
+                <div class="col-12">
+                    <div class="d-flex justify-content-between">
+                        <a href="{{ path('back_analytics_dashboard') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left"></i> Retour au tableau de bord
+                        </a>
+                        <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn btn-primary">
+                            <i class="bi bi-eye"></i> Voir l'événement
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Prepare city data
+            const cityLabels = [];
+            const cityData = [];
+            
+            {% for city in demographics.cityDistribution %}
+                cityLabels.push('{{ city.city }}');
+                cityData.push({{ city.participantCount }});
+            {% endfor %}
+            
+            // Prepare country data
+            const countryLabels = [];
+            const countryData = [];
+            
+            {% for country in demographics.countryDistribution %}
+                countryLabels.push('{{ country.country }}');
+                countryData.push({{ country.participantCount }});
+            {% endfor %}
+            
+            // City Chart
+            const cityCtx = document.getElementById('cityChart').getContext('2d');
+            const cityChart = new Chart(cityCtx, {
+                type: 'pie',
+                data: {
+                    labels: cityLabels,
+                    datasets: [{
+                        data: cityData,
+                        backgroundColor: [
+                            '#013220',
+                            '#00693E',
+                            '#29AB87',
+                            '#3CB371',
+                            '#66CDAA'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 10
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Country Chart
+            const countryCtx = document.getElementById('countryChart').getContext('2d');
+            const countryChart = new Chart(countryCtx, {
+                type: 'pie',
+                data: {
+                    labels: countryLabels,
+                    datasets: [{
+                        data: countryData,
+                        backgroundColor: [
+                            '#00693E',
+                            '#29AB87',
+                            '#3CB371',
+                            '#66CDAA',
+                            '#8FBC8F'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 10
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}

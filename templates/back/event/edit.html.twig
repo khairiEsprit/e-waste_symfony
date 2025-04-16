@@ -1,0 +1,203 @@
+{% extends 'back/index.html.twig' %}
+
+{% block content %}
+    <div class="app-content">
+        <div class="container-fluid">
+                        {# Les messages flash seront affichés via SweetAlert2 dans le script #}
+
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h1 class="h3 mb-0" style="color: #013220;">Modifier {{ event.title }}</h1>
+                <div>
+                    <a href="{{ path('app_event_show', {'id': event.id}) }}" class="btn me-2" style="background-color: #013220; color: #FEFEFA;">
+                        <i class="fas fa-times me-1"></i> Annuler
+                    </a>
+                </div>
+            </div>
+
+            <div class="card border-0 shadow-sm">
+                <div class="card-body">
+                    {{ form_start(form, {'attr': {'id': 'event-form', 'class': 'needs-validation', 'novalidate': true}}) }}
+
+                    <div class="row g-4">
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.title, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.title, {'attr': {
+                                    'class': 'form-control' ~ (form.title.vars.errors|length ? ' is-invalid' : ''),
+                                    'style': 'border-color: #29AB87',
+                                    'required': true
+                                }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.title) }}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.description, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.description, {'attr': {
+                                    'class': 'form-control' ~ (form.description.vars.errors|length ? ' is-invalid' : ''),
+                                    'style': 'border-color: #29AB87; height: 120px',
+                                    'required': true
+                                }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.description) }}
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-md-6">
+                            <div class="mb-3">
+                                {{ form_label(form.date, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.date, {'attr': {
+                                    'class': 'form-control' ~ (form.date.vars.errors|length ? ' is-invalid' : ''),
+                                    'style': 'border-color: #29AB87',
+                                    'required': true
+                                }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.date) }}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.location, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.location, {'attr': {
+                                    'class': 'form-control' ~ (form.location.vars.errors|length ? ' is-invalid' : ''),
+                                    'style': 'border-color: #29AB87',
+                                    'required': true
+                                }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.location) }}
+                                </div>
+                            </div>
+
+                            <div class="mb-3">
+                                {{ form_label(form.remainingPlaces, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
+                                {{ form_widget(form.remainingPlaces, {'attr': {
+                                    'class': 'form-control' ~ (form.remainingPlaces.vars.errors|length ? ' is-invalid' : ''),
+                                    'style': 'border-color: #29AB87',
+                                    'min': 0,
+                                    'required': true
+                                }}) }}
+                                <div class="invalid-feedback">
+                                    {{ form_errors(form.remainingPlaces) }}
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
+                        <button type="submit" class="btn px-4" style="background-color: #29AB87; color: white;" id="submit-btn">
+                            <i class="fas fa-save me-2"></i> Mettre à jour
+                        </button>
+                    </div>
+                    {{ form_end(form) }}
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <style>
+        .form-control:focus {
+            border-color: #29AB87;
+            box-shadow: 0 0 0 0.25rem rgba(41, 171, 135, 0.25);
+        }
+        .card {
+            border-radius: 10px;
+            background-color: #FEFEFA;
+        }
+        .is-invalid {
+            border-color: #dc3545 !important;
+        }
+        .invalid-feedback {
+            color: #dc3545;
+            font-size: 0.875em;
+        }
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border-color: #c3e6cb;
+        }
+        .alert-error {
+            background-color: #f8d7da;
+            color: #721c24;
+            border-color: #f5c6cb;
+        }
+    </style>
+
+    <!-- Intégration de SweetAlert2 -->
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const form = document.getElementById('event-form');
+            const submitBtn = document.getElementById('submit-btn');
+            
+            // Désactiver la validation HTML5 native pour utiliser notre propre validation
+            form.setAttribute('novalidate', 'novalidate');
+            
+            form.addEventListener('submit', function(event) {
+                // Empêcher la soumission par défaut
+                event.preventDefault();
+                
+                // Validation manuelle du formulaire
+                let isValid = true;
+                const requiredFields = form.querySelectorAll('[required]');
+                
+                // Vérifier chaque champ requis
+                requiredFields.forEach(field => {
+                    if (!field.value.trim()) {
+                        isValid = false;
+                        field.classList.add('is-invalid');
+                    } else {
+                        field.classList.remove('is-invalid');
+                        field.classList.add('is-valid');
+                    }
+                });
+                
+                // Si le formulaire n'est pas valide, arrêter ici
+                if (!isValid) {
+                    form.classList.add('was-validated');
+                    return false;
+                }
+                
+                // Si le formulaire est valide, afficher la confirmation
+                Swal.fire({
+                    title: 'Confirmer la modification',
+                    text: 'Voulez-vous mettre à jour cet événement ?',
+                    icon: 'question',
+                    showCancelButton: true,
+                    confirmButtonColor: '#29AB87',
+                    cancelButtonColor: '#d33',
+                    confirmButtonText: 'Oui, mettre à jour',
+                    cancelButtonText: 'Annuler',
+                    background: '#FEFEFA',
+                    customClass: {
+                        popup: 'animated bounceIn'
+                    }
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Soumettre le formulaire directement sans événement
+                        form.submit();
+                    }
+                });
+                
+                return false;
+            });
+            
+            // Afficher les alertes de succès avec SweetAlert2 si présentes
+            {% for message in app.flashes('success') %}
+                Swal.fire({
+                    title: 'Succès !',
+                    text: "{{ message|e('js') }}",
+                    icon: 'success',
+                    confirmButtonColor: '#29AB87',
+                    confirmButtonText: 'OK',
+                    background: '#FEFEFA',
+                    customClass: {
+                        popup: 'animated fadeInDown'
+                    }
+                });
+            {% endfor %}
+        });
+    </script>
+{% endblock %}

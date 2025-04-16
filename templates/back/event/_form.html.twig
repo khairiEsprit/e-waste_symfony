@@ -1,0 +1,47 @@
+{{ form_start(form) }}
+<div class="row">
+    <div class="col-md-8">
+        {{ form_row(form.title, {
+            'label': 'Titre de l\'événement',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+    <div class="col-md-4">
+        {{ form_row(form.remainingPlaces, {
+            'label': 'Nombre de places',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+</div>
+
+<div class="mb-3">
+    {{ form_row(form.description, {
+        'label': 'Description',
+        'attr': {'class': 'form-control', 'rows': 5}
+    }) }}
+</div>
+
+<div class="row">
+    <div class="col-md-6">
+        {{ form_row(form.location, {
+            'label': 'Lieu',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+    <div class="col-md-6">
+        {{ form_row(form.date, {
+            'label': 'Date et heure',
+            'attr': {'class': 'form-control'}
+        }) }}
+    </div>
+</div>
+
+<div class="mb-3">
+    {{ form_row(form.imageUrl, {
+        'label': 'URL de l\'image',
+        'attr': {'class': 'form-control'}
+    }) }}
+</div>
+
+<button class="btn btn-primary">{{ button_label|default('Enregistrer') }}</button>
+{{ form_end(form) }}

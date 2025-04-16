@@ -1,0 +1,351 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}New Participation{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/sweetalert2@11/dist/sweetalert2.min.css">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <style>
+        /* Styles généraux des boutons */
+        .participation-btn {
+            position: relative;
+            overflow: hidden;
+            border: none;
+            font-weight: 600;
+            padding: 12px 25px;
+            border-radius: 50px;
+            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            min-width: 180px;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+            z-index: 1;
+        }
+
+        .participation-btn i {
+            margin-right: 8px;
+            transition: all 0.3s ease;
+        }
+
+        /* Effet de vague au survol */
+        .participation-btn::after {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(255,255,255,0.1);
+            transform: scale(0);
+            border-radius: 50px;
+            transition: transform 0.6s ease;
+            z-index: -1;
+        }
+
+        .participation-btn:hover::after {
+            transform: scale(1);
+        }
+
+        /* Bouton Back to list */
+        .btn-back-list {
+            background: linear-gradient(135deg, #6c757d 0%, #495057 100%);
+            color: white;
+        }
+
+        .btn-back-list:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4);
+        }
+
+        .btn-back-list:hover i {
+            transform: translateX(-5px);
+        }
+
+        /* Bouton Retour aux événements */
+        .btn-back-events {
+            background: linear-gradient(135deg, #29AB87 0%, #1E7D65 100%);
+            color: white;
+        }
+
+        .btn-back-events:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(41, 171, 135, 0.4);
+        }
+
+        .btn-back-events:hover i {
+            transform: translateX(-5px);
+        }
+
+        /* Bouton Envoyer */
+        .btn-submit {
+            background: linear-gradient(135deg, #218838 0%, #1a7433 100%);
+            color: white;
+            position: relative;
+            overflow: visible;
+        }
+
+        .btn-submit:hover {
+            transform: translateY(-3px);
+            box-shadow: 0 8px 25px rgba(33, 136, 56, 0.6);
+            animation: pulse 1s infinite alternate;
+        }
+
+        .btn-submit:hover i {
+            transform: translateY(-3px) rotate(15deg);
+        }
+
+        /* Effet de particules */
+        .btn-submit::before {
+            content: '';
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            top: 0;
+            left: 0;
+            pointer-events: none;
+            overflow: hidden;
+            border-radius: 50px;
+        }
+
+        .btn-submit:hover::before {
+            animation: particles 2s ease infinite;
+        }
+
+        @keyframes pulse {
+            0% { transform: translateY(-3px) scale(1); }
+            100% { transform: translateY(-3px) scale(1.05); }
+        }
+
+        @keyframes particles {
+            0% {
+                background: rgba(255,255,255,0.5);
+                transform: translate(0, 0);
+                opacity: 1;
+                width: 8px;
+                height: 8px;
+                border-radius: 50%;
+                top: 50%;
+                left: 50%;
+            }
+            100% {
+                transform: translate(var(--x), var(--y));
+                opacity: 0;
+                width: 2px;
+                height: 2px;
+            }
+        }
+
+        /* Disposition des boutons */
+        .form-buttons-container {
+            display: flex;
+            justify-content: space-between;
+            gap: 15px;
+            flex-wrap: wrap;
+        }
+
+        @media (max-width: 768px) {
+            .form-buttons-container {
+                flex-direction: column;
+            }
+            .participation-btn {
+                width: 100%;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="container py-5" style="transform: translateY(30px);">
+        <div class="row justify-content-center align-items-stretch gx-4">
+            <!-- Colonne formulaire -->
+            <div class="col-lg-7 mb-4 mb-lg-0 d-flex">
+                <div class="card shadow border-0 w-100">
+                    <div class="card-header bg-success text-white py-3">
+                        <h1 class="h4 mb-0">Create New Participation</h1>
+                    </div>
+                    <div class="card-body">
+                        {{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+                        <div class="card shadow-sm mb-4">
+                            <div class="card-body">
+                                {% for child in form %}
+                                    {% if child.vars.name != '_token' %}
+                                        <div class="mb-3">
+                                            {{ form_label(child, null, {'label_attr': {'class': 'form-label fw-bold'}}) }}
+                                            {{ form_widget(child, {'attr': {'class': 'form-control' ~ (child.vars.valid ? '' : ' is-invalid')}}) }}
+                                            <div class="invalid-feedback">
+                                                {{ form_errors(child) }}
+                                            </div>
+                                        </div>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            <div class="card-footer bg-white">
+                                <div class="form-buttons-container">
+                                    <a href="{{ path('app_participation_index') }}" 
+                                       class="participation-btn btn-back-list">
+                                        <i class="fas fa-list"></i> Back to list
+                                    </a>
+                                    <a href="{{ path('app_front_event_list') }}" 
+                                       class="participation-btn btn-back-events">
+                                        <i class="fas fa-calendar-alt"></i> Retour aux événements
+                                    </a>
+                                    <button type="submit" class="participation-btn btn-submit">
+                                        <i class="fas fa-paper-plane"></i> {{ button_label|default('Envoyer') }}
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
+                        {{ form_end(form) }}
+                    </div>
+                </div>
+            </div>
+            <!-- Colonne image (dynamique) -->
+            <div class="col-lg-5 d-flex">
+                <div class="card shadow border-0 w-100" style="border-left: 4px solid #29AB87;">
+                    <div class="position-relative h-100">
+                        {% if event is defined and event is not null and event.imageName %}
+                            <!-- Image de l'événement sélectionné -->
+                            <img src="{{ asset('uploads/events/' ~ event.imageName) }}"
+                                 class="img-fluid h-100 w-100"
+                                 style="object-fit: cover; min-height: 300px;"
+                                 alt="{{ event.title }}">
+                            
+                            <div class="position-absolute bottom-0 start-0 end-0 p-4"
+                                 style="background: linear-gradient(to top, rgba(0,105,62,0.9), transparent);">
+                                <h3 class="text-white mb-2">{{ event.title }}</h3>
+                                <p class="text-white-50 mb-0">{{ event.date|date('d/m/Y à H:i') }}<br>{{ event.location }}</p>
+                            </div>
+                        {% else %}
+                            <!-- Image par défaut si aucun événement n'est sélectionné -->
+                            <img src="{{ asset('assets/front/assets/img/participation-image2.jpg') }}"
+                                 class="img-fluid h-100 w-100"
+                                 style="object-fit: cover; min-height: 300px;"
+                                 alt="Éco-participation">
+
+                            <div class="position-absolute bottom-0 start-0 end-0 p-4"
+                                 style="background: linear-gradient(to top, rgba(0,105,62,0.9), transparent);">
+                                <h3 class="text-white mb-2">#ECO-BYTE</h3>
+                                <p class="text-white-50 mb-0">BESOIN DE NATURE<br>REJOIGNEZ L'AVENTURE</p>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Afficher les alertes flash
+            {% for message in app.flashes('success') %}
+            Swal.fire({
+                title: 'Succès',
+                text: '{{ message }}',
+                icon: 'success',
+                confirmButtonColor: '#29AB87',
+                background: '#f8f9fa',
+                backdrop: `
+                        rgba(41, 171, 135, 0.4)
+                        url("/images/leaf-pattern.png")
+                        center top
+                        no-repeat
+                    `,
+                timer: 3000
+            });
+            {% endfor %}
+
+            // Effet de vague amélioré
+            const buttons = document.querySelectorAll('.btn-primary, .btn-outline-secondary');
+            buttons.forEach(btn => {
+                btn.addEventListener('click', function(e) {
+                    // Effet de vague
+                    const ripple = document.createElement('span');
+                    ripple.classList.add('ripple-effect');
+
+                    const rect = btn.getBoundingClientRect();
+                    const size = Math.max(rect.width, rect.height);
+                    const x = e.clientX - rect.left - size/2;
+                    const y = e.clientY - rect.top - size/2;
+
+                    ripple.style.width = ripple.style.height = `${size}px`;
+                    ripple.style.left = `${x}px`;
+                    ripple.style.top = `${y}px`;
+
+                    this.appendChild(ripple);
+
+                    setTimeout(() => ripple.remove(), 800);
+
+                    // Effet de rebond
+                    this.classList.add('animate__animated', 'animate__rubberBand');
+                    setTimeout(() => {
+                        this.classList.remove('animate__animated', 'animate__rubberBand');
+                    }, 1000);
+                });
+            });
+
+            // Gestion du formulaire (identique)
+            const form = document.querySelector('.needs-validation');
+            if (form) {
+                form.addEventListener('submit', function(event) {
+                    event.preventDefault();
+
+                    if (!form.checkValidity()) {
+                        event.stopPropagation();
+                        form.classList.add('was-validated');
+
+                        const invalidFields = form.querySelectorAll('.is-invalid');
+                        if (invalidFields.length > 0) {
+                            invalidFields[0].focus();
+                            Swal.fire({
+                                title: 'Formulaire incomplet',
+                                text: 'Veuillez corriger les erreurs dans le formulaire.',
+                                icon: 'error',
+                                confirmButtonColor: '#dc3545'
+                            });
+                        }
+                        return;
+                    }
+
+                    // Confirmation avant soumission
+                    Swal.fire({
+                        title: 'Confirmer la participation',
+                        html: `
+                            <div class="text-center">
+                                <i class="fas fa-check-circle text-success mb-3" style="font-size: 3rem;"></i>
+                                <p>Êtes-vous sûr de vouloir soumettre votre participation ?</p>
+                            </div>
+                        `,
+                        icon: 'question',
+                        showCancelButton: true,
+                        confirmButtonColor: '#29AB87',
+                        cancelButtonColor: '#6c757d',
+                        confirmButtonText: '<i class="fas fa-check me-2"></i> Confirmer',
+                        cancelButtonText: '<i class="fas fa-times me-2"></i> Annuler',
+                        customClass: {
+                            confirmButton: 'btn btn-primary btn-magnetic',
+                            cancelButton: 'btn btn-outline-secondary'
+                        }
+                    }).then((result) => {
+                        if (result.isConfirmed) {
+                            form.removeEventListener('submit', arguments.callee);
+                            form.submit();
+
+                            Swal.fire({
+                                title: 'Envoi en cours',
+                                html: '<div class="spinner-border text-success"></div><p class="mt-3">Traitement de votre participation...</p>',
+                                showConfirmButton: false,
+                                allowOutsideClick: false
+                            });
+                        }
+                    });
+                });
+            }
+        });
+    </script>
+{% endblock %}

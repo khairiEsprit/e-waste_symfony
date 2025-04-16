@@ -1,0 +1,528 @@
+{% extends 'front/base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css"/>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        /* Translation uniquement */
+        .translated-content {
+            transform: translateY(70px);
+            margin-bottom: 70px;
+            min-height: 100vh;
+            background: linear-gradient(to bottom, #FEFEFA 0%, #E8F5EE 100%);
+        }
+
+        /* Improved Title Section */
+        .alert-info {
+            position: relative;
+            background: linear-gradient(135deg, #ACE1AF 0%, #29AB87 100%);
+            border: 2px solid #00693E;
+            color: #013220;
+            border-radius: 15px;
+            box-shadow: 0 6px 20px rgba(41, 171, 135, 0.3);
+            padding: 20px 30px;
+            font-size: 1.5rem;
+            font-weight: 700;
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            align-items: center;
+            gap: 15px;
+            transition: all 0.3s ease;
+            overflow: hidden;
+        }
+
+        /* Subtle wave pattern overlay */
+        .alert-info::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1440 320"><path fill="rgba(255,255,255,0.1)" fill-opacity="1" d="M0,224L48,213.3C96,203,192,181,288,181.3C384,181,480,203,576,192C672,181,768,139,864,138.7C960,139,1056,181,1152,186.7C1248,192,1344,160,1392,144L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path></svg>');
+            background-size: cover;
+            background-position: center;
+            opacity: 0.3;
+            pointer-events: none;
+        }
+
+        .alert-info:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 10px 30px rgba(41, 171, 135, 0.4);
+        }
+
+        .alert-info i {
+            font-size: 2rem;
+            color: #00693E;
+            animation: bounce-rotate 2s infinite;
+        }
+
+        @keyframes bounce-rotate {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-10px) rotate(15deg);
+            }
+        }
+
+        /* Improved Form Card */
+        .card.form-card {
+            background: linear-gradient(145deg, #FEFEFA 0%, #E8F5EE 100%);
+            border: 1px solid #ACE1AF;
+            border-radius: 15px;
+            box-shadow: 0 10px 30px rgba(0, 105, 62, 0.15);
+            transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .card.form-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 40px rgba(0, 105, 62, 0.2);
+        }
+
+        .card.form-card::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: radial-gradient(circle, rgba(41, 171, 135, 0.1) 0%, transparent 70%);
+            pointer-events: none;
+        }
+
+        .card-header.bg-primary {
+            background: linear-gradient(135deg, #013220 0%, #00693E 100%) !important;
+            color: #FEFEFA;
+            border-radius: 12px 12px 0 0;
+            padding: 20px;
+            box-shadow: 0 4px 15px rgba(1, 50, 32, 0.15);
+            font-family: 'Poppins', sans-serif;
+            font-weight: 600;
+            font-size: 1.25rem;
+        }
+
+        .card-body {
+            padding: 30px;
+        }
+
+        .text-muted {
+            color: #29AB87 !important;
+            font-style: italic;
+            font-size: 0.95rem;
+            line-height: 1.5;
+        }
+
+        /* Image Card with Slideshow (Unchanged) */
+        .image-card {
+            background: #FEFEFA;
+            border-radius: 12px;
+            border: 1px solid #ACE1AF;
+            box-shadow: 0 10px 30px rgba(0, 105, 62, 0.15);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            position: relative;
+        }
+
+        .image-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 15px 35px rgba(0, 105, 62, 0.2);
+        }
+
+        /* Slideshow container (Unchanged) */
+        .slideshow-container {
+            position: relative;
+            width: 100%;
+            height: 250px;
+            overflow: hidden;
+        }
+
+        .slideshow-image {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            border-radius: 12px 12px 0 0;
+            opacity: 0;
+            transition: opacity 1s ease-in-out;
+        }
+
+        /* Show the active image */
+        .slideshow-image.active {
+            opacity: 1;
+        }
+
+        .image-card .card-body {
+            padding: 20px;
+            text-align: center;
+        }
+
+        /* Étoiles de notation */
+        .star-rating-form {
+            display: flex;
+            flex-direction: row-reverse;
+            justify-content: flex-end;
+            gap: 10px;
+            margin-top: 10px;
+        }
+        .star-rating-form input {
+            display: none;
+        }
+        .star-rating-form label {
+            font-size: 1.8rem;
+            color: #ACE1AF;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        .star-rating-form label:hover,
+        .star-rating-form label:hover ~ label {
+            color: #29AB87;
+            transform: scale(1.1);
+        }
+        .star-rating-form input:checked ~ label {
+            color: #29AB87;
+        }
+        .star-rating-form input:checked + label {
+            color: #00693E;
+            transform: scale(1.2);
+            animation: star-pulse 0.5s ease;
+        }
+
+        @keyframes star-pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.3); }
+            100% { transform: scale(1.2); }
+        }
+
+        /* Custom SweetAlert2 Styling */
+        .swal2-title-custom {
+            color: #D32F2F !important;
+            font-size: 1.5rem !important;
+            font-weight: 600 !important;
+            margin-bottom: 1rem !important;
+        }
+
+        .swal2-html-custom {
+            padding: 0 1rem !important;
+        }
+
+        .btn-confirm {
+            background: linear-gradient(145deg, #29AB87, #218838) !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 24px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            letter-spacing: 1px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(41, 171, 135, 0.3) !important;
+        }
+
+        .btn-confirm:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 25px rgba(41, 171, 135, 0.4) !important;
+        }
+
+        .btn-cancel {
+            background: linear-gradient(145deg, #6c757d, #495057) !important;
+            color: white !important;
+            border: none !important;
+            padding: 10px 24px !important;
+            border-radius: 50px !important;
+            font-weight: 600 !important;
+            letter-spacing: 1px !important;
+            display: inline-flex !important;
+            align-items: center !important;
+            justify-content: center !important;
+            transition: all 0.3s ease !important;
+            box-shadow: 0 4px 15px rgba(108, 117, 125, 0.3) !important;
+        }
+
+        .btn-cancel:hover {
+            transform: translateY(-3px) !important;
+            box-shadow: 0 8px 25px rgba(108, 117, 125, 0.4) !important;
+        }
+
+        .swal2-close {
+            color: #666 !important;
+            font-size: 1.5rem !important;
+            transition: all 0.3s ease !important;
+        }
+
+        .swal2-close:hover {
+            color: #D32F2F !important;
+            transform: rotate(90deg) !important;
+        }
+
+        .swal2-popup {
+            border-radius: 12px !important;
+            box-shadow: 0 10px 30px rgba(0, 105, 62, 0.1) !important;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767.98px) {
+            .slideshow-container {
+                height: 200px;
+            }
+
+            .image-card {
+                margin-top: 20px;
+            }
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+    <div class="translated-content">
+        <div class="container mb-3 mt-4">
+            <div class="alert alert-info mb-4 animate__animated animate__fadeInDown">
+                <i class="fas fa-info-circle"></i> Votre avis nous intéresse !
+            </div>
+
+            <div class="row">
+                <!-- Carte du formulaire -->
+                <div class="col-md-9">
+                    <div class="card form-card shadow-sm animate__animated animate__fadeIn">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="card-title mb-0">Donnez votre avis</h5>
+                        </div>
+                        <div class="card-body">
+                            {{ include('front/avis/_form.html.twig') }}
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Carte de l'image avec slideshow (Unchanged) -->
+                <div class="col-md-3">
+                    <div class="image-card h-100 animate__animated animate__fadeIn">
+                        <div class="card-body p-0">
+                            <div class="slideshow-container">
+                                <img src="{{ asset('assets/front/assets/img/image-avis-1.png') }}"
+                                     alt="E-Waste Recycling 1"
+                                     class="slideshow-image active">
+                                <img src="{{ asset('assets/front/assets/img/image-avis-2.png') }}"
+                                     alt="E-Waste Recycling 2"
+                                     class="slideshow-image">
+                                <img src="{{ asset('assets/front/assets/img/image-avis-3.png') }}"
+                                     alt="E-Waste Recycling 3"
+                                     class="slideshow-image">
+                            </div>
+                            <p class="p-3 mb-0 small text-muted">
+                                Un grand merci pour cette initiative et pour la prise en compte des retours des utilisateurs, ce qui améliore continuellement l'expérience et la qualité du projet. <br> #Eco-Byte
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <script>
+        $(document).ready(function() {
+            // Gestion des étoiles de notation
+            const stars = $('.star-rating-form label');
+            const noteInputs = $('.star-rating-input');
+            const hiddenNoteField = $('#avis_note_hidden');
+
+            stars.on('click', function() {
+                const value = $(this).prev('input').val();
+                
+                // Mettre à jour les inputs radio visibles
+                noteInputs.prop('checked', false);
+                noteInputs.filter(`[value="${value}"]`).prop('checked', true);
+                
+                // Mettre à jour le champ caché
+                hiddenNoteField.val(value);
+                
+                // Supprimer le message d'erreur si présent
+                $('#note-error').text('');
+            });
+
+            // Effet de vague sur le bouton Enregistrer
+            $('.save-btn').on('click', function(e) {
+                const ripple = document.createElement('span');
+                ripple.classList.add('ripple-wave');
+
+                const rect = this.getBoundingClientRect();
+                const size = Math.max(rect.width, rect.height);
+                const x = e.clientX - rect.left - size/2;
+                const y = e.clientY - rect.top - size/2;
+
+                ripple.style.width = ripple.style.height = `${size}px`;
+                ripple.style.left = `${x}px`;
+                ripple.style.top = `${y}px`;
+
+                this.appendChild(ripple);
+
+                setTimeout(() => ripple.remove(), 600);
+            });
+
+            // Slideshow logic (Unchanged)
+            const images = $('.slideshow-image');
+            let currentIndex = 0;
+
+            function showNextImage() {
+                images.removeClass('active');
+                currentIndex = (currentIndex + 1) % images.length;
+                images.eq(currentIndex).addClass('active');
+            }
+
+            // Start the slideshow (every 3 seconds)
+            setInterval(showNextImage, 3000);
+
+            // Validation et soumission du formulaire
+            $('#avis-form').on('submit', function(e) {
+                e.preventDefault();
+
+                // Réinitialiser les messages d'erreur
+                $('.error-message').text('');
+
+                // Récupérer les valeurs des champs
+                const nom = $('#avis_nom').val().trim();
+                const avis = $('#avis_avis').val().trim();
+                const note = $('input[name="avis[note]"]:checked').val();
+
+                let hasErrors = false;
+
+                // Validation des champs
+                if (!nom) {
+                    $('#nom-error').text('Veuillez entrer votre nom.');
+                    hasErrors = true;
+                }
+
+                if (!avis) {
+                    $('#avis-error').text('Veuillez entrer votre avis.');
+                    hasErrors = true;
+                }
+
+                if (!note) {
+                    $('#note-error').text('Veuillez sélectionner une note.');
+                    hasErrors = true;
+                }
+
+                // Si des erreurs sont présentes, arrêter la soumission
+                if (hasErrors) {
+                    return;
+                }
+
+                // Soumission du formulaire via AJAX
+                let formData = new FormData(this);
+                
+                // S'assurer que le champ note est inclus dans les données du formulaire
+                const noteValue = $('input.star-rating-input:checked').val();
+                if (noteValue) {
+                    // Forcer la valeur de note dans le formulaire
+                    formData.set('avis[note]', noteValue);
+                    
+                    // Mettre à jour le champ caché aussi
+                    $('#avis_note_hidden').val(noteValue);
+                }
+                
+                $.ajax({
+                    url: $(this).attr('action'),
+                    type: $(this).attr('method'),
+                    data: formData,
+                    processData: false,
+                    contentType: false,
+                    success: function(response) {
+                        Swal.fire({
+                            title: 'Succès !',
+                            html: `
+                                <div style="text-align: center; line-height: 1.6;">
+                                    <p style="font-size: 1.1rem; color: #333;">
+                                        Votre avis a été enregistré avec succès.
+                                    </p>
+                                    <p style="font-size: 0.9rem; color: #666; margin-top: 10px;">
+                                        Merci pour votre contribution à l'amélioration de notre projet !
+                                    </p>
+                                </div>
+                            `,
+                            icon: 'success',
+                            iconColor: '#29AB87',
+                            confirmButtonText: '<i class="fas fa-check mr-2"></i> OK',
+                            background: '#FEFEFA',
+                            backdrop: 'rgba(0, 105, 62, 0.2)',
+                            customClass: {
+                                popup: 'animate__animated animate__zoomIn',
+                                title: 'swal2-title-custom',
+                                htmlContainer: 'swal2-html-custom',
+                                confirmButton: 'btn-confirm'
+                            },
+                            buttonsStyling: false,
+                            showCloseButton: true,
+                            focusConfirm: true,
+                            padding: '1.5rem',
+                            width: '32rem'
+                        }).then((result) => {
+                            if (result.isConfirmed) {
+                                window.location.href = '{{ path('app_avis_index') }}';
+                            }
+                        });
+                    },
+                    error: function(xhr) {
+                        let errorMessage = 'Une erreur s\'est produite lors de l\'enregistrement de votre avis.';
+                        
+                        // Traiter les erreurs renvoyées par le serveur
+                        if (xhr.responseJSON) {
+                            if (xhr.responseJSON.message) {
+                                errorMessage = xhr.responseJSON.message;
+                            }
+                            
+                            if (xhr.responseJSON.errors) {
+                                // Si errors est un tableau
+                                if (Array.isArray(xhr.responseJSON.errors)) {
+                                    errorMessage = xhr.responseJSON.errors.join('<br>');
+                                } 
+                                // Si errors est un objet avec des champs nommés
+                                else {
+                                    errorMessage = '';
+                                    for (const field in xhr.responseJSON.errors) {
+                                        // Afficher l'erreur dans le champ correspondant
+                                        $('#' + field + '-error').text(xhr.responseJSON.errors[field]);
+                                        
+                                        // Ajouter au message d'erreur global
+                                        errorMessage += xhr.responseJSON.errors[field] + '<br>';
+                                    }
+                                }
+                            }
+                        }
+                        Swal.fire({
+                            title: 'Erreur',
+                            html: errorMessage,
+                            icon: 'error',
+                            iconColor: '#D32F2F',
+                            confirmButtonText: '<i class="fas fa-check mr-2"></i> OK',
+                            background: '#FEFEFA',
+                            backdrop: 'rgba(0, 105, 62, 0.2)',
+                            customClass: {
+                                popup: 'animate__animated animate__zoomIn',
+                                title: 'swal2-title-custom',
+                                htmlContainer: 'swal2-html-custom',
+                                confirmButton: 'btn-confirm'
+                            },
+                            buttonsStyling: false,
+                            showCloseButton: true,
+                            focusConfirm: true,
+                            padding: '1.5rem',
+                            width: '32rem'
+                        });
+                    }
+                });
+            });
+        });
+    </script>
+{% endblock %}

@@ -1,0 +1,379 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}SmartEvent Vision - Tableau de bord analytique{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.css">
+    <style>
+        .analytics-card {
+            border-radius: 10px;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            transition: transform 0.3s ease, box-shadow 0.3s ease;
+            overflow: hidden;
+        }
+        
+        .analytics-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 6px 12px rgba(0, 0, 0, 0.15);
+        }
+        
+        .stat-card {
+            border-left: 4px solid;
+            transition: all 0.3s ease;
+        }
+        
+        .stat-card:hover {
+            transform: scale(1.02);
+        }
+        
+        .stat-card.primary {
+            border-left-color: #013220;
+        }
+        
+        .stat-card.success {
+            border-left-color: #00693E;
+        }
+        
+        .stat-card.warning {
+            border-left-color: #29AB87;
+        }
+        
+        .stat-card.danger {
+            border-left-color: #FF6B6B;
+        }
+        
+        .stat-icon {
+            font-size: 2rem;
+            color: #013220;
+            opacity: 0.7;
+        }
+        
+        .chart-container {
+            position: relative;
+            height: 300px;
+            width: 100%;
+        }
+        
+        .prediction-card {
+            background: linear-gradient(135deg, #013220, #00693E);
+            color: white;
+            border-radius: 10px;
+        }
+        
+        .prediction-value {
+            font-size: 2rem;
+            font-weight: bold;
+        }
+        
+        .recommendation-item {
+            background-color: rgba(255, 255, 255, 0.1);
+            border-radius: 5px;
+            padding: 8px 12px;
+            margin-bottom: 8px;
+            display: inline-block;
+            margin-right: 8px;
+        }
+        
+        .dashboard-title {
+            color: #013220;
+            border-bottom: 2px solid #29AB87;
+            padding-bottom: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .section-title {
+            color: #00693E;
+            margin-bottom: 15px;
+            font-weight: 600;
+        }
+    </style>
+{% endblock %}
+
+{% block content %}
+    <div class="app-content-header">
+        <div class="container-fluid">
+            <div class="row">
+                <div class="col-sm-6">
+                    <h1 class="dashboard-title">SmartEvent Vision</h1>
+                </div>
+                <div class="col-sm-6">
+                    <ol class="breadcrumb float-sm-end">
+                        <li class="breadcrumb-item"><a href="{{ path('back_dashboard') }}">Accueil</a></li>
+                        <li class="breadcrumb-item active" aria-current="page">SmartEvent Vision</li>
+                    </ol>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="app-content">
+        <div class="container-fluid">
+            <!-- Statistics Overview -->
+            <h4 class="section-title">Vue d'ensemble</h4>
+            <div class="row mb-4">
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card primary">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted">Événements totaux</h6>
+                                <h2 class="mb-0">{{ stats.totalEvents }}</h2>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="bi bi-calendar-event"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card success">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted">Événements à venir</h6>
+                                <h2 class="mb-0">{{ stats.upcomingEvents }}</h2>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="bi bi-calendar-plus"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card warning">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted">Participations totales</h6>
+                                <h2 class="mb-0">{{ stats.totalParticipations }}</h2>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="bi bi-people"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-3 col-md-6 mb-3">
+                    <div class="card stat-card danger">
+                        <div class="card-body d-flex justify-content-between align-items-center">
+                            <div>
+                                <h6 class="card-title text-muted">Moy. participations/événement</h6>
+                                <h2 class="mb-0">{{ stats.avgParticipationsPerEvent }}</h2>
+                            </div>
+                            <div class="stat-icon">
+                                <i class="bi bi-graph-up"></i>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Charts Row -->
+            <div class="row mb-4">
+                <div class="col-lg-8 mb-4">
+                    <div class="card analytics-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Tendances mensuelles des participations</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="monthlyTrendsChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-4 mb-4">
+                    <div class="card analytics-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Distribution par ville</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="locationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Event Participation Chart -->
+            <div class="row mb-4">
+                <div class="col-12">
+                    <div class="card analytics-card">
+                        <div class="card-header">
+                            <h5 class="mb-0">Participation par événement</h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="chart-container">
+                                <canvas id="eventParticipationChart"></canvas>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Predictive Analytics -->
+            <h4 class="section-title">Analyse prédictive</h4>
+            <div class="row mb-4">
+                <div class="col-lg-4 mb-4">
+                    <div class="card prediction-card">
+                        <div class="card-body">
+                            <h5 class="card-title text-white">Participation prévue</h5>
+                            <p class="prediction-value">{{ predictions.predictedParticipation }}</p>
+                            <p class="card-text">Basé sur un taux de croissance de {{ predictions.growthRate }}%</p>
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="col-lg-8 mb-4">
+                    <div class="card prediction-card">
+                        <div class="card-body">
+                            <h5 class="card-title text-white">Lieux recommandés pour les prochains événements</h5>
+                            {% for location in predictions.recommendedLocations %}
+                                <span class="recommendation-item">{{ location }}</span>
+                            {% endfor %}
+                            <p class="card-text mt-3">Ces recommandations sont basées sur l'analyse des données de participation historiques.</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@3.9.1/dist/chart.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Monthly Trends Chart
+            const monthlyTrendsCtx = document.getElementById('monthlyTrendsChart').getContext('2d');
+            const monthlyTrendsChart = new Chart(monthlyTrendsCtx, {
+                type: 'line',
+                data: {
+                    labels: {{ monthlyTrends.labels|json_encode|raw }},
+                    datasets: [{
+                        label: 'Participations',
+                        data: {{ monthlyTrends.data|json_encode|raw }},
+                        backgroundColor: 'rgba(0, 105, 62, 0.2)',
+                        borderColor: '#00693E',
+                        borderWidth: 2,
+                        tension: 0.3,
+                        pointBackgroundColor: '#013220',
+                        pointRadius: 4
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        },
+                        tooltip: {
+                            backgroundColor: 'rgba(0, 0, 0, 0.7)',
+                            padding: 10,
+                            cornerRadius: 4
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Location Chart
+            const locationCtx = document.getElementById('locationChart').getContext('2d');
+            const locationChart = new Chart(locationCtx, {
+                type: 'doughnut',
+                data: {
+                    labels: {{ locationData.labels|json_encode|raw }},
+                    datasets: [{
+                        data: {{ locationData.data|json_encode|raw }},
+                        backgroundColor: [
+                            '#013220',
+                            '#00693E',
+                            '#29AB87',
+                            '#3CB371',
+                            '#66CDAA',
+                            '#8FBC8F',
+                            '#90EE90',
+                            '#98FB98',
+                            '#FEFEFA',
+                            '#F5F5F5'
+                        ],
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'right',
+                            labels: {
+                                boxWidth: 12,
+                                padding: 10
+                            }
+                        }
+                    }
+                }
+            });
+            
+            // Event Participation Chart
+            const eventParticipationCtx = document.getElementById('eventParticipationChart').getContext('2d');
+            const eventParticipationChart = new Chart(eventParticipationCtx, {
+                type: 'bar',
+                data: {
+                    labels: {{ eventParticipationData.labels|json_encode|raw }},
+                    datasets: [{
+                        label: 'Participations',
+                        data: {{ eventParticipationData.data|json_encode|raw }},
+                        backgroundColor: '#29AB87',
+                        borderColor: '#013220',
+                        borderWidth: 1
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            display: false
+                        }
+                    },
+                    scales: {
+                        y: {
+                            beginAtZero: true,
+                            grid: {
+                                color: 'rgba(0, 0, 0, 0.05)'
+                            }
+                        },
+                        x: {
+                            grid: {
+                                display: false
+                            },
+                            ticks: {
+                                autoSkip: false,
+                                maxRotation: 45,
+                                minRotation: 45
+                            }
+                        }
+                    }
+                }
+            });
+        });
+    </script>
+{% endblock %}
