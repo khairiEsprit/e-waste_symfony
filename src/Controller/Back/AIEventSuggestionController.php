@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
 
 use App\Service\AIEventGenerator;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
@@ -22,7 +22,7 @@ class AIEventSuggestionController extends AbstractController
     #[Route('/', name: 'app_event_ai_suggestions', methods: ['GET'])]
     public function index(): Response
     {
-        return $this->render('event/ai_suggestions/index.html.twig');
+        return $this->render('back/event/ai_suggestions/index.html.twig');
     }
 
     #[Route('/generate', name: 'app_event_ai_suggestions_generate', methods: ['POST'])]
@@ -51,7 +51,7 @@ class AIEventSuggestionController extends AbstractController
         // This route will be used to view a single suggestion in detail
         // The ID will be used to identify which suggestion from the session to display
         
-        return $this->render('event/ai_suggestions/view.html.twig', [
+        return $this->render('back/event/ai_suggestions/view.html.twig', [
             'id' => $id
         ]);
     }

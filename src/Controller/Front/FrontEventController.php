@@ -1,7 +1,7 @@
 <?php
 
 // src/Controller/FrontEventController.php
-namespace App\Controller;
+namespace App\Controller\Front;
 
 use App\Entity\Event;
 use App\Repository\EventRepository;
@@ -24,7 +24,7 @@ class FrontEventController extends AbstractController
             $events = $eventRepository->findBy([], ['date' => 'ASC']);
         }
 
-        return $this->render('list_evenements/list.html.twig', [
+        return $this->render('front/list_evenements/list.html.twig', [
             'events' => $events,
             'searchTerm' => $searchTerm
         ]);
@@ -33,7 +33,7 @@ class FrontEventController extends AbstractController
     #[Route('/{id}', name: 'app_front_event_show', methods: ['GET'])]
     public function show(Event $event): Response
     {
-        return $this->render('list_evenements/show.html.twig', [
+        return $this->render('front/list_evenements/show.html.twig', [
             'event' => $event,
         ]);
     }

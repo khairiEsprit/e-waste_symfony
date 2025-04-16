@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Front;
 
 use App\Entity\Avis;
 use App\Form\AvisType;
@@ -31,7 +31,7 @@ class AvisController extends AbstractController
             ? $avisRepository->findByNom($searchTerm)
             : $avisRepository->findBy([], ['createdAt' => 'DESC']);
 
-        return $this->render('avis/index.html.twig', [
+        return $this->render('front/avis/index.html.twig', [
             'avis' => $avis,
             'average_rating' => $avisRepository->getAverageRating(),
             'search_term' => $searchTerm
@@ -149,7 +149,7 @@ class AvisController extends AbstractController
             }
         }
 
-        return $this->render('avis/new.html.twig', [
+        return $this->render('front/avis/new.html.twig', [
             'form' => $form->createView(),
             'avi' => $avi
         ]);
@@ -158,7 +158,7 @@ class AvisController extends AbstractController
     #[Route('/{id}', name: 'app_avis_show', methods: ['GET'])]
     public function show(Avis $avi): Response
     {
-        return $this->render('avis/show.html.twig', [
+        return $this->render('front/avis/show.html.twig', [
             'avi' => $avi,
             'current_rating' => $avi->getNote()
         ]);
@@ -239,7 +239,7 @@ class AvisController extends AbstractController
             }
         }
 
-        return $this->render('avis/edit.html.twig', [
+        return $this->render('front/avis/edit.html.twig', [
             'form' => $form->createView(),
             'avi' => $avi
         ]);

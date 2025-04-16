@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
 
 use App\Entity\Event;
 use App\Form\EventType;
@@ -19,7 +19,7 @@ final class EventController extends AbstractController
     #[Route('/', name: 'app_event_index', methods: ['GET'])]
     public function index(EventRepository $eventRepository): Response
     {
-        return $this->render('event/index.html.twig', [
+        return $this->render('back/event/index.html.twig', [
             'events' => $eventRepository->findBy([], ['date' => 'ASC']),
         ]);
     }
@@ -69,7 +69,7 @@ final class EventController extends AbstractController
             }
         }
 
-        return $this->render('event/new.html.twig', [
+        return $this->render('back/event/new.html.twig', [
             'form' => $form->createView(),
             'event' => $event,
         ]);
@@ -78,7 +78,7 @@ final class EventController extends AbstractController
     #[Route('/{id}', name: 'app_event_show', methods: ['GET'])]
     public function show(Event $event): Response
     {
-        return $this->render('event/show.html.twig', [
+        return $this->render('back/event/show.html.twig', [
             'event' => $event,
         ]);
     }
@@ -155,7 +155,7 @@ final class EventController extends AbstractController
             }
         }
 
-        return $this->render('event/edit.html.twig', [
+        return $this->render('back/event/edit.html.twig', [
             'form' => $form->createView(),
             'event' => $event,
         ]);

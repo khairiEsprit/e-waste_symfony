@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Front;
 
 use App\Entity\Participation;
 use App\Form\ParticipationType;
@@ -32,7 +32,7 @@ class ParticipationController extends AbstractController
             $participations = $repository->findAll();
         }
 
-        return $this->render('participation/index.html.twig', [
+        return $this->render('front/participation/index.html.twig', [
             'participations' => $participations,
             'search_term' => $searchTerm
         ]);
@@ -101,7 +101,7 @@ class ParticipationController extends AbstractController
             }
         }
 
-        return $this->render('participation/new.html.twig', [
+        return $this->render('front/participation/new.html.twig', [
             'form' => $form->createView(),
             'event' => $event,
         ]);
@@ -110,7 +110,7 @@ class ParticipationController extends AbstractController
     #[Route('/{id}', name: 'app_participation_show', methods: ['GET'])]
     public function show(Participation $participation): Response
     {
-        return $this->render('participation/show.html.twig', [
+        return $this->render('front/participation/show.html.twig', [
             'participation' => $participation,
         ]);
     }
@@ -164,7 +164,7 @@ class ParticipationController extends AbstractController
             }
         }
 
-        return $this->render('participation/edit.html.twig', [
+        return $this->render('front/participation/edit.html.twig', [
             'participation' => $participation,
             'form' => $form,
         ]);
