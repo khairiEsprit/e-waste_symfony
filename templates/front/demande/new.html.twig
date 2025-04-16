@@ -1,0 +1,194 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Nouvelle Demande{% endblock %}
+
+{% block body %}
+<br>
+<br>
+<div class="container mt-5">
+    <div class="title-container">
+        <h1 class="main-title">Créer une Nouvelle Demande</h1>
+    </div>
+
+    <div class="card custom-card">
+        <div class="card-body">
+            {{ include('front/demande/_form.html.twig', {'button_label': 'Créer'}) }}
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    :root {
+        --primary-color: #2C5E1A;
+        --primary-light: #1a7718;
+        --secondary-color: #f8f9fa;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #e0e0e0;
+    }
+
+    body {
+        background-color: #f5f7fa;
+        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    }
+
+    .title-container {
+        text-align: center;
+        margin-bottom: 40px;
+        position: relative;
+    }
+
+    .main-title {
+        color: var(--text-color);
+        font-size: 2.8rem;
+        font-weight: 700;
+        margin: 0;
+        padding: 0;
+        position: relative;
+        display: inline-block;
+    }
+
+    .main-title::after {
+        content: '';
+        position: absolute;
+        bottom: -10px;
+        left: 50%;
+        transform: translateX(-50%);
+        width: 100px;
+        height: 4px;
+        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
+        border-radius: 2px;
+    }
+
+    .custom-card {
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
+        border: none;
+        overflow: hidden;
+        max-width: 800px;
+        margin: 0 auto;
+        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+    }
+
+    .custom-card:hover {
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+    }
+
+    .card-body {
+        padding: 2.5rem;
+    }
+
+    /* Form styling */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
+    .form-label {
+        color: var(--primary-color);
+        font-weight: 600;
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
+    }
+
+    .form-control {
+        border-radius: 12px;
+        border: 1px solid var(--border-color);
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: all 0.3s ease;
+        background-color: var(--secondary-color);
+    }
+
+    .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 0.2rem rgba(44, 94, 26, 0.15);
+        background-color: white;
+    }
+
+    .form-control::placeholder {
+        color: var(--text-light);
+        opacity: 0.7;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Custom button styling */
+    .custom-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 10px;
+        padding: 12px 30px;
+        border-radius: 30px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 1rem;
+        font-weight: 500;
+        box-shadow: 0 2px 8px rgba(0,0,0,0.1);
+        cursor: pointer;
+    }
+
+    .btn-back {
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+        color: white;
+    }
+
+    .btn-back:hover {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
+        transform: translateY(-2px);
+        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+        color: white;
+        text-decoration: none;
+    }
+
+    /* Form validation styling */
+    .is-invalid {
+        border-color: #dc3545;
+    }
+
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .main-title {
+            font-size: 2.2rem;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        .custom-card {
+            margin: 0 15px;
+        }
+        
+        .form-control {
+            padding: 10px 12px;
+        }
+    }
+</style>
+{% endblock %}

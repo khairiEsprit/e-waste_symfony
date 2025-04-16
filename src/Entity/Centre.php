@@ -74,9 +74,15 @@ class Centre
      */
     #[ORM\OneToMany(targetEntity: Poubelle::class, mappedBy: 'centre')]
     private Collection $poubelles;
+
+    #[ORM\OneToMany(targetEntity: Demande::class, mappedBy: 'centre')]
+    private Collection $demandes;
+
     public function __construct()
     {
         $this->poubelles = new ArrayCollection();
+        $this->demandes = new ArrayCollection();
+
     }
 
     public function getId(): ?int
@@ -104,6 +110,34 @@ class Centre
     public function setLongitude(float $longitude): static
     {
         $this->longitude = $longitude;
+
+        return $this;
+    }
+
+
+    public function getDemandes(): Collection
+    {
+        return $this->demandes;
+    }
+
+    public function addDemande(Demande $demande): static
+    {
+        if (!$this->demandes->contains($demande)) {
+            $this->demandes->add($demande);
+            $demande->setCentre($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemande(Demande $demande): static
+    {
+        if ($this->demandes->removeElement($demande)) {
+            // set the owning side to null (unless already changed)
+            if ($demande->getCentre() === $this) {
+                $demande->setCentre(null);
+            }
+        }
 
         return $this;
     }

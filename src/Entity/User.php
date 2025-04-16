@@ -27,10 +27,15 @@ class User extends BaseUser
     #[ORM\OneToMany(mappedBy: "user", targetEntity: UserReward::class, cascade: ["persist", "remove"])]
     private Collection $userRewards;
 
+    #[ORM\OneToMany(targetEntity: Demande::class, mappedBy: 'utilisateur')]
+    private Collection $demandes;
+
     public function __construct()
     {
         parent::__construct();
         $this->userRewards = new ArrayCollection();
+        $this->demandes = new ArrayCollection();
+
     }
 
     public function getBirthdate(): ?\DateTimeInterface
@@ -52,6 +57,33 @@ class User extends BaseUser
     public function setProfileImage(?string $profileImage): self
     {
         $this->profileImage = $profileImage;
+        return $this;
+    }
+
+    public function getDemandes(): Collection
+    {
+        return $this->demandes;
+    }
+
+    public function addDemande(Demande $demande): static
+    {
+        if (!$this->demandes->contains($demande)) {
+            $this->demandes->add($demande);
+            $demande->setUtilisateur($this);
+        }
+
+        return $this;
+    }
+
+    public function removeDemande(Demande $demande): static
+    {
+        if ($this->demandes->removeElement($demande)) {
+            // set the owning side to null (unless already changed)
+            if ($demande->getUtilisateur() === $this) {
+                $demande->setUtilisateur(null);
+            }
+        }
+
         return $this;
     }
 

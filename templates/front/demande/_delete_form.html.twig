@@ -1,0 +1,22 @@
+<form method="post" action="{{ path('app_demande_delete', {'id': demande.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette demande ?');" class="d-inline">
+    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ demande.id) }}">
+    <button class="custom-btn btn-delete">
+        <i class="fas fa-trash-alt"></i> Supprimer
+    </button>
+</form>
+
+{% block stylesheets %}
+    <style>
+        /* White Delete button */
+        .btn-delete {
+            background-color: white;
+            color: white;
+            border: 1px solid #ccc;
+        }
+
+        .btn-delete:hover {
+            background-color: #f8f9fa;
+            border-color: #ddd;
+        }
+    </style>
+{% endblock %}

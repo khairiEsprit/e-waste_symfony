@@ -1,0 +1,126 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Modifier la Demande{% endblock %}
+
+{% block body %}
+<br>
+<br>
+<div class="container mt-5">
+    <div class="title-container">
+        <h1 class="main-title">Modifier la Demande</h1>
+    </div>
+
+    <div class="card custom-card">
+        <div class="card-body">
+            {{ include('front/demande/_form.html.twig', {'button_label': 'Modifier'}) }}
+            <div class="delete-button-container mt-3">
+                {{ include('front/demande/_delete_form.html.twig') }}
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    .title-container {
+        text-align: center;
+        margin-bottom: 40px;
+    }
+
+    .main-title {
+        color: #333;
+        font-size: 2.5rem;
+        font-weight: 600;
+        margin: 0;
+        padding: 0;
+        font-family: Arial, sans-serif;
+    }
+
+    .custom-card {
+        background: #ffffff;
+        border-radius: 15px;
+        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
+        border: none;
+        overflow: hidden;
+        max-width: 800px;
+        margin: 0 auto;
+    }
+
+    .card-body {
+        padding: 2rem;
+    }
+
+    /* Form styling */
+    .form-label {
+        color: #2C5E1A;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .form-control {
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem;
+        margin-bottom: 1rem;
+    }
+
+    .form-control:focus {
+        border-color: #2C5E1A;
+        box-shadow: 0 0 0 0.2rem rgba(44, 94, 26, 0.25);
+    }
+
+    /* Custom button styling */
+    .custom-btn {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 10px 25px;
+        border-radius: 25px;
+        text-decoration: none;
+        transition: all 0.3s ease;
+        border: none;
+        font-size: 16px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        cursor: pointer;
+    }
+
+    .btn-back {
+        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        color: white;
+    }
+
+    .btn-back:hover {
+        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-edit {
+        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        color: white;
+    }
+
+    .btn-edit:hover {
+        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+
+    .btn-delete {
+        background: linear-gradient(145deg, #dc3545, #c82333);
+        color: white;
+    }
+
+    .btn-delete:hover {
+        background: linear-gradient(145deg, #c82333, #dc3545);
+        transform: translateY(-2px);
+        color: white;
+        text-decoration: none;
+    }
+</style>
+{% endblock %}

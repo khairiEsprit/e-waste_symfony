@@ -1,0 +1,305 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Liste des Traitement{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1>Liste des Traitement</h1>
+    </div>
+
+    <div class="card mb-4">
+        <div class="card-header d-flex justify-content-between align-items-center flex-wrap">
+            <h3 class="card-title mb-0">Traitements</h3>
+            <div class="search-container">
+                <div class="input-group">
+                    <input type="text" id="searchInput" class="form-control" placeholder="Rechercher un traitement...">
+                    <span class="input-group-text">
+                        <i class="fas fa-search"></i>
+                    </span>
+                </div>
+            </div>
+        </div>
+        <div class="card-body p-0">
+            <table class="table table-bordered table-hover">
+                <thead class="table-light">
+                    <tr>
+                        <th>Status</th>
+                        <th>Date de traitement</th>
+                        <th>Email Utilisateur</th>
+                        <th>Commentaire</th>
+                        <th>Actions</th>
+                    </tr>
+                </thead>
+                <tbody id="traitementsTableBody">
+                    {% for traitement in traitements %}
+                        <tr class="traitement-row" data-search="{{ traitement.status|lower }} {{ traitement.commentaire|lower }} {{ traitement.dateTraitement|date('Y-m-d') }} {{ traitement.demande.emailUtilisateur|lower }}">
+                            <td>{{ traitement.status }}</td>
+                            <td>{{ traitement.dateTraitement ? traitement.dateTraitement|date('Y-m-d') : '' }}</td>
+                            <td>{{ traitement.demande.emailUtilisateur }}</td>
+                            <td>{{ traitement.commentaire }}</td>
+                            <td>
+                                <a href="{{ path('app_traitement_show', {'id': traitement.id}) }}" class="btn btn-secondary">Show</a>
+                                <a href="{{ path('app_traitement_edit', {'id': traitement.id}) }}" class="btn btn-primary">Edit</a>
+                            </td>
+                        </tr>
+                    {% else %}
+                        <tr>
+                            <td colspan="5" class="text-center">Aucune tâche trouvée</td>
+                        </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+        <div class="card-footer">
+            <nav aria-label="Pagination">
+                <ul class="pagination justify-content-center mb-0">
+                    <li class="page-item disabled">
+                        <a class="page-link" href="#" tabindex="-1">Précédent</a>
+                    </li>
+                    <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                    <li class="page-item"><a class="page-link" href="#">2</a></li>
+                    <li class="page-item"><a class="page-link" href="#">3</a></li>
+                    <li class="page-item">
+                        <a class="page-link" href="#">Suivant</a>
+                    </li>
+                </ul>
+            </nav>
+        </div>
+    </div>
+
+    <!-- Modal de confirmation -->
+    <div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header bg-danger text-white">
+                    <h5 class="modal-title" id="deleteConfirmationModalLabel">Confirmation de suppression</h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p>Êtes-vous sûr de vouloir supprimer cette tâche ?</p>
+                    <p class="text-muted"><small>Cette action est irréversible.</small></p>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Annuler</button>
+                    <form id="deleteForm" method="post" action="">
+                        <input type="hidden" name="_token" value="">
+                        <button type="submit" class="btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
+<style>
+    :root {
+        --primary-color: #2C5E1A;
+        --primary-light: #1a7718;
+        --secondary-color: #f8f9fa;
+        --text-color: #333;
+        --text-light: #666;
+        --border-color: #e0e0e0;
+    }
+
+    .card-header {
+        background: white;
+        padding: 1rem 1.5rem;
+    }
+
+    .card-title {
+        color: var(--text-color);
+        font-size: 1.25rem;
+        font-weight: 600;
+    }
+
+    .search-container {
+        flex: 1;
+        max-width: 400px;
+        margin-left: 15px;
+    }
+
+    .input-group {
+        background: var(--secondary-color);
+        border-radius: 12px;
+        overflow: hidden;
+        border: 1px solid var(--border-color);
+        transition: all 0.3s ease;
+    }
+
+    .input-group:focus-within {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 3px rgba(44, 94, 26, 0.1);
+    }
+
+    .input-group .form-control {
+        border: none;
+        padding: 12px 15px;
+        font-size: 0.95rem;
+        background: transparent;
+    }
+
+    .input-group .form-control:focus {
+        box-shadow: none;
+    }
+
+    .input-group .form-control::placeholder {
+        color: var(--text-light);
+        opacity: 0.7;
+    }
+
+    .input-group-text {
+        background: transparent;
+        border: none;
+        color: var(--primary-color);
+        padding: 0 15px;
+    }
+
+    .input-group-text i {
+        font-size: 1.1rem;
+    }
+
+    /* Table styling */
+    .table {
+        margin-bottom: 0;
+    }
+
+    .table th {
+        background: var(--secondary-color);
+        color: var(--text-color);
+        font-weight: 600;
+        padding: 1rem;
+        border-bottom: 2px solid var(--border-color);
+    }
+
+    .table td {
+        padding: 1rem;
+        vertical-align: middle;
+    }
+
+    /* Button styling */
+    .btn {
+        border-radius: 8px;
+        padding: 8px 16px;
+        font-weight: 500;
+        transition: all 0.3s ease;
+    }
+
+    .btn-primary {
+        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
+        border: none;
+    }
+
+    .btn-primary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(44, 94, 26, 0.15);
+    }
+
+    .btn-secondary {
+        background: linear-gradient(135deg, #6c757d, #5a6268);
+        border: none;
+        color: white;
+    }
+
+    .btn-secondary:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(108, 117, 125, 0.15);
+        color: white;
+    }
+
+    .btn-danger {
+        background: linear-gradient(135deg, #dc3545, #c82333);
+        border: none;
+    }
+
+    .btn-danger:hover {
+        transform: translateY(-1px);
+        box-shadow: 0 4px 12px rgba(220, 53, 69, 0.15);
+    }
+
+    @media (max-width: 768px) {
+        .card-header {
+            flex-direction: column;
+            gap: 15px;
+        }
+
+        .search-container {
+            margin-left: 0;
+            max-width: 100%;
+        }
+
+        .card-title {
+            text-align: center;
+            width: 100%;
+        }
+    }
+</style>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const searchInput = document.getElementById('searchInput');
+    const traitementsTableBody = document.getElementById('traitementsTableBody');
+    const traitementRows = document.querySelectorAll('.traitement-row');
+
+    searchInput.addEventListener('input', function() {
+        const searchTerm = this.value.toLowerCase();
+        
+        traitementRows.forEach(row => {
+            const searchableText = row.getAttribute('data-search');
+            if (searchableText.includes(searchTerm)) {
+                row.style.display = '';
+            } else {
+                row.style.display = 'none';
+            }
+        });
+
+        // Check if any rows are visible
+        const visibleRows = Array.from(traitementsTableBody.querySelectorAll('.traitement-row'))
+            .filter(row => row.style.display !== 'none');
+
+        if (visibleRows.length === 0) {
+            if (!document.querySelector('.no-results-message')) {
+                const noResults = document.createElement('tr');
+                noResults.className = 'no-results-message';
+                noResults.innerHTML = '<td colspan="5" class="text-center">Aucun traitement ne correspond à votre recherche.</td>';
+                traitementsTableBody.appendChild(noResults);
+            }
+        } else {
+            const noResults = document.querySelector('.no-results-message');
+            if (noResults) {
+                noResults.remove();
+            }
+        }
+    });
+
+    // Gestion de la suppression
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const deleteForm = document.getElementById('deleteForm');
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            // Mise à jour du formulaire avec les données du bouton cliqué
+            deleteForm.action = this.dataset.url;
+            deleteForm.querySelector('input[name="_token"]').value = this.dataset.token;
+        });
+    });
+    
+    // Optionnel: Affichage d'un toast après suppression réussie
+    const urlParams = new URLSearchParams(window.location.search);
+    if (urlParams.has('deleted')) {
+        const toast = new bootstrap.Toast(document.getElementById('successToast'));
+        document.getElementById('toastMessage').textContent = 'La tâche a été supprimée avec succès';
+        toast.show();
+    }
+});
+</script>
+{% endblock %}

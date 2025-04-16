@@ -1,0 +1,145 @@
+{% form_theme form 'bootstrap_5_layout.html.twig' %}
+
+{{ form_start(form, {'attr': {'novalidate': 'novalidate', 'class': 'styled-form'}}) }}
+    <div class="form-fields">
+        {# Type field #}
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-tag"></i>
+                </span>
+                {{ form_widget(form.type, {'attr': {'class': 'form-control'}}) }}
+            </div>
+            {{ form_errors(form.type) }}
+        </div>
+
+        {# Adresse field #}
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-map-marker-alt"></i>
+                </span>
+                {{ form_widget(form.adresse, {'attr': {'class': 'form-control', 'placeholder': 'Votre adresse'}}) }}
+            </div>
+            {{ form_errors(form.adresse) }}
+        </div>
+
+        {# Email field #}
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-envelope"></i>
+                </span>
+                {{ form_widget(form.email_utilisateur, {'attr': {'class': 'form-control', 'placeholder': 'Votre email'}}) }}
+            </div>
+            {{ form_errors(form.email_utilisateur) }}
+        </div>
+
+        {# Message field #}
+        <div class="form-group">
+            <div class="input-group">
+                <span class="input-group-text">
+                    <i class="fas fa-comment-alt"></i>
+                </span>
+                {{ form_widget(form.message, {'attr': {'class': 'form-control', 'placeholder': 'Votre message', 'rows': '4'}}) }}
+            </div>
+            {{ form_errors(form.message) }}
+        </div>
+    </div>
+
+    <div class="button-group mt-4">
+        <a href="{{ path('app_demande_index') }}" class="custom-btn btn-back">
+            <i class="fas fa-arrow-left"></i> Retour à la liste
+        </a>
+        <button type="submit" class="custom-btn btn-edit">
+            {% if button_label is defined and button_label == 'Créer' %}
+                <i class="fas fa-plus-circle"></i> {{ button_label }}
+            {% else %}
+                <i class="fas fa-save"></i> {{ button_label|default('Enregistrer') }}
+            {% endif %}
+        </button>
+    </div>
+{{ form_end(form) }}
+
+<style>
+    .styled-form {
+        max-width: 100%;
+    }
+
+    .form-fields {
+        display: flex;
+        flex-direction: column;
+        gap: 1.5rem;
+    }
+
+    .input-group {
+        position: relative;
+        display: flex;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .input-group-text {
+        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        border: none;
+        color: white;
+        display: flex;
+        align-items: center;
+        padding: 0.75rem 1rem;
+        border-top-left-radius: 10px;
+        border-bottom-left-radius: 10px;
+    }
+
+    .input-group .form-control {
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
+        border-top-right-radius: 10px;
+        border-bottom-right-radius: 10px;
+        margin-bottom: 0;
+    }
+
+    .form-control, .form-select {
+        border-radius: 10px;
+        border: 1px solid #e0e0e0;
+        padding: 0.75rem;
+    }
+
+    .form-control:focus, .form-select:focus {
+        border-color: #2C5E1A;
+        box-shadow: 0 0 0 0.2rem rgba(44, 94, 26, 0.25);
+    }
+
+    .form-label {
+        color: #2C5E1A;
+        font-weight: 600;
+        margin-bottom: 0.5rem;
+    }
+
+    .button-group {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        gap: 1rem;
+        margin-top: 2rem;
+    }
+
+    /* Error message styling */
+    .invalid-feedback {
+        color: #dc3545;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+        display: block;
+    }
+
+    /* Required field indicator */
+    .required:after {
+        content: " *";
+        color: #2C5E1A;
+    }
+
+    /* Style for textareas */
+    textarea.form-control {
+        min-height: 100px;
+        resize: vertical;
+    }
+</style>

@@ -1,0 +1,11 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}New Traitement {% endblock %}
+
+{% block body %}
+    <h1>Create new Traitement</h1>
+
+    {{ include('back/traitement/_form.html.twig') }}
+
+    <a href="{{ path('app_traitement_index') }}">back to list</a>
+{% endblock %}
