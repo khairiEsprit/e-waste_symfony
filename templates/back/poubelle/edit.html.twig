@@ -1,0 +1,13 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Modifier la Poubelle{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            {{ include('back/poubelle/_form.html.twig', {'button_label': 'Update'}) }}
+        </div>
+    </div>
+</div>
+{% endblock %}

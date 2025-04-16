@@ -1,8 +1,9 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
 
 use App\Entity\Poubelle;
+use App\Entity\Historique;
 use App\Form\PoubelleType;
 use App\Repository\PoubelleRepository;
 use Doctrine\ORM\EntityManagerInterface;
@@ -17,7 +18,7 @@ final class PoubelleController extends AbstractController
     #[Route(name: 'app_poubelle_index', methods: ['GET'])]
     public function index(PoubelleRepository $poubelleRepository): Response
     {
-        return $this->render('poubelle/index.html.twig', [
+        return $this->render('back/poubelle/index.html.twig', [
             'poubelles' => $poubelleRepository->findAll(),
         ]);
     }
@@ -36,17 +37,25 @@ final class PoubelleController extends AbstractController
             return $this->redirectToRoute('app_poubelle_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('poubelle/new.html.twig', [
+        return $this->render('back/poubelle/new.html.twig', [
             'poubelle' => $poubelle,
             'form' => $form,
         ]);
     }
 
     #[Route('/{id}', name: 'app_poubelle_show', methods: ['GET'])]
-    public function show(Poubelle $poubelle): Response
+    public function show(Poubelle $poubelle, EntityManagerInterface $entityManager): Response
     {
-        return $this->render('poubelle/show.html.twig', [
+        // Récupérer l'historique trié par date (du plus récent au plus ancien)
+        $historiqueRepository = $entityManager->getRepository(Historique::class);
+        $historique = $historiqueRepository->findBy(
+            ['poubelle' => $poubelle],
+            ['date_evenement' => 'DESC']
+        );
+        
+        return $this->render('back/poubelle/show.html.twig', [
             'poubelle' => $poubelle,
+            'historique' => $historique,
         ]);
     }
 
@@ -62,7 +71,7 @@ final class PoubelleController extends AbstractController
             return $this->redirectToRoute('app_poubelle_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('poubelle/edit.html.twig', [
+        return $this->render('back/poubelle/edit.html.twig', [
             'poubelle' => $poubelle,
             'form' => $form,
         ]);
@@ -77,5 +86,13 @@ final class PoubelleController extends AbstractController
         }
 
         return $this->redirectToRoute('app_poubelle_index', [], Response::HTTP_SEE_OTHER);
+    }
+
+    #[Route('/front', name: 'app_poubelle_front', methods: ['GET'])]
+    public function front(PoubelleRepository $poubelleRepository): Response
+    {
+        return $this->render('front/poubelle/index.html.twig', [
+            'poubelles' => $poubelleRepository->findAll(),
+        ]);
     }
 }

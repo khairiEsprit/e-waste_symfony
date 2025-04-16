@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
 
 use App\Entity\Capteurp;
 use App\Form\CapteurpType;
@@ -17,7 +17,7 @@ final class CapteurpController extends AbstractController
     #[Route(name: 'app_capteurp_index', methods: ['GET'])]
     public function index(CapteurpRepository $capteurpRepository): Response
     {
-        return $this->render('capteurp/index.html.twig', [
+        return $this->render('back/capteurp/index.html.twig', [
             'capteurps' => $capteurpRepository->findAll(),
         ]);
     }
@@ -36,7 +36,7 @@ final class CapteurpController extends AbstractController
             return $this->redirectToRoute('app_capteurp_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('capteurp/new.html.twig', [
+        return $this->render('back/capteurp/new.html.twig', [
             'capteurp' => $capteurp,
             'form' => $form,
         ]);
@@ -45,7 +45,7 @@ final class CapteurpController extends AbstractController
     #[Route('/{id}', name: 'app_capteurp_show', methods: ['GET'])]
     public function show(Capteurp $capteurp): Response
     {
-        return $this->render('capteurp/show.html.twig', [
+        return $this->render('back/capteurp/show.html.twig', [
             'capteurp' => $capteurp,
         ]);
     }
@@ -62,7 +62,7 @@ final class CapteurpController extends AbstractController
             return $this->redirectToRoute('app_capteurp_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('capteurp/edit.html.twig', [
+        return $this->render('back/capteurp/edit.html.twig', [
             'capteurp' => $capteurp,
             'form' => $form,
         ]);

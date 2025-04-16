@@ -1,0 +1,352 @@
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Détails de la Poubelle{% endblock %}
+
+{% block content %}
+<div class="container-fluid py-4">
+    <div class="row justify-content-center">
+        <div class="col-md-10">
+            <div class="card shadow" style="border-radius: 15px; overflow: hidden;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #013220; color: white;">
+                    <h4 class="mb-0">
+                        <i class="bi bi-trash-fill me-2"></i>
+                        Détails de la poubelle #{{ poubelle.id }}
+                    </h4>
+                    <span class="badge rounded-pill" 
+                        style="font-size: 0.9rem; padding: 8px 15px; background-color: 
+                        {% if poubelle.etat == 'Fonctionnel' %}#198754{% else %}#dc3545{% endif %};">
+                        <i class="bi {% if poubelle.etat == 'Fonctionnel' %}bi-check-circle{% else %}bi-exclamation-triangle{% endif %} me-1"></i>
+                        {{ poubelle.etat }}
+                    </span>
+                </div>
+                <div class="card-body" style="background-color: #FEFEFA;">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="card h-100" style="border-color: #ACE1AF;">
+                                <div class="card-header" style="background-color: #ACE1AF; color: #013220;">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-info-square me-2"></i>
+                                        Informations générales
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="small text-muted">ID de la poubelle</div>
+                                        <div class="fw-bold">{{ poubelle.id }}</div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Adresse</div>
+                                        <div class="fw-bold">
+                                            <i class="bi bi-geo-alt me-1"></i>
+                                            {{ poubelle.adresse }}
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Date d'installation</div>
+                                        <div class="fw-bold">
+                                            <i class="bi bi-calendar-event me-1"></i>
+                                            {{ poubelle.dateInstallation ? poubelle.dateInstallation|date('d/m/Y') : 'Non définie' }}
+                                        </div>
+                                    </div>
+                                    {% if poubelle.centre %}
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Centre</div>
+                                        <div class="fw-bold">
+                                            <i class="bi bi-building me-1"></i>
+                                            {{ poubelle.centre.nom }}
+                                        </div>
+                                    </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card h-100" style="border-color: #ACE1AF;">
+                                <div class="card-header" style="background-color: #ACE1AF; color: #013220;">
+                                    <h5 class="mb-0">
+                                        <i class="bi bi-speedometer2 me-2"></i>
+                                        Informations techniques
+                                    </h5>
+                                </div>
+                                <div class="card-body">
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Hauteur totale</div>
+                                        <div class="fw-bold">
+                                            <i class="bi bi-arrows-vertical me-1"></i>
+                                            {{ poubelle.hauteurTotale }} cm
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">Niveau de remplissage</div>
+                                        <div class="fw-bold">
+                                            <div class="d-flex align-items-center">
+                                                <span class="badge bg-warning me-2">{{ poubelle.niveau }}%</span>
+                                                <div class="progress flex-grow-1" style="height: 10px;">
+                                                    <div class="progress-bar" role="progressbar" 
+                                                        style="width: {{ poubelle.niveau }}%; 
+                                                            background-color: 
+                                                            {% if poubelle.niveau < 40 %}#28a745
+                                                            {% elseif poubelle.niveau < 70 %}#ffc107
+                                                            {% else %}#dc3545{% endif %};"
+                                                        aria-valuenow="{{ poubelle.niveau }}" 
+                                                        aria-valuemin="0" 
+                                                        aria-valuemax="100"></div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="mb-3">
+                                        <div class="small text-muted">État</div>
+                                        <div class="fw-bold">
+                                            <span class="badge rounded-pill 
+                                                {% if poubelle.etat == 'Fonctionnel' %}bg-success
+                                                {% else %}bg-danger{% endif %} px-3 py-2">
+                                                <i class="bi 
+                                                    {% if poubelle.etat == 'Fonctionnel' %}bi-check-circle
+                                                    {% else %}bi-exclamation-triangle{% endif %} me-1"></i>
+                                                {{ poubelle.etat }}
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    {% if poubelle.capteur %}
+                    <div class="card mb-4" style="border-color: #ACE1AF;">
+                        <div class="card-header" style="background-color: #ACE1AF; color: #013220;">
+                            <h5 class="mb-0">
+                                <i class="bi bi-cpu me-2"></i>
+                                Capteur de distance
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Distance mesurée</div>
+                                    <div class="fw-bold">{{ poubelle.capteur.distanceMesuree }} cm</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Portée maximale</div>
+                                    <div class="fw-bold">{{ poubelle.capteur.porteeMaximale }} cm</div>
+                                </div>
+                                <div class="col-md-4">
+                                    <div class="small text-muted">Date de mesure</div>
+                                    <div class="fw-bold">{{ poubelle.capteur.dateMesure|date('d/m/Y H:i') }}</div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+                    
+                    <div class="d-flex justify-content-between mt-4">
+                        <a href="{{ path('app_poubelle_index') }}" class="btn btn-secondary">
+                            <i class="bi bi-arrow-left me-1"></i> Retour à la liste
+                        </a>
+                        <div>
+                            <a href="{{ path('app_poubelle_edit', {'id': poubelle.id}) }}" class="btn" style="background-color: #00693E; color: white;">
+                                <i class="bi bi-pencil me-1"></i> Modifier
+                            </a>
+                            <button type="button" class="btn btn-danger ms-2" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                                <i class="bi bi-trash me-1"></i> Supprimer
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Section Historique de la poubelle -->
+            <div class="card shadow mt-4" style="border-radius: 15px; overflow: hidden;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #013220; color: white;">
+                    <h4 class="mb-0">
+                        <i class="bi bi-clock-history me-2"></i>
+                        Historique de la poubelle #{{ poubelle.id }}
+                    </h4>
+                    <a href="{{ path('app_historique_new') }}" class="btn" style="background-color: #00693E; color: white;">
+                        <i class="bi bi-plus-circle me-1"></i> Nouvel événement
+                    </a>
+                </div>
+                
+                <div class="card-body p-0">
+                    <div class="table-responsive">
+                        <table class="table table-hover mb-0">
+                            <thead style="background-color: #ACE1AF;">
+                                <tr>
+                                    <th class="px-3">ID</th>
+                                    <th>Date</th>
+                                    <th>Type</th>
+                                    <th>Description</th>
+                                    <th>Quantité</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody style="background-color: #FEFEFA;">
+                            {% if poubelle.historiques is defined and poubelle.historiques|length > 0 %}
+                                {% for historique in poubelle.historiques %}
+                                    <tr>
+                                        <td class="px-3">{{ historique.id }}</td>
+                                        <td>{{ historique.dateEvenement ? historique.dateEvenement|date('d/m/Y H:i') : '' }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill 
+                                                {% if historique.typeEvenement == 'Collecte' %}text-bg-success
+                                                {% elseif historique.typeEvenement == 'Traitement' %}text-bg-info
+                                                {% elseif historique.typeEvenement == 'Recyclage' %}text-bg-primary
+                                                {% else %}text-bg-secondary{% endif %}">
+                                                <i class="bi 
+                                                    {% if historique.typeEvenement == 'Collecte' %}bi-trash
+                                                    {% elseif historique.typeEvenement == 'Traitement' %}bi-gear
+                                                    {% elseif historique.typeEvenement == 'Recyclage' %}bi-recycle
+                                                    {% else %}bi-tools{% endif %} me-1"></i>
+                                                {{ historique.typeEvenement }}
+                                            </span>
+                                        </td>
+                                        <td>
+                                            {% if historique.description %}
+                                                {{ historique.description|length > 30 ? historique.description|slice(0, 30) ~ '...' : historique.description }}
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            {% if historique.quantiteDechets %}
+                                                <span class="badge text-bg-warning">{{ historique.quantiteDechets }} kg</span>
+                                            {% else %}
+                                                <span class="text-muted">-</span>
+                                            {% endif %}
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group">
+                                                <a href="{{ path('app_historique_show', {'id': historique.id}) }}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Voir les détails">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="{{ path('app_historique_edit', {'id': historique.id}) }}" 
+                                                   class="btn btn-sm btn-outline-success" 
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Modifier">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-danger delete-item"
+                                                        data-id="{{ historique.id }}"
+                                                        data-token="{{ csrf_token('delete' ~ historique.id) }}"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-title="Supprimer">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="6" class="text-center py-5">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                                            <p class="mt-3 mb-1 fw-bold">Aucun événement enregistré pour cette poubelle</p>
+                                            <a href="{{ path('app_historique_new') }}" class="btn mt-2" style="background-color: #00693E; color: white;">
+                                                <i class="bi bi-plus-circle me-1"></i> Ajouter un événement
+                                            </a>
+                                        </div>
+                                    </td>
+                                </tr>
+                            {% endif %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Total: {{ poubelle.historiques is defined ? poubelle.historiques|length : 0 }} événement(s)</small>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation de suppression -->
+<div class="modal fade" id="deleteModal" tabindex="-1" aria-labelledby="deleteModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header" style="background-color: #dc3545; color: white;">
+                <h5 class="modal-title" id="deleteModalLabel">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    Confirmation de suppression
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette poubelle ? Cette action est irréversible.</p>
+                <div class="alert alert-warning">
+                    <i class="bi bi-info-circle me-2"></i>
+                    La poubelle #{{ poubelle.id }} située à {{ poubelle.adresse }} sera définitivement supprimée.
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">
+                    <i class="bi bi-x-circle me-1"></i> Annuler
+                </button>
+                <form method="post" action="{{ path('app_poubelle_delete', {'id': poubelle.id}) }}">
+                    <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ poubelle.id) }}">
+                    <button class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Script pour gérer la suppression des événements -->
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Activer les tooltips Bootstrap
+    const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+    [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+    
+    // Gestion des boutons de suppression pour les historiques
+    const deleteButtons = document.querySelectorAll('.delete-item');
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const id = this.getAttribute('data-id');
+            const token = this.getAttribute('data-token');
+            
+            Swal.fire({
+                title: 'Êtes-vous sûr?',
+                text: "Cette action est irréversible!",
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonColor: '#dc3545',
+                cancelButtonColor: '#6c757d',
+                confirmButtonText: 'Oui, supprimer',
+                cancelButtonText: 'Annuler'
+            }).then((result) => {
+                if (result.isConfirmed) {
+                    // Créer et soumettre un formulaire de suppression
+                    const form = document.createElement('form');
+                    form.method = 'POST';
+                    form.action = "{{ path('app_historique_delete', {'id': 'ID'}) }}".replace('ID', id);
+                    form.style.display = 'none';
+                    
+                    const csrfToken = document.createElement('input');
+                    csrfToken.type = 'hidden';
+                    csrfToken.name = '_token';
+                    csrfToken.value = token;
+                    
+                    form.appendChild(csrfToken);
+                    document.body.appendChild(form);
+                    
+                    form.submit();
+                }
+            });
+        });
+    });
+});
+</script>
+{% endblock %}

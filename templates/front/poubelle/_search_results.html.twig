@@ -1,0 +1,104 @@
+{# filepath: c:\Users\asus\OneDrive\Bureau\e-waste_symfony\e-waste_symfony\templates\front\poubelle\_search_results.html.twig #}
+
+{% if poubelles is empty %}
+    <div class="alert alert-info text-center w-100">Aucune poubelle trouvée</div>
+{% else %}
+    {% for poubelle in poubelles %}
+        <div class="card poubelle-card mb-3">
+            <div class="card-header status-{{ poubelle.etat|lower == 'fonctionnel' ? 'fonctionnel' : 'panne' }}">
+                <h5 class="card-title mb-0">Poubelle #{{ poubelle.id }}</h5>
+            </div>
+            <div class="card-body">
+                {# Affichage de l'adresse #}
+                <p class="card-text mb-2">
+                    <i class="fas fa-map-marker-alt me-2"></i> {{ poubelle.adresse }}
+                </p>
+                
+                {# État de la poubelle #}
+                <p class="card-text mb-3">
+                    <span class="badge {{ poubelle.etat|lower == 'fonctionnel' ? 'bg-success' : 'bg-danger' }}">
+                        <i class="fas {{ poubelle.etat|lower == 'fonctionnel' ? 'fa-check-circle' : 'fa-exclamation-triangle' }} me-1"></i>
+                        {{ poubelle.etat }}
+                    </span>
+                </p>
+                
+                {# Barre de progression du niveau de remplissage #}
+                <div class="mb-3">
+                    <p class="mb-1 small text-muted">Niveau de remplissage: {{ poubelle.niveau }}%</p>
+                    <div class="progress">
+                        {% set progress_color = '' %}
+                        {% if poubelle.niveau < 40 %}
+                            {% set progress_color = 'bg-success' %}
+                        {% elseif poubelle.niveau < 70 %}
+                            {% set progress_color = 'bg-success dark-green' %}
+                        {% else %}
+                            {% set progress_color = 'bg-danger' %}
+                        {% endif %}
+                        
+                        <div class="progress-bar {{ progress_color }}" role="progressbar" 
+                             style="width: {{ poubelle.niveau }}%" 
+                             aria-valuenow="{{ poubelle.niveau }}" 
+                             aria-valuemin="0" 
+                             aria-valuemax="100">
+                            {{ poubelle.niveau }}%
+                        </div>
+                    </div>
+                </div>
+                
+                {# Bouton pour afficher/masquer les détails #}
+                <button type="button" class="toggle-details btn btn-success w-100 mb-3">
+                    <strong>Afficher les détails</strong> <i class="fas fa-chevron-down icon-toggle ms-1"></i>
+                </button>
+                
+                {# Contenu détaillé à afficher/masquer #}
+                <div class="card-body-content">
+                    <hr>
+                    <h6 class="mb-3">Détails de la poubelle</h6>
+                    
+                    <div class="mb-2">
+                        <p class="mb-1 small text-muted">Centre</p>
+                        <p class="mb-0">{{ poubelle.centre ? poubelle.centre.nom : 'Non assigné' }}</p>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <p class="mb-1 small text-muted">Date d'installation</p>
+                        <p class="mb-0">{{ poubelle.dateInstallation|date('d/m/Y') }}</p>
+                    </div>
+                    
+                    <div class="mb-2">
+                        <p class="mb-1 small text-muted">Hauteur totale</p>
+                        <p class="mb-0">{{ poubelle.hauteurTotale }} cm</p>
+                    </div>
+                    
+                    {% if poubelle.capteur %}
+                    <h6 class="mt-4 mb-3">Capteur de distance</h6>
+                    <div class="mb-2">
+                        <p class="mb-1 small text-muted">Distance mesurée</p>
+                        <p class="mb-0">{{ poubelle.capteur.distanceMesuree }} cm</p>
+                    </div>
+                    <div class="mb-2">
+                        <p class="mb-1 small text-muted">Portée maximale</p>
+                        <p class="mb-0">{{ poubelle.capteur.porteeMaximale }} cm</p>
+                    </div>
+                    <div class="mb-2">
+                        <p class="mb-1 small text-muted">Dernière mesure</p>
+                        <p class="mb-0">{{ poubelle.capteur.dateMesure|date('d/m/Y H:i') }}</p>
+                    </div>
+                    {% endif %}
+                    
+                    {% if poubelle.capteurp %}
+                    <h6 class="mt-4 mb-3">Capteur de poids</h6>
+                    <div class="mb-2">
+                        <p class="mb-1 small text-muted">Quantité</p>
+                        <p class="mb-0">{{ poubelle.capteurp.quantite }} kg</p>
+                    </div>
+                    <div class="mb-2">
+                        <p class="mb-1 small text-muted">Date de mesure</p>
+                        <p class="mb-0">{{ poubelle.capteurp.dateM|date('d/m/Y H:i') }}</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    {% endfor %}
+{% endif %}

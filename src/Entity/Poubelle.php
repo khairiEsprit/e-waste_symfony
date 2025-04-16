@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\DBAL\Types\Types;
 use Doctrine\ORM\Mapping as ORM;
+use Symfony\Component\Validator\Constraints as Assert;
 
 #[ORM\Entity(repositoryClass: PoubelleRepository::class)]
 class Poubelle
@@ -17,20 +18,29 @@ class Poubelle
     private ?int $id = null;
 
     #[ORM\ManyToOne(inversedBy: 'poubelles', cascade: ['persist'])]
+    #[Assert\NotBlank(message: "Le centre est obligatoire.")]
     private ?Centre $centre = null;
+
     #[ORM\Column(length: 255)]
+    #[Assert\NotBlank(message: "L'adresse est obligatoire.")]
     private ?string $adresse = null;
 
     #[ORM\Column(nullable: false)]
     private ?int $niveau = 0;
 
     #[ORM\Column(length: 255)]
+    #[Assert\Choice(choices: ["Fonctionnel", "En panne"], message: "L'état doit être 'Fonctionnel' ou 'En panne'.")]
     private ?string $etat = null;
 
     #[ORM\Column(type: Types::DATE_MUTABLE)]
-    private ?\DateTimeInterface $date_installation = null;
+    private ?\DateTimeInterface $date_installation ;
 
     #[ORM\Column]
+    #[Assert\Range(
+        min: 100,
+        max: 200,
+        notInRangeMessage: "La hauteur totale doit être entre 100 et 200."
+    )]
     private ?int $hauteur_totale = null;
 
     #[ORM\OneToOne(mappedBy: 'poubelle', cascade: ['persist', 'remove'])]
@@ -48,9 +58,55 @@ class Poubelle
     public function __construct()
     {
         $this->historique = new ArrayCollection();
-    } 
+        $this->niveau = 0;
+        $this->date_installation = new \DateTime();
+        
+        // Création des capteurs avec valeurs par défaut
+        $this->createDefaultCapteurs();
+    }
+    private function createDefaultCapteurs(): void
+    {
+        // Création du capteur de distance
+        $this->capteur = new Capteur();
+        $this->capteur->setPoubelle($this);
+        $this->capteur->setDistanceMesuree(0.0);
+        $this->capteur->setPorteeMaximale(200.0); // Valeur par défaut
+        $this->capteur->setPrecisionCapteur(0.5);
+        $this->capteur->setDateMesure(new \DateTime());
+
+        // Création du capteur de poids (Capteurp)
+        $this->capteurp = new Capteurp();
+        $this->capteurp->setPoubelle($this);
+        $this->capteurp->setQuantite(0.0);
+        $this->capteurp->setDateM(new \DateTime());
+    }
+
+    // Getters et setters inchangés, sauf pour ceux modifiés ci-dessous
     
-    public function getId(): ?int
+
+    public function setAdresse(?string $adresse): static
+    {
+        $this->adresse = $adresse;
+
+        return $this;
+    }
+
+    public function setEtat(?string $etat): static
+    {
+        $this->etat = $etat;
+
+        return $this;
+    }
+
+    public function setHauteurTotale(?int $hauteur_totale): static
+    {
+        $this->hauteur_totale = $hauteur_totale;
+
+        return $this;
+    }
+
+    // Les autres getters et setters restent inchangés
+        public function getId(): ?int
     {
         return $this->id;
     }
@@ -71,14 +127,6 @@ class Poubelle
     {
         return $this->adresse;
     }
-
-    public function setAdresse(string $adresse): static
-    {
-        $this->adresse = $adresse;
-
-        return $this;
-    }
-
     public function getNiveau(): ?int
     {
         return $this->niveau;
@@ -95,14 +143,6 @@ class Poubelle
     {
         return $this->etat;
     }
-
-    public function setEtat(string $etat): static
-    {
-        $this->etat = $etat;
-
-        return $this;
-    }
-
     public function getDateInstallation(): ?\DateTimeInterface
     {
         return $this->date_installation;
@@ -119,23 +159,14 @@ class Poubelle
     {
         return $this->hauteur_totale;
     }
-
-    public function setHauteurTotale(int $hauteur_totale): static
-    {
-        $this->hauteur_totale = $hauteur_totale;
-
-        return $this;
-    }
-
     public function getCapteur(): ?Capteur
     {
         return $this->capteur;
     }
 
-    public function setCapteur(Capteur $capteur): static
+    public function setCapteur(?Capteur $capteur): static
     {
-        // set the owning side of the relation if necessary
-        if ($capteur->getPoubelle() !== $this) {
+        if ($capteur !== null && $capteur->getPoubelle() !== $this) {
             $capteur->setPoubelle($this);
         }
 
@@ -190,5 +221,4 @@ class Poubelle
 
         return $this;
     }
-
 }

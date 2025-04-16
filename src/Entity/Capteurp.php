@@ -23,6 +23,11 @@ class Capteurp
     #[ORM\OneToOne(inversedBy: 'capteurp', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Poubelle $poubelle = null;
+    public function __construct()
+    {
+        $this->quantite = 0.0;
+        $this->date_m = new \DateTime();
+    }
 
     public function getId(): ?int
     {

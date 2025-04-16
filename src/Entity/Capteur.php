@@ -29,6 +29,14 @@ class Capteur
     #[ORM\OneToOne(inversedBy: 'capteur', cascade: ['persist', 'remove'])]
     #[ORM\JoinColumn(nullable: false)]
     private ?Poubelle $poubelle = null;
+    public function __construct()
+    {
+        // Valeurs par défaut pour éviter des erreurs
+        $this->distance_mesuree = 0.0;
+        $this->porteeMaximale = 100.0; // Valeur par défaut raisonnable
+        $this->precision_capteur = 0.5;
+        $this->date_mesure = new \DateTime(); // Date actuelle par défaut
+    }
 
     public function getId(): ?int
     {
@@ -64,10 +72,10 @@ class Capteur
         return $this->porteeMaximale;
     }
 
-    public function setPorteeMaximale(float $porteeMaximale): static
+    public function setPorteeMaximale(mixed $porteeMaximale): static
     {
-        $this->porteeMaximale = $porteeMaximale;
-
+        // Convertit null en 0.0 ou garde la valeur float
+        $this->porteeMaximale = (float)$porteeMaximale;
         return $this;
     }
 

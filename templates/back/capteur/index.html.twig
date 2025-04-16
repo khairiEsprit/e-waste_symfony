@@ -19,7 +19,7 @@
         <tbody>
         {% for capteur in capteurs %}
             <tr>
-                <td>{{ capteur.idC }}</td>
+                <td>{{ capteur.id_c }}</td>
                 <td>{{ capteur.distanceMesuree }}</td>
                 <td>{{ capteur.dateMesure ? capteur.dateMesure|date('Y-m-d H:i:s') : '' }}</td>
                 <td>{{ capteur.porteeMaximale }}</td>

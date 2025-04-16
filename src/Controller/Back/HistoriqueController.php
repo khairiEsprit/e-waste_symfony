@@ -1,6 +1,6 @@
 <?php
 
-namespace App\Controller;
+namespace App\Controller\Back;
 
 use App\Entity\Historique;
 use App\Form\HistoriqueType;
@@ -17,8 +17,8 @@ final class HistoriqueController extends AbstractController
     #[Route(name: 'app_historique_index', methods: ['GET'])]
     public function index(HistoriqueRepository $historiqueRepository): Response
     {
-        return $this->render('historique/index.html.twig', [
-            'historiques' => $historiqueRepository->findAll(),
+        return $this->render('back/historique/index.html.twig', [
+            'historiques' => $historiqueRepository->findBy([], ['date_evenement' => 'DESC']),
         ]);
     }
 
@@ -26,6 +26,8 @@ final class HistoriqueController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $historique = new Historique();
+        $historique->setDateEvenement(new \DateTime());
+        
         $form = $this->createForm(HistoriqueType::class, $historique);
         $form->handleRequest($request);
 
@@ -33,10 +35,11 @@ final class HistoriqueController extends AbstractController
             $entityManager->persist($historique);
             $entityManager->flush();
 
+            $this->addFlash('success', 'L\'événement a été créé avec succès.');
             return $this->redirectToRoute('app_historique_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('historique/new.html.twig', [
+        return $this->render('back/historique/new.html.twig', [
             'historique' => $historique,
             'form' => $form,
         ]);
@@ -45,7 +48,7 @@ final class HistoriqueController extends AbstractController
     #[Route('/{id}', name: 'app_historique_show', methods: ['GET'])]
     public function show(Historique $historique): Response
     {
-        return $this->render('historique/show.html.twig', [
+        return $this->render('back/historique/show.html.twig', [
             'historique' => $historique,
         ]);
     }
@@ -58,11 +61,12 @@ final class HistoriqueController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             $entityManager->flush();
-
+            
+            $this->addFlash('success', 'L\'événement a été mis à jour avec succès.');
             return $this->redirectToRoute('app_historique_index', [], Response::HTTP_SEE_OTHER);
         }
 
-        return $this->render('historique/edit.html.twig', [
+        return $this->render('back/historique/edit.html.twig', [
             'historique' => $historique,
             'form' => $form,
         ]);
@@ -74,6 +78,8 @@ final class HistoriqueController extends AbstractController
         if ($this->isCsrfTokenValid('delete'.$historique->getId(), $request->getPayload()->getString('_token'))) {
             $entityManager->remove($historique);
             $entityManager->flush();
+            
+            $this->addFlash('success', 'L\'événement a été supprimé avec succès.');
         }
 
         return $this->redirectToRoute('app_historique_index', [], Response::HTTP_SEE_OTHER);

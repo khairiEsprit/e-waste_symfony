@@ -5,9 +5,9 @@
 {% block body %}
     <h1>Edit Capteurp</h1>
 
-    {{ include('capteurp/_form.html.twig', {'button_label': 'Update'}) }}
+    {{ include('back/capteurp/_form.html.twig', {'button_label': 'Update'}) }}
 
     <a href="{{ path('app_capteurp_index') }}">back to list</a>
 
-    {{ include('capteurp/_delete_form.html.twig') }}
+    {{ include('back/capteurp/_delete_form.html.twig') }}
 {% endblock %}

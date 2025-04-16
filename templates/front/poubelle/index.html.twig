@@ -1,0 +1,534 @@
+{# templates/poubelle/index.html.twig #}
+
+{% extends 'front/base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css">
+    <style>
+        /* Variables de couleurs pour la cohérence */
+        :root {
+            --primary: #28a745;
+            --primary-dark: #1a7431;
+            --primary-light: #d4edda;
+            --secondary: #6c757d;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Styles globaux */
+        body {
+            background-color: #f9f9f9;
+        }
+        
+        .container-fluid {
+            max-width: 1440px;
+            padding: 2rem;
+        }
+        
+        h1 {
+            font-weight: 700;
+            color: var(--dark);
+            margin-bottom: 2rem;
+            position: relative;
+            display: inline-block;
+        }
+        
+        h1:after {
+            content: '';
+            position: absolute;
+            width: 50%;
+            height: 4px;
+            background: var(--primary);
+            bottom: -10px;
+            left: 25%;
+            border-radius: 2px;
+        }
+        
+        /* Animation d'entrée pour le titre */
+        .page-title {
+            animation: fadeInDown 0.8s ease-out;
+        }
+        
+        /* Styles pour la zone de recherche */
+        .search-container {
+            padding: 1.5rem;
+            background: white;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 8px 30px rgba(0, 0, 0, 0.08);
+            animation: fadeIn 0.8s ease-out;
+            transition: all 0.3s ease;
+        }
+        
+        .search-container:hover {
+            box-shadow: 0 10px 40px rgba(0, 0, 0, 0.1);
+        }
+        
+        .form-control, .form-select {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #e0e0e0;
+            transition: all 0.3s ease;
+            box-shadow: none;
+        }
+        
+        .form-control:focus, .form-select:focus {
+            border-color: var(--primary);
+            box-shadow: 0 0 0 0.2rem rgba(40, 167, 69, 0.2);
+        }
+        
+        /* Animation des inputs au focus */
+        .form-control:focus, .form-select:focus {
+            transform: translateY(-2px);
+        }
+        
+        /* Bouton de réinitialisation */
+        #reset-filters {
+            padding: 0.8rem 1rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            border: 1px solid #e0e0e0;
+            background: white;
+            color: var(--secondary);
+        }
+        
+        #reset-filters:hover {
+            background: #f8f9fa;
+            transform: translateY(-2px);
+            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
+        }
+        
+        /* Container des poubelles */
+        #poubelles-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+            gap: 25px;
+            padding: 1rem 0;
+        }
+        
+        /* Animation d'entrée des cards */
+        @keyframes fadeInUp {
+            from {
+                opacity: 0;
+                transform: translateY(20px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+        
+        /* Styles des cards */
+        .card.poubelle-card {
+            cursor: default;
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px var(--shadow);
+            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+            animation: fadeInUp 0.6s ease-out;
+            animation-fill-mode: both;
+            border: none;
+            background: white;
+        }
+        
+        /* Animation séquentielle des cards */
+        .poubelle-card:nth-child(1) { animation-delay: 0.1s; }
+        .poubelle-card:nth-child(2) { animation-delay: 0.2s; }
+        .poubelle-card:nth-child(3) { animation-delay: 0.3s; }
+        .poubelle-card:nth-child(4) { animation-delay: 0.4s; }
+        .poubelle-card:nth-child(5) { animation-delay: 0.5s; }
+        .poubelle-card:nth-child(6) { animation-delay: 0.6s; }
+        
+        .card.poubelle-card:hover {
+            box-shadow: 0 15px 30px rgba(0, 0, 0, 0.15);
+            transform: translateY(-10px);
+        }
+        
+        .card-header {
+            padding: 1.2rem 1.5rem;
+            font-weight: 600;
+            letter-spacing: 0.5px;
+        }
+        
+        .card-header.status-fonctionnel {
+            background: linear-gradient(145deg, var(--primary), var(--primary-dark));
+            color: white;
+        }
+        
+        .card-header.status-panne {
+            background: linear-gradient(145deg, var(--danger), #b02a37);
+            color: white;
+        }
+        
+        .card-body {
+            padding: 1.5rem;
+        }
+        
+        /* Styles des icônes dans les cards */
+        .card-text i {
+            opacity: 0.7;
+            width: 20px;
+            text-align: center;
+        }
+        
+        /* Badge d'état */
+        .badge {
+            padding: 0.5rem 0.8rem;
+            font-weight: 500;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        .badge:hover {
+            transform: scale(1.05);
+        }
+        
+        /* Barre de progression */
+        .progress {
+            height: 20px;
+            border-radius: 30px;
+            overflow: hidden;
+            box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.1);
+            background-color: #f5f5f5;
+        }
+        
+        .progress-bar {
+            transition: width 1.2s cubic-bezier(0.65, 0, 0.35, 1);
+            font-size: 0.8rem;
+            line-height: 20px;
+            font-weight: 600;
+            text-align: right;
+            padding-right: 10px;
+            position: relative;
+            overflow: visible;
+        }
+        
+        /* Couleurs des barres de progression */
+        .bg-success {
+            background: linear-gradient(90deg, #28a745, #20c997);
+        }
+        
+        .dark-green {
+            background: linear-gradient(90deg, #1a7431, #145a26) !important;
+        }
+        
+        .bg-danger {
+            background: linear-gradient(90deg, #dc3545, #c82333) !important;
+        }
+        
+        /* Animation de la barre de progression */
+        @keyframes pulse {
+            0% { opacity: 0.6; }
+            50% { opacity: 1; }
+            100% { opacity: 0.6; }
+        }
+        
+        /* Styles pour le bouton toggle */
+        .toggle-details {
+            width: 100%;
+            text-align: center;
+            padding: 0.8rem 1rem;
+            margin: 1rem 0;
+            border-radius: 10px;
+            background: var(--primary);
+            color: white;
+            font-weight: 600;
+            border: none;
+            position: relative;
+            overflow: hidden;
+            transition: all 0.3s ease;
+            z-index: 1;
+        }
+        
+        /* Animation du bouton */
+        .toggle-details:before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: -100%;
+            width: 100%;
+            height: 100%;
+            background: rgba(255, 255, 255, 0.2);
+            transition: all 0.4s ease;
+            z-index: -1;
+        }
+        
+        .toggle-details:hover:before {
+            left: 0;
+        }
+        
+        .toggle-details:hover {
+            box-shadow: 0 5px 15px rgba(40, 167, 69, 0.3);
+            transform: translateY(-2px);
+        }
+        
+        .toggle-details:active {
+            transform: scale(0.98);
+        }
+        
+        .toggle-details .icon-toggle {
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.27, 1.55);
+            display: inline-block;
+            margin-left: 8px;
+        }
+        
+        /* Contenu détaillé à afficher/masquer */
+        .card-body-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+            opacity: 0;
+            transform: translateY(-10px);
+        }
+        
+        .card-body-content.show {
+            max-height: 1000px;
+            opacity: 1;
+            transform: translateY(0);
+            padding: 1rem 0;
+        }
+        
+        .card-body-content hr {
+            background: linear-gradient(to right, transparent, var(--primary-light), transparent);
+            border: 0;
+            height: 1px;
+            margin: 1rem 0;
+        }
+        
+        /* Animation du spinner de chargement */
+        @keyframes rotate {
+            from { transform: rotate(0deg); }
+            to { transform: rotate(360deg); }
+        }
+        
+        .spinner-border {
+            animation: rotate 1s linear infinite;
+        }
+        
+        /* Styles des informations détaillées */
+        .card-body-content h6 {
+            color: var(--primary-dark);
+            font-weight: 600;
+            position: relative;
+            display: inline-block;
+            margin-bottom: 1rem;
+        }
+        
+        .card-body-content h6:after {
+            content: '';
+            position: absolute;
+            width: 30%;
+            height: 2px;
+            background: var(--primary);
+            bottom: -5px;
+            left: 0;
+            border-radius: 1px;
+        }
+        
+        .small.text-muted {
+            color: var(--secondary) !important;
+            font-weight: 500;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+            font-size: 0.7rem;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<div class="container-fluid">
+    <h1 class="text-center page-title">Liste des Poubelles Connectées</h1>
+    
+    <div class="search-container">
+        <div class="row g-3">
+            <div class="col-md-4">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-search"></i></span>
+                    <input type="text" id="search-input" class="form-control" placeholder="Rechercher...">
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-cog"></i></span>
+                    <select id="etat-filter" class="form-select">
+                        <option value="">Tous les états</option>
+                        <option value="Fonctionnel">Fonctionnel</option>
+                        <option value="En panne">En panne</option>
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-3">
+                <div class="input-group">
+                    <span class="input-group-text"><i class="fas fa-building"></i></span>
+                    <select id="centre-filter" class="form-select">
+                        <option value="">Tous les centres</option>
+                        {% for centre in centres %}
+                            <option value="{{ centre.id }}">{{ centre.nom }}</option>
+                        {% endfor %}
+                    </select>
+                </div>
+            </div>
+            <div class="col-md-2">
+                <button id="reset-filters" class="btn w-100">
+                    <i class="fas fa-sync-alt me-1"></i> Réinitialiser
+                </button>
+            </div>
+        </div>
+    </div>
+    
+    <div id="poubelles-container">
+        {{ render(path('app_poubelles_search')) }}
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Pour les boutons déjà présents sur la page
+            setupToggleButtons();
+            
+            // Pour les éléments qui seront ajoutés dynamiquement (après une recherche)
+            document.addEventListener('click', function(event) {
+                if (event.target.closest('.toggle-details')) {
+                    const button = event.target.closest('.toggle-details');
+                    const contentDiv = button.nextElementSibling;
+                    const icon = button.querySelector('.icon-toggle');
+                    
+                    // Ajouter/supprimer la classe 'show' pour afficher/masquer le contenu
+                    contentDiv.classList.toggle('show');
+                    
+                    // Rotation de l'icône et changement de texte
+                    if (contentDiv.classList.contains('show')) {
+                        icon.style.transform = 'rotate(180deg)';
+                        button.innerHTML = button.innerHTML.replace('Afficher les détails', 'Masquer les détails <i class="fas fa-chevron-up icon-toggle"></i>');
+                    } else {
+                        icon.style.transform = 'rotate(0)';
+                        button.innerHTML = button.innerHTML.replace('Masquer les détails', 'Afficher les détails <i class="fas fa-chevron-down icon-toggle"></i>');
+                    }
+                }
+            });
+            
+            function setupToggleButtons() {
+                const toggleButtons = document.querySelectorAll('.toggle-details');
+                toggleButtons.forEach(button => {
+                    button.addEventListener('click', function() {
+                        const contentDiv = this.nextElementSibling;
+                        const icon = this.querySelector('.icon-toggle');
+                        
+                        // Ajouter/supprimer la classe 'show' pour afficher/masquer le contenu
+                        contentDiv.classList.toggle('show');
+                        
+                        // Rotation de l'icône
+                        if (contentDiv.classList.contains('show')) {
+                            icon.style.transform = 'rotate(180deg)';
+                            this.innerHTML = this.innerHTML.replace('Afficher les détails', 'Masquer les détails <i class="fas fa-chevron-up icon-toggle" style="transform: rotate(180deg);"></i>');
+                        } else {
+                            icon.style.transform = 'rotate(0)';
+                            this.innerHTML = this.innerHTML.replace('Masquer les détails', 'Afficher les détails <i class="fas fa-chevron-down icon-toggle"></i>');
+                        }
+                    });
+                });
+                
+                // Animation d'entrée pour les barres de progression
+                const progressBars = document.querySelectorAll('.progress-bar');
+                progressBars.forEach(bar => {
+                    // Force une relecture pour déclencher l'animation
+                    const width = bar.style.width;
+                    bar.style.width = '0%';
+                    setTimeout(() => {
+                        bar.style.width = width;
+                    }, 100);
+                });
+            }
+
+            // Référence aux éléments de recherche
+            const searchInput = document.getElementById('search-input');
+            const etatFilter = document.getElementById('etat-filter');
+            const centreFilter = document.getElementById('centre-filter');
+            const resetButton = document.getElementById('reset-filters');
+            const poubellesContainer = document.getElementById('poubelles-container');
+            
+            // Fonction pour effectuer la recherche via AJAX
+            function performSearch() {
+                // Construire l'URL avec les paramètres de recherche
+                const searchParams = new URLSearchParams();
+                if (searchInput.value) searchParams.append('search', searchInput.value);
+                if (etatFilter.value) searchParams.append('etat', etatFilter.value);
+                if (centreFilter.value) searchParams.append('centre', centreFilter.value);
+                
+                // URL de l'API de recherche
+                const url = `{{ path('app_poubelles_search') }}?${searchParams.toString()}`;
+                
+                // Afficher un indicateur de chargement
+                poubellesContainer.innerHTML = '<div class="text-center py-5 animate__animated animate__fadeIn"><div class="spinner-border text-success" role="status" style="width: 3rem; height: 3rem;"><span class="visually-hidden">Chargement...</span></div><p class="mt-3 text-muted">Chargement des données...</p></div>';
+                
+                // Effectuer la requête AJAX
+                fetch(url)
+                    .then(response => {
+                        if (!response.ok) {
+                            throw new Error('Erreur réseau');
+                        }
+                        return response.text();
+                    })
+                    .then(html => {
+                        // Fade out du contenu actuel
+                        poubellesContainer.style.opacity = '0';
+                        
+                        setTimeout(() => {
+                            // Mettre à jour le contenu avec les résultats
+                            poubellesContainer.innerHTML = html;
+                            
+                            // Animation pour afficher le nouveau contenu
+                            poubellesContainer.style.opacity = '1';
+                            
+                            // Réinitialiser les écouteurs d'événements pour les nouveaux boutons
+                            setupToggleButtons();
+                        }, 300);
+                    })
+                    .catch(error => {
+                        console.error('Erreur lors de la recherche:', error);
+                        poubellesContainer.innerHTML = '<div class="alert alert-danger animate__animated animate__shakeX">Une erreur est survenue lors de la recherche. Veuillez réessayer.</div>';
+                    });
+            }
+            
+            // Écouteurs d'événements pour les filtres
+            searchInput.addEventListener('input', debounce(performSearch, 500));
+            etatFilter.addEventListener('change', performSearch);
+            centreFilter.addEventListener('change', performSearch);
+            
+            // Écouteur pour le bouton de réinitialisation avec animation
+            resetButton.addEventListener('click', function() {
+                // Animation du bouton
+                this.classList.add('animate__animated', 'animate__pulse');
+                setTimeout(() => {
+                    this.classList.remove('animate__animated', 'animate__pulse');
+                }, 500);
+                
+                // Réinitialisation des filtres
+                searchInput.value = '';
+                etatFilter.selectedIndex = 0;
+                centreFilter.selectedIndex = 0;
+                performSearch();
+            });
+            
+            // Fonction utilitaire pour limiter le nombre d'appels (debounce)
+            function debounce(func, delay) {
+                let timeout;
+                return function() {
+                    const context = this;
+                    const args = arguments;
+                    clearTimeout(timeout);
+                    timeout = setTimeout(() => func.apply(context, args), delay);
+                };
+            }
+            
+            // Effectuer une recherche initiale pour charger les résultats
+            performSearch();
+        });
+    </script>
+{% endblock %}

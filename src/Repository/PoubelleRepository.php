@@ -40,4 +40,45 @@ class PoubelleRepository extends ServiceEntityRepository
     //            ->getOneOrNullResult()
     //        ;
     //    }
+    public function search(?string $search, ?string $etat, ?string $centre): array
+    {
+        $qb = $this->createQueryBuilder('p')
+            ->leftJoin('p.centre', 'c')
+            ->addSelect('c')
+            ->orderBy('p.etat', 'ASC');
+        
+        // Vérifiez si remplissage existe, sinon utilisez id pour le tri
+        if (property_exists(\App\Entity\Poubelle::class, 'remplissage')) {
+            $qb->addOrderBy('p.remplissage', 'DESC');
+        } else {
+            $qb->addOrderBy('p.id', 'DESC');
+        }
+
+        if ($search) {
+            $qb->andWhere('p.adresse LIKE :search OR c.nom LIKE :search')
+               ->setParameter('search', '%'.$search.'%');
+        }
+
+        if ($etat && in_array($etat, ['Fonctionnel', 'En panne'])) {
+            $qb->andWhere('p.etat = :etat')
+               ->setParameter('etat', $etat);
+        }
+
+        if ($centre) {
+            $qb->andWhere('c.id = :centre')
+               ->setParameter('centre', $centre);
+        }
+
+        return $qb->getQuery()->getResult();
+    }
+
+    public function findAllCentres(): array
+    {
+        return $this->createQueryBuilder('p')
+            ->select('DISTINCT c.id, c.nom')
+            ->join('p.centre', 'c')
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult();
+    }
 }

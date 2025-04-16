@@ -4,8 +4,7 @@
         <meta charset="UTF-8">
         <title>{% block title %}titlet{% endblock %}</title>
         {% block stylesheets %}
-
-         <link
+            <link
       rel="stylesheet"
       href="https://cdn.jsdelivr.net/npm/@fontsource/source-sans-3@5.0.12/index.css"
       integrity="sha256-tXJfXfp6Ewt1ilPzLDtQnJV4hclT9XuaZUKyUvmyr+Q="
@@ -32,6 +31,82 @@
             {# Load AdminLTE and your custom CSS #}
             <link rel="stylesheet" href="{{ asset('assets/back/css/adminlte.min.css') }}">
             {# <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}"> #}
+            <style>
+        /* Variables de couleurs pour la cohérence */
+        :root {
+            --primary: #28a745;
+            --primary-dark: #013220;
+            --primary-medium: #00693E;
+            --primary-light: #ACE1AF;
+            --background-light: #FEFEFA;
+            --secondary: #6c757d;
+            --danger: #dc3545;
+            --light: #f8f9fa;
+            --dark: #343a40;
+            --shadow: rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Style global pour les tableaux */
+        .table thead th {
+            font-weight: 600;
+            color: var(--primary-dark);
+        }
+        
+        /* Style pour les cartes */
+        .card {
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px var(--shadow);
+        }
+        
+        /* Style des boutons principaux */
+        .btn-primary {
+            background-color: var(--primary-medium) !important;
+            border-color: var(--primary-medium) !important;
+        }
+        
+        .btn-primary:hover {
+            background-color: var(--primary-dark) !important;
+            border-color: var(--primary-dark) !important;
+        }
+        
+        /* Style des badges d'état */
+        .badge {
+            padding: 0.5rem 0.8rem;
+            font-weight: 500;
+            border-radius: 30px;
+            transition: all 0.3s ease;
+        }
+        
+        /* Animation des boutons */
+        .btn {
+            transition: all 0.3s ease;
+        }
+        
+        .btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+        }
+        
+        /* Style des headers de carte */
+        .card-header {
+            padding: 1rem 1.5rem;
+        }
+        
+        /* Style des barres de progression */
+        .progress {
+            height: 15px;
+            border-radius: 10px;
+            background-color: rgba(0, 0, 0, 0.05);
+            overflow: hidden;
+        }
+        
+        .progress-bar {
+            transition: width 0.6s ease;
+            position: relative;
+            overflow: visible;
+        }
+    </style>
         {% endblock %}
         {% block javascripts %}
             <script
