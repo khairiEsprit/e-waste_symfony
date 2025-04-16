@@ -27,7 +27,7 @@
       integrity="sha256-9kPW/n5nn53j4WMRYAxe9c1rCY96Oogo/MKSVdKzPmI="
       crossorigin="anonymous"
     />
-    
+
 
             {# Load AdminLTE and your custom CSS #}
             <link rel="stylesheet" href="{{ asset('assets/back/css/adminlte.min.css') }}">
@@ -85,17 +85,20 @@
             {# Include partials for the navbar and sidebar #}
             {% include 'back/partials/topbar.html.twig' %}
             {% include 'back/partials/sidebar.html.twig' %}
-            
+
             {# Content Wrapper: where the page content will go #}
          <main class="app-main">
                  {% block content %}
                 {# Default content (if any) goes here #}
                 {% endblock %}
             </main>
-            
+
             {% include 'back/partials/footer.html.twig' %}
+
+            {# Include the floating chatbot #}
+            {% include 'back/partials/_floating_chatbot.html.twig' %}
         </div>
-        
-      
+
+
     </body>
 </html>

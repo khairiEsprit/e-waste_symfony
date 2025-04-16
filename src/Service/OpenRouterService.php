@@ -53,11 +53,11 @@ class OpenRouterService
             'content' => $content
         ];
 
-        // Try multiple models in case one fails
+        // Define models to try (with recommended model)
         $models = [
-            'openai/gpt-4.1',
-            'qwen/qwen2.5-coder-7b-instruct',
-
+            'google/gemini-2.0-flash-001',
+            'meta-llama/llama-4-maverick:free',
+            'meta-llama/llama-4-scout:free',
         ];
 
         $lastException = null;
@@ -66,7 +66,8 @@ class OpenRouterService
         foreach ($models as $model) {
             $requestPayload = [
                 'model' => $model,
-                'messages' => $messages
+                'messages' => $messages,
+                'max_tokens' => 10000, // Set max_tokens to a safe value
             ];
 
             try {

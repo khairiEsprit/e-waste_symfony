@@ -1,0 +1,632 @@
+<div class="chatbot-container">
+    <div class="chat-button" id="chatButton">
+        <svg xmlns="http://www.w3.org/2000/svg" width="28" height="28" viewBox="0 0 24 24" fill="none" stroke="white" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+            <path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"></path>
+            <path d="M8 9h.01"></path>
+            <path d="M12 9h.01"></path>
+            <path d="M16 9h.01"></path>
+        </svg>
+    </div>
+
+    <div class="chat-window" id="chatWindow">
+        <div class="chat-header">
+            <h3>E-Waste Assistant</h3>
+            <button id="closeChat" class="close-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="18" y1="6" x2="6" y2="18"></line>
+                    <line x1="6" y1="6" x2="18" y2="18"></line>
+                </svg>
+            </button>
+        </div>
+
+        <div class="chat-messages" id="chatMessages">
+            <div class="message bot">
+                <strong>👋 Welcome to E-Waste Assistant!</strong><br><br>
+                I can help you with waste management information and provide real-time insights about waste collection. How can I assist you today?
+            </div>
+            <div class="insight-buttons">
+                <button class="insight-button">Recycling Tips</button>
+                <button class="insight-button">Collection Schedule</button>
+                <button class="insight-button">Waste Categories</button>
+                <!-- Admin-specific insight buttons -->
+                <button class="admin-insight-button" data-query="show me today's waste collection status">Collection Status</button>
+                <button class="admin-insight-button" data-query="show me overflowing bins">Bin Conditions</button>
+                <button class="admin-insight-button" data-query="show me route progress of collection trucks">Truck Routes</button>
+                <button class="admin-insight-button" data-query="show me sensor anomalies">Sensor Anomalies</button>
+            </div>
+        </div>
+
+        <div id="imagePreviewContainer" style="display: none;">
+            <img id="imagePreview" src="" alt="Preview" style="max-width: 100%; max-height: 150px;">
+            <button id="removeImage" class="remove-image-btn">×</button>
+        </div>
+
+        <div class="chat-input-container">
+            <input type="text" id="messageInput" placeholder="Type your question here..." class="chat-input">
+            <label for="fileInput" class="file-input-label">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect>
+                    <circle cx="8.5" cy="8.5" r="1.5"></circle>
+                    <polyline points="21 15 16 10 5 21"></polyline>
+                </svg>
+            </label>
+            <input type="file" id="fileInput" accept="image/*" style="display: none;">
+            <button id="sendButton" class="send-button">
+                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                    <line x1="22" y1="2" x2="11" y2="13"></line>
+                    <polygon points="22 2 15 22 11 13 2 9 22 2"></polygon>
+                </svg>
+            </button>
+        </div>
+    </div>
+</div>
+
+<style>
+.chatbot-container {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    z-index: 1000;
+    font-family: 'Source Sans 3', sans-serif;
+}
+
+.chat-button {
+    width: 60px;
+    height: 60px;
+    border-radius: 50%;
+    background-color: #4CAF50;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    cursor: pointer;
+    box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+    transition: all 0.3s ease;
+}
+
+.chat-button:hover {
+    transform: scale(1.05);
+    box-shadow: 0 6px 12px rgba(0, 0, 0, 0.3);
+}
+
+.chat-window {
+    position: absolute;
+    bottom: 80px;
+    right: 0;
+    width: 350px;
+    height: 500px;
+    background-color: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+    display: none;
+    flex-direction: column;
+    overflow: hidden;
+}
+
+.chat-header {
+    background-color: #4CAF50;
+    color: white;
+    padding: 15px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.chat-header h3 {
+    margin: 0;
+    font-size: 18px;
+}
+
+.close-button {
+    background: none;
+    border: none;
+    color: white;
+    cursor: pointer;
+    padding: 0;
+}
+
+.chat-messages {
+    flex: 1;
+    padding: 15px;
+    overflow-y: auto;
+    display: flex;
+    flex-direction: column;
+    gap: 10px;
+}
+
+.message {
+    padding: 10px 15px;
+    border-radius: 10px;
+    max-width: 80%;
+    word-wrap: break-word;
+}
+
+.message.user {
+    background-color: #E3F2FD;
+    align-self: flex-end;
+}
+
+.message.bot {
+    background-color: #F1F1F1;
+    align-self: flex-start;
+}
+
+.chat-input-container {
+    display: flex;
+    padding: 10px;
+    border-top: 1px solid #eee;
+    background-color: white;
+}
+
+.chat-input {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 20px;
+    outline: none;
+}
+
+.file-input-label {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 10px;
+    cursor: pointer;
+    color: #666;
+}
+
+.send-button {
+    background: none;
+    border: none;
+    color: #4CAF50;
+    cursor: pointer;
+    padding: 0;
+}
+
+.insight-buttons {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
+    margin-top: 10px;
+}
+
+.insight-button {
+    background-color: #E8F5E9;
+    border: 1px solid #C8E6C9;
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+}
+
+.insight-button:hover {
+    background-color: #C8E6C9;
+}
+
+.admin-insight-button {
+    background-color: #4CAF50;
+    color: white;
+    border: none;
+    border-radius: 15px;
+    padding: 5px 10px;
+    font-size: 12px;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-top: 5px;
+}
+
+.admin-insight-button:hover {
+    background-color:rgb(101, 207, 105);
+}
+
+#imagePreviewContainer {
+    position: relative;
+    margin: 10px;
+    text-align: center;
+}
+
+.remove-image-btn {
+    position: absolute;
+    top: -10px;
+    right: -10px;
+    background-color: #ff5252;
+    color: white;
+    border: none;
+    border-radius: 50%;
+    width: 24px;
+    height: 24px;
+    font-size: 16px;
+    line-height: 1;
+    cursor: pointer;
+}
+</style>
+
+<script>
+class Chatbot {
+    constructor() {
+        this.chatWindow = document.getElementById('chatWindow');
+        this.chatButton = document.getElementById('chatButton');
+        this.closeButton = document.getElementById('closeChat');
+        this.messageInput = document.getElementById('messageInput');
+        this.messagesContainer = document.getElementById('chatMessages');
+        this.fileInput = document.getElementById('fileInput');
+        this.sendButton = document.getElementById('sendButton');
+        this.imagePreviewContainer = document.getElementById('imagePreviewContainer');
+        this.imagePreview = document.getElementById('imagePreview');
+        this.removeImageButton = document.getElementById('removeImage');
+
+        this.uploadedImageUrl = null;
+        this.isProcessingMessage = false;
+
+        this.initEventListeners();
+    }
+
+    initEventListeners() {
+        // Toggle chat window
+        this.chatButton.addEventListener('click', () => this.toggleChatWindow(true));
+        this.closeButton.addEventListener('click', () => this.toggleChatWindow(false));
+
+        // Send message on button click or Enter key
+        this.sendButton.addEventListener('click', () => this.sendMessage());
+        this.messageInput.addEventListener('keypress', (e) => {
+            if (e.key === 'Enter') {
+                e.preventDefault();
+                this.sendMessage();
+            }
+        });
+
+        // Handle file input
+        this.fileInput.addEventListener('change', (e) => this.handleFileInput(e));
+        this.removeImageButton.addEventListener('click', () => this.removeImage());
+    }
+
+    toggleChatWindow(show) {
+        this.chatWindow.style.display = show ? 'flex' : 'none';
+        if (show) {
+            this.messageInput.focus();
+        }
+    }
+
+    handleFileInput(event) {
+        const file = event.target.files[0];
+        if (file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                this.uploadedImageUrl = e.target.result;
+                this.imagePreview.src = this.uploadedImageUrl;
+                this.imagePreviewContainer.style.display = 'block';
+            };
+            reader.readAsDataURL(file);
+        }
+    }
+
+    removeImage() {
+        this.uploadedImageUrl = null;
+        this.fileInput.value = '';
+        this.imagePreviewContainer.style.display = 'none';
+    }
+
+    addMessage(text, sender, imageUrl = null) {
+        const messageDiv = document.createElement('div');
+        messageDiv.className = `message ${sender}`;
+
+        // Add text content
+        messageDiv.innerHTML = text;
+
+        // Add image if provided
+        if (imageUrl) {
+            const img = document.createElement('img');
+            img.src = imageUrl;
+            img.style.maxWidth = '100%';
+            img.style.borderRadius = '5px';
+            img.style.marginTop = '10px';
+            messageDiv.appendChild(img);
+        }
+
+        this.messagesContainer.appendChild(messageDiv);
+        this.messagesContainer.scrollTop = this.messagesContainer.scrollHeight;
+    }
+
+    async sendMessage() {
+        const message = this.messageInput.value.trim();
+
+        if ((!message && !this.uploadedImageUrl) || this.isProcessingMessage) {
+            return;
+        }
+
+        this.isProcessingMessage = true;
+        this.messageInput.placeholder = 'Processing...';
+
+        try {
+            // Add message with image if available
+            this.addMessage(message || 'What is in this image?', 'user', this.uploadedImageUrl);
+            this.messageInput.value = '';
+
+            const response = await fetch('/admin/chatbot/message', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: message || 'What is in this image?',
+                    imageUrl: this.uploadedImageUrl // Send the image URL if it exists
+                })
+            });
+
+            if (!response.ok) {
+                const errorText = await response.text();
+                console.error(`HTTP error! Status: ${response.status}, Response: ${errorText}`);
+                throw new Error(`HTTP error! Status: ${response.status}`);
+            }
+
+            const data = await response.json();
+
+            if (data.success) {
+                this.addMessage(data.response, 'bot');
+            } else {
+                console.error('API Error:', data.error || 'Unknown error');
+                this.addMessage(data.error || 'Sorry, there was an error processing your request.', 'bot');
+            }
+        } catch (error) {
+            console.error('Error:', error);
+            this.addMessage('Sorry, there was an error processing your request. Please try again later.', 'bot');
+        } finally {
+            // Reset image preview
+            if (this.uploadedImageUrl) {
+                this.imagePreviewContainer.style.display = 'none';
+            }
+            this.uploadedImageUrl = null; // Reset after processing
+            this.isProcessingMessage = false; // Reset flag
+            this.messageInput.placeholder = 'Type your question here...';
+        }
+    }
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+    // Initialize chatbot and expose it globally for the insights module
+    window.chatbot = new Chatbot();
+
+    // Add event listeners for regular insight buttons
+    document.querySelectorAll('.insight-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const query = button.textContent.trim();
+            window.chatbot.messageInput.value = query;
+            window.chatbot.sendMessage();
+        });
+    });
+
+    // Add event listeners for admin insight buttons
+    document.querySelectorAll('.admin-insight-button').forEach(button => {
+        button.addEventListener('click', () => {
+            const query = button.getAttribute('data-query');
+            handleAdminInsightQuery(query, window.chatbot);
+        });
+    });
+
+    // Load the chatbot insights script
+    const script = document.createElement('script');
+    script.src = '/assets/back/js/chatbot-insights.js';
+    document.body.appendChild(script);
+
+    // Function to handle admin insight queries
+    function handleAdminInsightQuery(query, chatbot) {
+        // Add user message
+        chatbot.addMessage(query, 'user');
+
+        // Generate response based on query
+        let response = '';
+
+        if (query.includes('collection status')) {
+            response = generateCollectionStatusResponse();
+        } else if (query.includes('overflowing bins')) {
+            response = generateBinConditionsResponse();
+        } else if (query.includes('truck') || query.includes('route')) {
+            response = generateTruckRoutesResponse();
+        } else if (query.includes('sensor') || query.includes('anomalies')) {
+            response = generateSensorAnomaliesResponse();
+        } else {
+            response = 'I\'m not sure how to help with that. Please try one of the quick access buttons for waste collection insights.';
+        }
+
+        // Add bot response
+        chatbot.addMessage(response, 'bot');
+    }
+
+    // Static data for insights
+    const wasteData = {
+        bins: [
+            {
+                id: 1,
+                name: 'Trash Container #1',
+                longitude: 10.181667,
+                latitude: 36.806389,
+                fillLevel: 85,
+                status: 'Critical',
+                lastCollected: '2023-06-15 08:30:00',
+                isCollected: false
+            },
+            {
+                id: 2,
+                name: 'Trash Container #2',
+                longitude: 10.184667,
+                latitude: 36.809389,
+                fillLevel: 70,
+                status: 'Warning',
+                lastCollected: '2023-06-15 09:15:00',
+                isCollected: false
+            },
+            {
+                id: 3,
+                name: 'Trash Container #3',
+                longitude: 10.179667,
+                latitude: 36.803389,
+                fillLevel: 45,
+                status: 'Normal',
+                lastCollected: '2023-06-15 10:00:00',
+                isCollected: true
+            },
+            {
+                id: 4,
+                name: 'Trash Container #4',
+                longitude: 10.186667,
+                latitude: 36.801389,
+                fillLevel: 30,
+                status: 'Normal',
+                lastCollected: '2023-06-15 10:45:00',
+                isCollected: true
+            },
+            {
+                id: 5,
+                name: 'Trash Container #5',
+                longitude: 10.182667,
+                latitude: 36.807389,
+                fillLevel: 60,
+                status: 'Warning',
+                lastCollected: '2023-06-15 11:30:00',
+                isCollected: false
+            }
+        ],
+        trucks: [
+            {
+                id: 1,
+                name: 'Truck #1',
+                status: 'On Route',
+                currentLocation: 'Near Trash Container #2',
+                completedBins: 2,
+                totalBins: 5
+            },
+            {
+                id: 2,
+                name: 'Truck #2',
+                status: 'At Depot',
+                currentLocation: 'Collection Center',
+                completedBins: 0,
+                totalBins: 0
+            }
+        ],
+        sensors: [
+            {
+                id: 1,
+                name: 'Sensor #1',
+                binId: 1,
+                status: 'Normal',
+                lastReading: '2023-06-15 12:00:00',
+                batteryLevel: '85%'
+            },
+            {
+                id: 2,
+                name: 'Sensor #2',
+                binId: 2,
+                status: 'Normal',
+                lastReading: '2023-06-15 12:05:00',
+                batteryLevel: '90%'
+            },
+            {
+                id: 3,
+                name: 'Sensor #3',
+                binId: 3,
+                status: 'Anomaly Detected',
+                lastReading: '2023-06-15 12:10:00',
+                batteryLevel: '75%'
+            },
+            {
+                id: 4,
+                name: 'Sensor #4',
+                binId: 4,
+                status: 'Normal',
+                lastReading: '2023-06-15 12:15:00',
+                batteryLevel: '95%'
+            },
+            {
+                id: 5,
+                name: 'Sensor #5',
+                binId: 5,
+                status: 'Low Battery',
+                lastReading: '2023-06-15 12:20:00',
+                batteryLevel: '15%'
+            }
+        ]
+    };
+
+    // Generate collection status response
+    function generateCollectionStatusResponse() {
+        const collectedBins = wasteData.bins.filter(bin => bin.isCollected).length;
+        const totalBins = wasteData.bins.length;
+        const uncollectedBins = totalBins - collectedBins;
+        const criticalBins = wasteData.bins.filter(bin => bin.status === 'Critical').length;
+
+        return `📊 **Today's Waste Collection Status**<br><br>` +
+               `- Bins collected: ${collectedBins}/${totalBins} (${Math.round(collectedBins/totalBins*100)}%)<br>` +
+               `- Bins awaiting collection: ${uncollectedBins}<br>` +
+               `- Overflowing bins: ${criticalBins}<br>` +
+               `- Active collection trucks: ${wasteData.trucks.filter(truck => truck.status === 'On Route').length}<br><br>` +
+               `Would you like more detailed information about specific bins or trucks?`;
+    }
+
+    // Generate bin conditions response
+    function generateBinConditionsResponse() {
+        const criticalBins = wasteData.bins.filter(bin => bin.status === 'Critical');
+        const warningBins = wasteData.bins.filter(bin => bin.status === 'Warning');
+
+        let response = `🗑️ **Bin Conditions Report**<br><br>`;
+
+        if (criticalBins.length > 0) {
+            response += `**Critical Bins (${criticalBins.length}):**<br>`;
+            criticalBins.forEach(bin => {
+                response += `- ${bin.name}: ${bin.fillLevel}% full, ${bin.isCollected ? 'collected' : 'not collected'}<br>`;
+            });
+            response += '<br>';
+        } else {
+            response += `**Critical Bins:** None<br><br>`;
+        }
+
+        if (warningBins.length > 0) {
+            response += `**Warning Bins (${warningBins.length}):**<br>`;
+            warningBins.forEach(bin => {
+                response += `- ${bin.name}: ${bin.fillLevel}% full, ${bin.isCollected ? 'collected' : 'not collected'}<br>`;
+            });
+        } else {
+            response += `**Warning Bins:** None<br>`;
+        }
+
+        return response;
+    }
+
+    // Generate truck routes response
+    function generateTruckRoutesResponse() {
+        let response = `🚚 **Collection Truck Routes**<br><br>`;
+
+        wasteData.trucks.forEach(truck => {
+            const progressPercent = truck.completedBins > 0 ? Math.round(truck.completedBins/truck.totalBins*100) : 0;
+            response += `**${truck.name}**<br>` +
+                       `- Status: ${truck.status}<br>` +
+                       `- Location: ${truck.currentLocation}<br>` +
+                       `- Progress: ${truck.completedBins}/${truck.totalBins} bins (${progressPercent}%)<br><br>`;
+        });
+
+        return response;
+    }
+
+    // Generate sensor anomalies response
+    function generateSensorAnomaliesResponse() {
+        const anomalySensors = wasteData.sensors.filter(sensor =>
+            sensor.status !== 'Normal');
+
+        let response = `⚠️ **Sensor Anomalies Report**<br><br>`;
+
+        if (anomalySensors.length > 0) {
+            response += `Found ${anomalySensors.length} sensors with anomalies:<br><br>`;
+
+            anomalySensors.forEach(sensor => {
+                const bin = wasteData.bins.find(bin => bin.id === sensor.binId);
+                response += `**${sensor.name} (${bin ? bin.name : 'Unknown bin'})**<br>` +
+                           `- Status: ${sensor.status}<br>` +
+                           `- Last reading: ${sensor.lastReading}<br>` +
+                           `- Battery level: ${sensor.batteryLevel}<br><br>`;
+            });
+        } else {
+            response += `All sensors are functioning normally. No anomalies detected.`;
+        }
+
+        return response;
+    }
+});
+</script>
