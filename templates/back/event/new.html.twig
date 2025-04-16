@@ -37,7 +37,7 @@
                                     'class': 'form-control' ~ (form.title.vars.errors|length ? ' is-invalid' : ''),
                                     'style': 'border-color: #29AB87',
                                     'placeholder': 'Titre de l\'événement',
-                                    'required': true
+                                    'required': 'required'
                                 }}) }}
                                 <div class="invalid-feedback">
                                     {{ form_errors(form.title) }}
@@ -50,7 +50,7 @@
                                     'class': 'form-control' ~ (form.description.vars.errors|length ? ' is-invalid' : ''),
                                     'style': 'border-color: #29AB87; height: 120px',
                                     'placeholder': 'Description détaillée...',
-                                    'required': true
+                                    'required': 'required'
                                 }}) }}
                                 <div class="invalid-feedback">
                                     {{ form_errors(form.description) }}
@@ -64,7 +64,7 @@
                                 {{ form_widget(form.date, {'attr': {
                                     'class': 'form-control' ~ (form.date.vars.errors|length ? ' is-invalid' : ''),
                                     'style': 'border-color: #29AB87',
-                                    'required': true
+                                    'required': 'required'
                                 }}) }}
                                 <div class="invalid-feedback">
                                     {{ form_errors(form.date) }}
@@ -77,7 +77,7 @@
                                     'class': 'form-control' ~ (form.location.vars.errors|length ? ' is-invalid' : ''),
                                     'style': 'border-color: #29AB87',
                                     'placeholder': 'Lieu exact...',
-                                    'required': true
+                                    'required': 'required'
                                 }}) }}
                                 <div class="invalid-feedback">
                                     {{ form_errors(form.location) }}
@@ -90,18 +90,18 @@
                                     'class': 'form-control' ~ (form.remainingPlaces.vars.errors|length ? ' is-invalid' : ''),
                                     'style': 'border-color: #29AB87',
                                     'min': 0,
-                                    'required': true
+                                    'required': 'required'
                                 }}) }}
                                 <div class="invalid-feedback">
                                     {{ form_errors(form.remainingPlaces) }}
                                 </div>
                             </div>
-                            
+
                             <div class="mb-3">
                                 {{ form_label(form.image, null, {'label_attr': {'class': 'form-label fw-bold', 'style': 'color: #00693E'}}) }}
                                 
                                 <!-- Custom File Upload Area -->
-                                <div class="file-upload-container">
+                                <div class="file-upload-container {{ form.image.vars.errors|length ? 'is-invalid' : '' }}">
                                     <div class="file-upload-area" id="dropzone">
                                         <div class="file-upload-message text-center">
                                             <i class="fas fa-cloud-upload-alt fa-3x mb-3" style="color: #29AB87;"></i>
@@ -122,13 +122,17 @@
                                             <p class="mt-2 mb-0 file-name text-center"></p>
                                         </div>
                                     </div>
-                                    {{ form_widget(form.image) }}
-                                    <div class="invalid-feedback d-block">
+                                    {{ form_widget(form.image, {'attr': {
+                                        'class': 'd-none',
+                                        'accept': 'image/*',
+                                        'required': 'required'
+                                    }}) }}
+                                    <div class="invalid-feedback mt-2">
                                         {{ form_errors(form.image) }}
                                     </div>
                                 </div>
                             </div>
-                        </div>
+                        </div>  
                     </div>
 
                     <div class="d-grid gap-2 d-md-flex justify-content-md-end mt-4">
@@ -157,6 +161,11 @@
         .invalid-feedback {
             color: #dc3545;
             font-size: 0.875em;
+            display: none;
+        }
+        .file-upload-container.is-invalid .invalid-feedback,
+        .form-control.is-invalid ~ .invalid-feedback {
+            display: block;
         }
         .alert-success {
             background-color: #d4edda;
@@ -184,6 +193,11 @@
             cursor: pointer;
             position: relative;
             overflow: hidden;
+        }
+        
+        .file-upload-container.is-invalid .file-upload-area {
+            border-color: #dc3545;
+            background-color: rgba(220, 53, 69, 0.05);
         }
         
         .file-upload-area:hover, .file-upload-area.dragover {
@@ -337,6 +351,7 @@
                         icon: 'error',
                         confirmButtonColor: '#29AB87'
                     });
+                    fileInput.value = '';
                     return;
                 }
                 
@@ -348,6 +363,7 @@
                         icon: 'error',
                         confirmButtonColor: '#29AB87'
                     });
+                    fileInput.value = '';
                     return;
                 }
                 

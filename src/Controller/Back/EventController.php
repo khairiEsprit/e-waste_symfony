@@ -33,30 +33,32 @@ final class EventController extends AbstractController
 
         if ($form->isSubmitted() && $form->isValid()) {
             try {
-                // Handle file upload
+                // Handle file upload (image is mandatory)
                 $imageFile = $form->get('image')->getData();
                 
-                if ($imageFile) {
-                    $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
-                    // Generate a unique name for the file
-                    // Replace special characters and spaces with underscores
-                    $safeFilename = preg_replace('/[^a-zA-Z0-9]/', '_', $originalFilename);
-                    $safeFilename = strtolower($safeFilename);
-                    $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
-                    
-                    // Move the file to the uploads directory
-                    try {
-                        $imageFile->move(
-                            $this->getParameter('events_directory'),
-                            $newFilename
-                        );
-                    } catch (FileException $e) {
-                        $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image');
-                    }
-                    
-                    // Update the imageName property
-                    $event->setImageName($newFilename);
+                // Since image is required, $imageFile should always be present
+                $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
+                // Generate a unique name for the file
+                $safeFilename = preg_replace('/[^a-zA-Z0-9]/', '_', $originalFilename);
+                $safeFilename = strtolower($safeFilename);
+                $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
+                
+                // Move the file to the uploads directory
+                try {
+                    $imageFile->move(
+                        $this->getParameter('events_directory'),
+                        $newFilename
+                    );
+                } catch (FileException $e) {
+                    $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image');
+                    return $this->render('back/event/new.html.twig', [
+                        'form' => $form->createView(),
+                        'event' => $event,
+                    ]);
                 }
+                
+                // Update the imageName property
+                $event->setImageName($newFilename);
                 
                 $entityManager->persist($event);
                 $entityManager->flush();
@@ -103,7 +105,6 @@ final class EventController extends AbstractController
                     if ($imageFile) {
                         $originalFilename = pathinfo($imageFile->getClientOriginalName(), PATHINFO_FILENAME);
                         // Generate a unique name for the file
-                        // Replace special characters and spaces with underscores
                         $safeFilename = preg_replace('/[^a-zA-Z0-9]/', '_', $originalFilename);
                         $safeFilename = strtolower($safeFilename);
                         $newFilename = $safeFilename . '-' . uniqid() . '.' . $imageFile->guessExtension();
@@ -127,10 +128,11 @@ final class EventController extends AbstractController
                             $event->setImageName($newFilename);
                         } catch (FileException $e) {
                             $this->addFlash('error', 'Une erreur est survenue lors du téléchargement de l\'image');
+                            return $this->render('back/event/edit.html.twig', [
+                                'form' => $form->createView(),
+                                'event' => $event,
+                            ]);
                         }
-                    } else {
-                        // Keep the original image if no new image is uploaded
-                        $event->setImageName($originalImageName);
                     }
                     
                     // Save changes to database

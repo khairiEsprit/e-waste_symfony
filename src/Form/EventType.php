@@ -14,6 +14,7 @@ use Symfony\Component\Form\Extension\Core\Type\FileType;
 use Symfony\Component\Validator\Constraints\NotBlank;
 use Symfony\Component\Validator\Constraints\Length;
 use Symfony\Component\Validator\Constraints\PositiveOrZero;
+use Symfony\Component\Validator\Constraints\File;
 
 class EventType extends AbstractType
 {
@@ -22,80 +23,102 @@ class EventType extends AbstractType
         $builder
             ->add('title', TextType::class, [
                 'label' => 'Titre de l\'événement',
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Entrez le titre de l\'événement'
+                    'placeholder' => 'Entrez le titre de l\'événement',
                 ],
                 'constraints' => [
-                    new NotBlank(['message' => 'Le titre est obligatoire']),
+                    new NotBlank(['message' => 'Le titre est obligatoire.']),
                     new Length([
                         'min' => 5,
                         'max' => 255,
-                        'minMessage' => 'Le titre doit contenir au moins {{ limit }} caractères',
-                        'maxMessage' => 'Le titre ne peut pas dépasser {{ limit }} caractères'
-                    ])
-                ]
+                        'minMessage' => 'Le titre doit contenir au moins {{ limit }} caractères.',
+                        'maxMessage' => 'Le titre ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
             ])
             ->add('description', TextareaType::class, [
                 'label' => 'Description',
-                'required' => false,
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                     'rows' => 5,
-                    'placeholder' => 'Description détaillée de l\'événement'
+                    'placeholder' => 'Description détaillée de l\'événement',
                 ],
                 'constraints' => [
+                    new NotBlank(['message' => 'La description est obligatoire.']),
                     new Length([
                         'max' => 1000,
-                        'maxMessage' => 'La description ne peut pas dépasser {{ limit }} caractères'
-                    ])
-                ]
+                        'maxMessage' => 'La description ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
             ])
             ->add('image', FileType::class, [
                 'label' => 'Image de l\'événement',
-                'required' => false,
+                'required' => true,
                 'mapped' => true,
                 'attr' => [
-                    'class' => 'form-control d-none', // Hidden input, we'll use custom drag & drop
-                    'accept' => 'image/jpeg, image/png, image/gif, image/webp',
-                    'data-max-file-size' => '5MB'
+                    'class' => 'form-control d-none',
+                    'accept' => 'image/jpeg,image/png,image/gif,image/webp',
+                    'data-max-file-size' => '5MB',
                 ],
-                'help' => 'Formats acceptés : JPG, PNG, GIF, WEBP. Taille max : 5 Mo'
+                'constraints' => [
+                    new NotBlank(['message' => 'Veuillez sélectionner une image.']),
+                    new File([
+                        'maxSize' => '5M',
+                        'mimeTypes' => [
+                            'image/jpeg',
+                            'image/png',
+                            'image/gif',
+                            'image/webp',
+                        ],
+                        'maxSizeMessage' => 'L\'image ne doit pas dépasser 5 Mo.',
+                        'mimeTypesMessage' => 'Veuillez sélectionner une image valide (JPEG, PNG, GIF ou WEBP).',
+                    ]),
+                ],
+                'help' => 'Formats acceptés : JPG, PNG, GIF, WEBP. Taille max : 5 Mo.',
             ])
             ->add('remainingPlaces', IntegerType::class, [
                 'label' => 'Places disponibles',
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
                     'min' => 0,
-                    'placeholder' => 'Nombre de places restantes'
+                    'placeholder' => 'Nombre de places restantes',
                 ],
                 'constraints' => [
-                    new NotBlank(),
-                    new PositiveOrZero()
-                ]
+                    new NotBlank(['message' => 'Le nombre de places est obligatoire.']),
+                    new PositiveOrZero(['message' => 'Le nombre de places doit être positif ou zéro.']),
+                ],
             ])
             ->add('location', TextType::class, [
                 'label' => 'Lieu',
+                'required' => true,
                 'attr' => [
                     'class' => 'form-control',
-                    'placeholder' => 'Lieu exact de l\'événement'
+                    'placeholder' => 'Lieu exact de l\'événement',
                 ],
                 'constraints' => [
-                    new NotBlank(),
-                    new Length(['max' => 255])
-                ]
+                    new NotBlank(['message' => 'Le lieu est obligatoire.']),
+                    new Length([
+                        'max' => 255,
+                        'maxMessage' => 'Le lieu ne peut pas dépasser {{ limit }} caractères.',
+                    ]),
+                ],
             ])
             ->add('date', DateTimeType::class, [
-                'label' => 'Date et heure',
+                'label' => 'Date et heureALK',
+                'required' => true,
                 'widget' => 'single_text',
                 'html5' => true,
                 'attr' => [
                     'class' => 'form-control datetimepicker',
-                    'min' => (new \DateTime())->format('Y-m-d\TH:i')
+                    'min' => (new \DateTime())->format('Y-m-d\TH:i'),
                 ],
                 'constraints' => [
-                    new NotBlank()
-                ]
+                    new NotBlank(['message' => 'La date et l\'heure sont obligatoires.']),
+                ],
             ]);
     }
 
@@ -105,9 +128,9 @@ class EventType extends AbstractType
             'data_class' => Event::class,
             'attr' => [
                 'novalidate' => 'novalidate',
-                'class' => 'needs-validation'
+                'class' => 'needs-validation',
             ],
-            'error_mapping' => []
+            'error_mapping' => [],
         ]);
     }
 }

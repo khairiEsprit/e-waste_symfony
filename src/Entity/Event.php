@@ -39,6 +39,7 @@ class Event
     /**
      * @var File|null
      */
+    #[Assert\NotBlank(message: "L'image est obligatoire")]
     #[Assert\Image(
         maxSize: "5M",
         mimeTypes: ["image/jpeg", "image/png", "image/gif", "image/webp"],
