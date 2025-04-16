@@ -29,7 +29,7 @@ class SecurityExceptionController extends AbstractController implements AccessDe
         if ($this->security->isGranted('ROLE_ADMIN')) {
             $returnRoute = 'back_dashboard';
         } elseif ($this->security->isGranted('ROLE_EMPLOYEE')) {
-            $returnRoute = 'employee_dashboard';
+            $returnRoute = 'app_tache_index';
         } elseif ($this->security->isGranted('ROLE_CITOYEN')) {
             $returnRoute = 'front_home';
         }

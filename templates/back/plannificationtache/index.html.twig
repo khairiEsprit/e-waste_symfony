@@ -1,0 +1,595 @@
+{# templates/back/plannificationtache/index.html.twig #}
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Planification des Tâches{% endblock %}
+
+{% block stylesheets %}
+{{ parent() }}
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700&display=swap" rel="stylesheet">
+<style>
+    :root {
+        --primary-green: #2E7D32;
+        --primary-red: #C70039;
+        --secondary-green: #81C784;
+        --light-green: #E8F5E9;
+        --off-white: #F8F9FA;
+        --background-light: #F5F5F5;
+        --font-poppins: 'Poppins', sans-serif;
+        --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.12);
+        --shadow-md: 0 4px 6px rgba(0, 0, 0, 0.1);
+        --shadow-lg: 0 10px 25px rgba(0, 0, 0, 0.1);
+    }
+
+    body {
+        background-color: var(--background-light);
+        font-family: var(--font-poppins);
+        font-weight: 500;
+    }
+
+    .main-content {
+        padding-top: 1rem;
+        padding-bottom: 1rem;
+    }
+
+    h1, h2, h3, h4, h5, h6,
+    .btn, .badge, .modal-title,
+    .table-custom th {
+        font-family: var(--font-poppins);
+        font-weight: 600;
+    }
+
+    .custom-header {
+        background: linear-gradient(135deg, var(--primary-green), var(--secondary-green));
+        color: white;
+        border-radius: 8px;
+        padding: 1.25rem;
+        margin-bottom: 1.5rem;
+        box-shadow: var(--shadow-md);
+    }
+
+    .custom-header h1 {
+        font-size: 1.8rem;
+        letter-spacing: -0.5px;
+        margin-bottom: 0.5rem;
+    }
+
+    .custom-header p {
+        font-size: 0.9rem;
+        opacity: 0.9;
+        margin-bottom: 0;
+    }
+
+    .table-container {
+        max-height: 65vh;
+        overflow-y: auto;
+        margin-bottom: 1rem;
+        border-radius: 8px;
+    }
+
+    .table-custom {
+        border-collapse: separate;
+        border-spacing: 0;
+        background: transparent;
+        margin-bottom: 0;
+    }
+
+    .table-custom thead {
+        background-color: var(--primary-green);
+        color: white;
+        position: sticky;
+        top: 0;
+        z-index: 10;
+    }
+
+    .table-custom th {
+        border: none;
+        padding: 0.75rem 1rem;
+        font-size: 0.8rem;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        white-space: nowrap;
+    }
+
+    .table-custom td {
+        background-color: white;
+        padding: 0.75rem 1rem;
+        vertical-align: middle;
+        border: none;
+        border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+        transition: all 0.2s ease;
+    }
+
+    .table-custom tr:last-child td {
+        border-bottom: none;
+    }
+
+    .table-custom tr:hover td {
+        background-color: var(--light-green);
+    }
+
+    .priority-badge {
+        padding: 0.35rem 0.75rem;
+        border-radius: 12px;
+        font-size: 0.75rem;
+        font-weight: 600;
+        display: inline-block;
+        min-width: 80px;
+        text-align: center;
+    }
+
+    .badge-haute {
+        background-color: #DC3545;
+        color: white;
+    }
+
+    .badge-moyenne {
+        background-color: #FFC107;
+        color: #212529;
+    }
+
+    .badge-basse {
+        background-color: #28A745;
+        color: white;
+    }
+
+    .btn-custom-primary {
+        background-color: var(--primary-green);
+        border-color: var(--primary-green);
+        color: white;
+        padding: 0.5rem 1.25rem;
+        border-radius: 6px;
+        transition: all 0.2s ease;
+        font-size: 0.85rem;
+        font-weight: 600;
+    }
+
+    .btn-custom-primary:hover {
+        background-color: #1B5E20;
+        border-color: #1B5E20;
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .action-buttons .btn {
+        margin: 0 2px;
+        border-radius: 6px;
+        width: 32px;
+        height: 32px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        font-size: 0.9rem;
+    }
+
+    .action-buttons .btn:hover {
+        transform: translateY(-1px);
+        box-shadow: var(--shadow-sm);
+    }
+
+    .no-results {
+        background-color: white;
+        color: var(--primary-green);
+        padding: 2rem;
+        text-align: center;
+        border-radius: 8px;
+        font-size: 1rem;
+        box-shadow: var(--shadow-sm);
+        margin: 1rem 0;
+    }
+
+    .pagination-container {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 1rem;
+    }
+
+    .pagination-info {
+        font-size: 0.85rem;
+        color: #6c757d;
+    }
+
+    .modal-header {
+        background-color: var(--primary-red);
+        color: white;
+        border-bottom: none;
+        padding: 1.25rem;
+    }
+
+    .modal-title {
+        font-size: 1.25rem;
+    }
+
+    .modal-body {
+        padding: 1.5rem;
+    }
+
+    .modal-footer {
+        border-top: none;
+        padding: 1rem 1.5rem;
+    }
+
+    @media (max-width: 768px) {
+        .custom-header h1 {
+            font-size: 1.5rem;
+        }
+        
+        .action-buttons .btn {
+            width: 28px;
+            height: 28px;
+            font-size: 0.8rem;
+        }
+        
+        .pagination-container {
+            flex-direction: column;
+            gap: 1rem;
+        }
+    }
+
+    /* Animation pour les lignes du tableau */
+    @keyframes fadeIn {
+        from { opacity: 0; transform: translateY(10px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+
+    .table-custom tbody tr {
+        animation: fadeIn 0.3s ease forwards;
+    }
+
+    .table-custom tbody tr:nth-child(odd) {
+        animation-delay: 0.05s;
+    }
+    .table-custom tbody tr:nth-child(even) {
+        animation-delay: 0.1s;
+    }
+
+    /* Custom scrollbar */
+    .table-container::-webkit-scrollbar {
+        width: 8px;
+        height: 8px;
+    }
+
+    .table-container::-webkit-scrollbar-track {
+        background: #f1f1f1;
+        border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb {
+        background: #c1c1c1;
+        border-radius: 4px;
+    }
+
+    .table-container::-webkit-scrollbar-thumb:hover {
+        background: #a8a8a8;
+    }
+
+    /* Style pour les dates */
+    .date-cell {
+        font-family: var(--font-poppins);
+        font-weight: 500;
+    }
+    
+    .date-past {
+        color: #DC3545;
+        font-weight: 600;
+    }
+    
+    .date-today {
+        color: #FFC107;
+        font-weight: 600;
+    }
+    
+    .date-future {
+        color: #28A745;
+    }
+</style>
+{% endblock %}
+
+{% block content %}
+<div class="container-fluid px-4 main-content">
+    <div class="custom-header">
+        <div class="d-flex flex-column flex-md-row justify-content-between align-items-start align-items-md-center">
+            <div class="mb-3 mb-md-0">
+                <h1 class="mb-1"><i class="bi bi-calendar-check me-2"></i>PLANIFICATION DES TÂCHES</h1>
+                <p class="mb-0">Gestion du calendrier des tâches</p>
+            </div>
+            <div class="d-flex gap-2">
+                <a href="{{ path('app_plannificationtache_new') }}" class="btn btn-custom-primary">
+                    <i class="bi bi-plus-lg me-1"></i>NOUVELLE PLANIFICATION
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="card border-0 shadow-sm">
+        <div class="card-body p-3 p-md-4">
+            <div class="table-container">
+                <table class="table table-custom" id="plannificationTable">
+                    <thead>
+                        <tr>
+                            <th>ID</th>
+                            <th>PRIORITÉ</th>
+                            <th>DATE LIMITE</th>
+                            <th>ACTIONS</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        {% for plannificationtache in plannificationtaches %}
+                        <tr class="task-row" data-id="{{ plannificationtache.id }}">
+                            <td>{{ plannificationtache.id }}</td>
+                            <td>
+                                {% if plannificationtache.priorite == 'Haute' %}
+                                    <span class="badge badge-haute priority-badge">{{ plannificationtache.priorite }}</span>
+                                {% elseif plannificationtache.priorite == 'Moyenne' %}
+                                    <span class="badge badge-moyenne priority-badge">{{ plannificationtache.priorite }}</span>
+                                {% else %}
+                                    <span class="badge badge-basse priority-badge">{{ plannificationtache.priorite }}</span>
+                                {% endif %}
+                            </td>
+                            <td class="date-cell {% if plannificationtache.dateLimite and plannificationtache.dateLimite|date('Y-m-d') == 'now'|date('Y-m-d') %}date-today{% elseif plannificationtache.dateLimite and plannificationtache.dateLimite|date('Y-m-d') < 'now'|date('Y-m-d') %}date-past{% else %}date-future{% endif %}">
+                                {{ plannificationtache.dateLimite ? plannificationtache.dateLimite|date('d/m/Y') : 'Non définie' }}
+                            </td>
+                            <td>
+                                <div class="action-buttons">
+                                    <a href="{{ path('app_plannificationtache_show', {'id': plannificationtache.id}) }}" class="btn btn-sm btn-info" title="Voir">
+                                        <i class="bi bi-eye"></i>
+                                    </a>
+                                    <a href="{{ path('app_plannificationtache_edit', {'id': plannificationtache.id}) }}" class="btn btn-sm btn-primary" title="Modifier">
+                                        <i class="bi bi-pencil"></i>
+                                    </a>
+                                    <button type="button" class="btn btn-sm btn-danger delete-btn" 
+                                            title="Supprimer" 
+                                            data-bs-toggle="modal" 
+                                            data-bs-target="#deleteConfirmationModal"
+                                            data-url="{{ path('app_plannificationtache_delete', {'id': plannificationtache.id}) }}"
+                                            data-token="{{ csrf_token('delete' ~ plannificationtache.id) }}">
+                                        <i class="bi bi-trash"></i>
+                                    </button>
+                                </div>
+                            </td>
+                        </tr>
+                        {% else %}
+                        <tr>
+                            <td colspan="4" class="no-results">
+                                <i class="bi bi-exclamation-circle fs-3"></i>
+                                <p class="mt-2 mb-0">AUCUNE TÂCHE PLANIFIÉE</p>
+                            </td>
+                        </tr>
+                        {% endfor %}
+                    </tbody>
+                </table>
+            </div>
+
+            <div class="pagination-container">
+                <div class="pagination-info">
+                    Affichage de <span class="fw-bold">{{ plannificationtaches|length }}</span> planifications
+                </div>
+                <nav>
+                    <ul class="pagination pagination-custom mb-0">
+                        <li class="page-item disabled">
+                            <a class="page-link" href="#" tabindex="-1">
+                                <i class="bi bi-chevron-left"></i>
+                            </a>
+                        </li>
+                        <li class="page-item active"><a class="page-link" href="#">1</a></li>
+                        <li class="page-item"><a class="page-link" href="#">2</a></li>
+                        <li class="page-item"><a class="page-link" href="#">3</a></li>
+                        <li class="page-item">
+                            <a class="page-link" href="#">
+                                <i class="bi bi-chevron-right"></i>
+                            </a>
+                        </li>
+                    </ul>
+                </nav>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Modal de confirmation -->
+<div class="modal fade" id="deleteConfirmationModal" tabindex="-1" aria-labelledby="deleteConfirmationModalLabel" aria-hidden="true">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title" id="deleteConfirmationModalLabel">CONFIRMATION DE SUPPRESSION</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <p>Êtes-vous sûr de vouloir supprimer cette planification ?</p>
+                <p class="text-muted"><small>Cette action est irréversible.</small></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-outline-secondary" data-bs-dismiss="modal">Annuler</button>
+                <form id="deleteForm" method="post" action="">
+                    <input type="hidden" name="_token" value="">
+                    <button type="submit" class="btn btn-danger">
+                        <i class="bi bi-trash me-1"></i> Supprimer
+                    </button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Toast Notification -->
+<div class="position-fixed bottom-0 end-0 p-3" style="z-index: 11">
+    <div id="liveToast" class="toast hide" role="alert" aria-live="assertive" aria-atomic="true">
+        <div class="toast-header bg-success text-white">
+            <strong class="me-auto">Notification</strong>
+            <button type="button" class="btn-close btn-close-white" data-bs-dismiss="toast" aria-label="Close"></button>
+        </div>
+        <div class="toast-body"></div>
+    </div>
+</div>
+{% endblock %}
+
+{% block javascripts %}
+{{ parent() }}
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Initialisation des tooltips
+    const tooltipTriggerList = [].slice.call(document.querySelectorAll('[title]'));
+    tooltipTriggerList.map(function (tooltipTriggerEl) {
+        return new bootstrap.Tooltip(tooltipTriggerEl, {
+            trigger: 'hover'
+        });
+    });
+
+    // Toast notification
+    const toastLiveExample = document.getElementById('liveToast');
+    const toast = new bootstrap.Toast(toastLiveExample);
+    
+    function showToast(message, type = 'success') {
+        const toastHeader = toastLiveExample.querySelector('.toast-header');
+        const toastBody = toastLiveExample.querySelector('.toast-body');
+        
+        toastHeader.className = 'toast-header text-white';
+        toastHeader.classList.add(`bg-${type}`);
+        toastBody.textContent = message;
+        toast.show();
+    }
+
+    // Gestion de la suppression avec confirmation
+    const deleteButtons = document.querySelectorAll('.delete-btn');
+    const deleteForm = document.getElementById('deleteForm');
+    
+    deleteButtons.forEach(button => {
+        button.addEventListener('click', function() {
+            const taskId = this.closest('tr').dataset.id;
+            deleteForm.action = this.dataset.url;
+            deleteForm.querySelector('input[name="_token"]').value = this.dataset.token;
+            
+            // Mise à jour du message de confirmation
+            const modalBody = document.querySelector('.modal-body p:first-child');
+            modalBody.textContent = `Êtes-vous sûr de vouloir supprimer la planification #${taskId} ?`;
+        });
+    });
+
+    // Tri des colonnes
+    const headers = document.querySelectorAll('#plannificationTable th');
+    headers.forEach((header, index) => {
+        if (index !== headers.length - 1) { // Exclure la colonne Actions
+            header.style.cursor = 'pointer';
+            header.addEventListener('click', () => {
+                sortTable(index);
+            });
+        }
+    });
+
+    function sortTable(columnIndex) {
+        const table = document.getElementById('plannificationTable');
+        const rows = table.querySelectorAll('tbody tr');
+        const rowsArray = Array.from(rows);
+        const isAsc = !table.querySelector('th').classList.contains('sorted-asc');
+        
+        rowsArray.sort((a, b) => {
+            const aText = a.querySelectorAll('td')[columnIndex].textContent.trim();
+            const bText = b.querySelectorAll('td')[columnIndex].textContent.trim();
+            
+            // Pour les colonnes numériques (ID)
+            if (columnIndex === 0) {
+                return isAsc ? aText - bText : bText - aText;
+            }
+            
+            // Pour la colonne Priorité (tri spécial)
+            if (columnIndex === 1) {
+                const priorityOrder = { 'Haute': 3, 'Moyenne': 2, 'Basse': 1 };
+                return isAsc 
+                    ? priorityOrder[aText] - priorityOrder[bText] 
+                    : priorityOrder[bText] - priorityOrder[aText];
+            }
+            
+            // Pour la colonne Date (tri spécial)
+            if (columnIndex === 2) {
+                const dateA = a.querySelector('td:nth-child(3)').classList.contains('date-past') ? 0 : 
+                             a.querySelector('td:nth-child(3)').classList.contains('date-today') ? 1 : 2;
+                const dateB = b.querySelector('td:nth-child(3)').classList.contains('date-past') ? 0 : 
+                             b.querySelector('td:nth-child(3)').classList.contains('date-today') ? 1 : 2;
+                return isAsc ? dateA - dateB : dateB - dateA;
+            }
+            
+            // Pour les autres colonnes
+            return isAsc 
+                ? aText.localeCompare(bText) 
+                : bText.localeCompare(aText);
+        });
+
+        // Supprimer les anciennes lignes
+        const tbody = table.querySelector('tbody');
+        rowsArray.forEach(row => tbody.removeChild(row));
+        
+        // Ajouter les lignes triées
+        rowsArray.forEach(row => tbody.appendChild(row));
+        
+        // Mettre à jour les classes de tri
+        headers.forEach(header => {
+            header.classList.remove('sorted-asc', 'sorted-desc');
+        });
+        
+        const sortClass = isAsc ? 'sorted-asc' : 'sorted-desc';
+        headers[columnIndex].classList.add(sortClass);
+        
+        // Afficher une notification
+        const columnName = headers[columnIndex].textContent.trim();
+        showToast(`Tableau trié par ${columnName} (${isAsc ? 'croissant' : 'décroissant'})`);
+    }
+
+    // Animation au survol des lignes
+    const rows = document.querySelectorAll('#plannificationTable tbody tr');
+    rows.forEach(row => {
+        row.addEventListener('mouseenter', () => {
+            row.style.transform = 'translateX(5px)';
+            row.style.transition = 'transform 0.2s ease';
+        });
+        
+        row.addEventListener('mouseleave', () => {
+            row.style.transform = '';
+        });
+    });
+
+    // Détection du scroll pour l'en-tête fixe
+    const tableContainer = document.querySelector('.table-container');
+    if (tableContainer) {
+        tableContainer.addEventListener('scroll', function() {
+            const scrollTop = this.scrollTop;
+            const thead = this.querySelector('thead');
+            
+            if (scrollTop > 0) {
+                thead.style.boxShadow = '0 4px 6px rgba(0, 0, 0, 0.1)';
+            } else {
+                thead.style.boxShadow = 'none';
+            }
+        });
+    }
+
+    // Mise en évidence des dates importantes
+    function highlightImportantDates() {
+        const today = new Date();
+        const dateCells = document.querySelectorAll('.date-cell');
+        
+        dateCells.forEach(cell => {
+            const dateText = cell.textContent.trim();
+            if (dateText !== 'Non définie') {
+                const [day, month, year] = dateText.split('/');
+                const taskDate = new Date(`${year}-${month}-${day}`);
+                
+                // Ajout d'un indicateur visuel pour les dates proches
+                const diffTime = taskDate - today;
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                
+                if (diffDays === 0) {
+                    cell.innerHTML = `<strong>${dateText} (Aujourd'hui)</strong>`;
+                } else if (diffDays === 1) {
+                    cell.innerHTML = `<strong>${dateText} (Demain)</strong>`;
+                } else if (diffDays > 0 && diffDays <= 3) {
+                    cell.innerHTML = `<strong>${dateText} (Dans ${diffDays} jours)</strong>`;
+                }
+            }
+        });
+    }
+    
+    highlightImportantDates();
+});
+</script>
+{% endblock %}

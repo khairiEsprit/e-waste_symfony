@@ -46,7 +46,6 @@ security:
                 failure_path: security_login
                 oauth_user_provider:
                     service: App\Security\MyOAuthUserProvider
-                default_target_path: back_dashboard
                 failure_handler: security.authentication.failure_handler
             access_denied_handler: App\Controller\SecurityExceptionController
     access_control:
@@ -66,4 +65,5 @@ security:
         - { path: ^/profile, roles: [ROLE_CITOYEN, ROLE_ADMIN, ROLE_EMPLOYEE] }
         
         # Employee routes
-        - { path: ^/employee, roles: ROLE_EMPLOYEE }
+        - { path: ^/tache, roles: ROLE_EMPLOYEE }
+        - { path: ^/plannificationtache, roles: ROLE_EMPLOYEE }

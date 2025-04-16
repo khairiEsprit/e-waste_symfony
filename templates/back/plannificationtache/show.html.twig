@@ -1,0 +1,288 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de la Tâche | {{ plannificationtache.id }}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            --primary-color: #00693E;
+            --primary-hover: #013220;
+            --secondary-color: #29AB87;
+            --accent-color: #a5b4fc;
+            --dark-text: #1f2937;
+            --light-text: #6b7280;
+            --light-bg: #f9fafb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        .task-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 1.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-header::after {
+            content: "";
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .task-card {
+            max-width: 800px;
+            margin: 2rem auto;
+            box-shadow: var(--card-shadow);
+            border-radius: 12px;
+            background: white;
+            overflow: hidden;
+        }
+
+        .detail-section {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .detail-section:last-child {
+            border-bottom: none;
+        }
+
+        .detail-item {
+            margin-bottom: 1rem;
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: var(--light-text);
+            font-weight: 500;
+            margin-bottom: 0.25rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-value {
+            font-size: 1rem;
+            font-weight: 500;
+            color: var(--dark-text);
+        }
+
+        .priority-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .priority-high {
+            background-color: rgba(239, 68, 68, 0.1);
+            color: var(--error-color);
+        }
+
+        .priority-medium {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .priority-low {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .date-overdue {
+            color: var(--error-color);
+            font-weight: 600;
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9375rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid transparent;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+            color: white;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .btn-outline {
+            background-color: white;
+            border-color: var(--light-text);
+            color: var(--dark-text);
+        }
+
+        .btn-outline:hover {
+            background-color: var(--light-bg);
+        }
+
+        .btn-danger {
+            background-color: var(--error-color);
+            border-color: var(--error-color);
+            color: white;
+        }
+
+        .btn-danger:hover {
+            background-color: #dc2626;
+            border-color: #dc2626;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        @media (max-width: 768px) {
+            .task-card {
+                margin: 1rem;
+                border-radius: 8px;
+            }
+            
+            .detail-section {
+                padding: 1rem;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% block body %}
+    <div class="task-card">
+        <!-- En-tête -->
+        <div class="task-header">
+            <div style="display: flex; justify-content: space-between; align-items: flex-start;">
+                <div>
+                    <h1 style="margin-bottom: 0.5rem; font-size: 1.5rem; font-weight: 700;">Détails de la Tâche #{{ plannificationtache.id }}</h1>
+                </div>
+                <button onclick="window.history.back()" aria-label="Fermer" style="background: rgba(255,255,255,0.2); border: none; border-radius: 50%; width: 36px; height: 36px; display: flex; align-items: center; justify-content: center; color: white; cursor: pointer;">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div style="padding: 0;">
+            <div class="detail-section animate-fade-in" style="animation-delay: 0.1s">
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="bi bi-tag"></i> ID
+                    </div>
+                    <div class="detail-value">
+                        {{ plannificationtache.id }}
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="bi bi-exclamation-triangle"></i> Priorité
+                    </div>
+                    <div class="detail-value">
+                        <span class="priority-badge 
+                            {% if plannificationtache.priorite == 'Haute' %}priority-high
+                            {% elseif plannificationtache.priorite == 'Moyenne' %}priority-medium
+                            {% else %}priority-low
+                            {% endif %}">
+                            <i class="bi bi-{% if plannificationtache.priorite == 'Haute' %}exclamation-triangle-fill
+                                          {% elseif plannificationtache.priorite == 'Moyenne' %}exclamation-circle-fill
+                                          {% else %}check-circle-fill{% endif %}"></i>
+                            {{ plannificationtache.priorite }}
+                        </span>
+                    </div>
+                </div>
+
+                <div class="detail-item">
+                    <div class="detail-label">
+                        <i class="bi bi-calendar-check"></i> Date limite
+                    </div>
+                    <div class="detail-value {% if date(plannificationtache.dateLimite) < date() %}date-overdue{% endif %}">
+                        {{ plannificationtache.dateLimite ? plannificationtache.dateLimite|date('d/m/Y') : 'Non définie' }}
+                        {% if date(plannificationtache.dateLimite) < date() %}
+                            <i class="bi bi-exclamation-triangle-fill" style="margin-left: 0.5rem;" title="Date dépassée"></i>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="detail-section" style="background-color: var(--light-bg); display: flex; justify-content: space-between; align-items: center; padding: 1.5rem 2rem; animation-delay: 0.2s;" class="animate-fade-in">
+                <a href="{{ path('app_plannificationtache_index') }}" class="action-btn btn-outline">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+                <div style="display: flex; gap: 0.75rem;">
+                    <a href="{{ path('app_plannificationtache_edit', {'id': plannificationtache.id}) }}" class="action-btn btn-primary">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                    <form method="post" action="{{ path('app_plannificationtache_delete', {'id': plannificationtache.id}) }}" onsubmit="return confirm('Êtes-vous sûr de vouloir supprimer cette tâche ?');" style="margin: 0;">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ plannificationtache.id) }}">
+                        <button type="submit" class="action-btn btn-danger">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Animation des éléments au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            document.querySelectorAll('.animate-fade-in').forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+
+            // Gestion des raccourcis clavier
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') window.history.back();
+                if (e.key === 'e' && e.ctrlKey) {
+                    window.location.href = "{{ path('app_plannificationtache_edit', {'id': plannificationtache.id}) }}";
+                }
+            });
+        });
+    </script>
+    {% endblock %}
+</body>
+</html>

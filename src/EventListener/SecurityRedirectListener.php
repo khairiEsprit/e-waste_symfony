@@ -114,9 +114,14 @@ class SecurityRedirectListener implements EventSubscriberInterface
             if (!$this->security->isGranted('ROLE_ADMIN')) {
                 throw new AccessDeniedException('Access denied. Admin role required.');
             }
-        } elseif (strpos($path, '/employee') === 0) {
+        } elseif (strpos($path, '/tache') === 0) {
             if (!$this->security->isGranted('ROLE_EMPLOYEE')) {
                 throw new AccessDeniedException('Access denied. Employee role required.');
+            }
+            elseif (strpos($path, '/plannificationtache') === 0) {
+                if (!$this->security->isGranted('ROLE_EMPLOYEE')) {
+                    throw new AccessDeniedException('Access denied. Employee role required.');
+                }
             }
         } elseif (strpos($path, '/front') === 0 || strpos($path, '/profile') === 0) {
             if (!$this->security->isGranted('ROLE_CITOYEN') && 

@@ -1,0 +1,612 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Détails de la Tâche | {{ tache.id }}</title>
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <!-- Bootstrap Icons -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css"/>
+    <style>
+        :root {
+            --primary-color: #00693E;
+            --primary-hover: #013220;
+            --secondary-color: #29AB87;
+            --accent-color: #a5b4fc;
+            --dark-text: #1f2937;
+            --light-text: #6b7280;
+            --light-bg: #f9fafb;
+            --card-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
+            --success-color: #10b981;
+            --warning-color: #f59e0b;
+            --error-color: #ef4444;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            background: var(--light-bg);
+            color: var(--dark-text);
+            line-height: 1.6;
+        }
+
+        .task-header {
+            background: linear-gradient(135deg, var(--primary-color), var(--secondary-color));
+            color: white;
+            border-radius: 12px 12px 0 0;
+            padding: 1.5rem 2rem;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .task-header::after {
+            content: "";
+            position: absolute;
+            bottom: -30px;
+            right: -30px;
+            width: 100px;
+            height: 100px;
+            background: rgba(255, 255, 255, 0.1);
+            border-radius: 50%;
+        }
+
+        .task-card {
+            max-width: 1200px;
+            margin: 2rem auto;
+            box-shadow: var(--card-shadow);
+            border-radius: 12px;
+            background: white;
+            overflow: hidden;
+        }
+
+        .detail-section {
+            padding: 1.5rem 2rem;
+            border-bottom: 1px solid rgba(0,0,0,0.05);
+        }
+
+        .detail-section:last-child {
+            border-bottom: none;
+        }
+
+        .detail-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+            gap: 1.5rem;
+        }
+
+        .detail-item {
+            background: var(--light-bg);
+            border-radius: 8px;
+            padding: 1.25rem;
+            transition: all 0.2s ease;
+        }
+
+        .detail-item:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.05);
+        }
+
+        .detail-label {
+            font-size: 0.875rem;
+            color: var(--light-text);
+            font-weight: 500;
+            margin-bottom: 0.5rem;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .detail-value {
+            font-size: 1.125rem;
+            font-weight: 600;
+            color: var(--dark-text);
+        }
+
+        #map-container {
+            height: 300px;
+            border-radius: 8px;
+            overflow: hidden;
+            margin: 1rem 0;
+            border: 1px solid #e5e7eb;
+        }
+
+        .status-badge {
+            padding: 0.5rem 1rem;
+            border-radius: 20px;
+            font-weight: 600;
+            font-size: 0.875rem;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .status-completed {
+            background-color: rgba(16, 185, 129, 0.1);
+            color: var(--success-color);
+        }
+
+        .status-in-progress {
+            background-color: rgba(245, 158, 11, 0.1);
+            color: var(--warning-color);
+        }
+
+        .status-pending {
+            background-color: rgba(156, 163, 175, 0.1);
+            color: var(--light-text);
+        }
+
+        .action-btn {
+            padding: 0.75rem 1.5rem;
+            border-radius: 8px;
+            font-weight: 500;
+            font-size: 0.9375rem;
+            transition: all 0.2s ease;
+            display: inline-flex;
+            align-items: center;
+            gap: 0.5rem;
+            border: 1px solid transparent;
+        }
+
+        .action-btn:hover {
+            transform: translateY(-1px);
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border-color: var(--primary-color);
+        }
+
+        .btn-primary:hover {
+            background-color: var(--primary-hover);
+            border-color: var(--primary-hover);
+        }
+
+        .timeline {
+            position: relative;
+            padding-left: 1.5rem;
+        }
+
+        .timeline::before {
+            content: "";
+            position: absolute;
+            left: 7px;
+            top: 0;
+            bottom: 0;
+            width: 2px;
+            background: #e5e7eb;
+        }
+
+        .timeline-item {
+            position: relative;
+            padding-bottom: 1.5rem;
+        }
+
+        .timeline-item:last-child {
+            padding-bottom: 0;
+        }
+
+        .timeline-item::before {
+            content: "";
+            position: absolute;
+            left: -1.5rem;
+            top: 5px;
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: var(--primary-color);
+            border: 2px solid white;
+        }
+
+        .timeline-date {
+            font-size: 0.8125rem;
+            color: var(--light-text);
+            margin-bottom: 0.25rem;
+        }
+
+        .timeline-content {
+            font-size: 0.9375rem;
+        }
+
+        .animate-fade-in {
+            animation: fadeIn 0.6s ease forwards;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; transform: translateY(10px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .tooltip {
+            position: relative;
+            display: inline-block;
+        }
+
+        .tooltip .tooltip-text {
+            visibility: hidden;
+            width: 200px;
+            background-color: var(--dark-text);
+            color: #fff;
+            text-align: center;
+            border-radius: 6px;
+            padding: 0.5rem;
+            position: absolute;
+            z-index: 1;
+            bottom: 125%;
+            left: 50%;
+            transform: translateX(-50%);
+            opacity: 0;
+            transition: opacity 0.3s;
+            font-size: 0.8125rem;
+            font-weight: normal;
+        }
+
+        .tooltip:hover .tooltip-text {
+            visibility: visible;
+            opacity: 1;
+        }
+
+        @media (max-width: 768px) {
+            .task-card {
+                margin: 1rem;
+                border-radius: 8px;
+            }
+            
+            .detail-section {
+                padding: 1rem;
+            }
+
+            .detail-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    {% block body %}
+    <div class="task-card">
+        <!-- En-tête -->
+        <div class="task-header">
+            <div class="d-flex justify-content-between align-items-start">
+                <div>
+                    <h1 class="mb-1 text-xl font-bold">Tâche #{{ tache.id }}</h1>
+                    <p class="mb-0 opacity-90 font-medium">
+                        {{ tache.message|length > 60 ? tache.message|slice(0, 60) ~ '...' : tache.message }}
+                    </p>
+                </div>
+                <button class="btn btn-light rounded-full p-2" onclick="window.history.back()" aria-label="Fermer">
+                    <i class="bi bi-x-lg"></i>
+                </button>
+            </div>
+        </div>
+
+        <!-- Contenu principal -->
+        <div class="p-0">
+            <!-- Grille de détails -->
+            <div class="detail-grid">
+                <!-- Colonne gauche -->
+                <div class="p-4">
+                    <div class="detail-section animate-fade-in" style="animation-delay: 0.1s">
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <i class="bi bi-geo-alt"></i> Localisation
+                        </h3>
+                        <div id="map-container"></div>
+                        <div class="grid grid-cols-2 gap-4 mt-4">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-arrow-up"></i> Latitude
+                                </div>
+                                <div class="detail-value">{{ tache.altitude }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-arrow-right"></i> Longitude
+                                </div>
+                                <div class="detail-value">{{ tache.longitude }}</div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section animate-fade-in" style="animation-delay: 0.2s">
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <i class="bi bi-chat-left-text"></i> Description
+                        </h3>
+                        <div class="p-4 bg-gray-50 rounded-lg whitespace-pre-line">{{ tache.message }}</div>
+                    </div>
+                </div>
+
+                <!-- Colonne droite -->
+                <div class="p-4 bg-gray-50">
+                    <div class="detail-section animate-fade-in" style="animation-delay: 0.3s">
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <i class="bi bi-info-circle"></i> Détails
+                        </h3>
+                        <div class="space-y-4">
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-building"></i> ID Centre
+                                </div>
+                                <div class="detail-value">{{ tache.idCentre }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-person"></i> ID Employé
+                                </div>
+                                <div class="detail-value">{{ tache.idEmploye }}</div>
+                            </div>
+                            <div class="detail-item">
+                                <div class="detail-label">
+                                    <i class="bi bi-calendar"></i> Date création
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="detail-section animate-fade-in" style="animation-delay: 0.4s">
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <i class="bi bi-activity"></i> Statut
+                        </h3>
+                        {% set status_class = {
+                            'Terminé': 'status-completed',
+                            'En cours': 'status-in-progress',
+                            'En attente': 'status-pending'
+                        } %}
+                        <div class="{{ status_class[tache.etat] ?? 'status-pending' }} status-badge">
+                            <i class="bi bi-{{ tache.etat == 'Terminé' ? 'check-circle' : (tache.etat == 'En cours' ? 'arrow-repeat' : 'clock') }}"></i>
+                            {{ tache.etat }}
+                        </div>
+                    </div>
+
+                    <div class="detail-section animate-fade-in" style="animation-delay: 0.5s">
+                        <h3 class="text-lg font-semibold mb-3 flex items-center gap-2">
+                            <i class="bi bi-clock-history"></i> Historique
+                        </h3>
+                        <div class="timeline">
+                            <div class="timeline-item">
+                                <div class="timeline-content">Tâche créée</div>
+                            </div>
+                            
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Actions -->
+            <div class="detail-section bg-gray-50 flex justify-between animate-fade-in" style="animation-delay: 0.6s">
+                <a href="{{ path('app_tache_index') }}" class="action-btn bg-white border-gray-300 text-gray-700 hover:bg-gray-50">
+                    <i class="bi bi-arrow-left"></i> Retour à la liste
+                </a>
+                <div class="flex gap-3">
+                    <a href="{{ path('app_tache_edit', {'id': tache.id}) }}" class="action-btn btn-primary text-white hover:bg-green-700">
+                        <i class="bi bi-pencil"></i> Modifier
+                    </a>
+                    <button class="action-btn bg-red-600 text-white hover:bg-red-700" data-bs-toggle="modal" data-bs-target="#deleteModal">
+                        <i class="bi bi-trash"></i> Supprimer
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal de suppression -->
+    <div class="modal fade" id="deleteModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog modal-dialog-centered">
+            <div class="modal-content overflow-hidden">
+                <div class="modal-header bg-red-600 text-white">
+                    <h5 class="modal-title flex items-center gap-2">
+                        <i class="bi bi-exclamation-octagon"></i> Confirmation de suppression
+                    </h5>
+                    <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+                </div>
+                <div class="modal-body">
+                    <p class="mb-4">Êtes-vous sûr de vouloir supprimer définitivement cette tâche ?</p>
+                    <div class="bg-yellow-50 border-l-4 border-yellow-400 p-4">
+                        <div class="flex items-center">
+                            <i class="bi bi-exclamation-triangle text-yellow-400 mr-3"></i>
+                            <p class="text-yellow-700 text-sm">Cette action est irréversible et supprimera toutes les données associées à cette tâche.</p>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button type="button" class="action-btn bg-gray-200 text-gray-700 hover:bg-gray-300" data-bs-dismiss="modal">
+                        Annuler
+                    </button>
+                    <form method="post" action="{{ path('app_tache_delete', {'id': tache.id}) }}" class="m-0">
+                        <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ tache.id) }}">
+                        <button type="submit" class="action-btn bg-red-600 text-white hover:bg-red-700">
+                            <i class="bi bi-trash"></i> Supprimer
+                        </button>
+                    </form>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Scripts -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/js/bootstrap.bundle.min.js"></script>
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Chart.js -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script>
+        // Initialisation de la carte avec des fonctionnalités avancées
+        function initMap() {
+            if (typeof {{ tache.altitude }} !== 'undefined' && typeof {{ tache.longitude }} !== 'undefined') {
+                const map = L.map('map-container').setView([{{ tache.altitude }}, {{ tache.longitude }}], 15);
+                
+                // Couche de base
+                L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
+                    attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>'
+                }).addTo(map);
+
+                // Marqueur personnalisé
+                const marker = L.marker([{{ tache.altitude }}, {{ tache.longitude }}], {
+                    icon: L.divIcon({
+                        className: 'custom-marker',
+                        html: `<div style="background-color: var(--primary-color); width: 24px; height: 24px; border-radius: 50%; border: 3px solid white; display: flex; align-items: center; justify-content: center; color: white;">
+                                  <i class="bi bi-geo-alt-fill" style="font-size: 12px;"></i>
+                               </div>`,
+                        iconSize: [24, 24],
+                        iconAnchor: [12, 24]
+                    })
+                }).addTo(map);
+
+                // Popup avec plus d'informations
+                marker.bindPopup(`
+                    <div style="min-width: 200px;">
+                        <h4 style="margin: 0 0 5px 0; font-size: 16px;">Localisation de la tâche</h4>
+                        <p style="margin: 0; font-size: 14px; color: #666;">
+                            <i class="bi bi-geo-alt"></i> ${marker.getLatLng().lat.toFixed(6)}, ${marker.getLatLng().lng.toFixed(6)}
+                        </p>
+                    </div>
+                `).openPopup();
+
+                // Contrôles supplémentaires
+                map.addControl(new L.Control.Fullscreen());
+                map.addControl(new L.Control.Zoom({ position: 'topright' }));
+
+                // Géolocalisation de l'utilisateur
+                map.locate({setView: false, maxZoom: 2});
+                map.on('locationfound', function(e) {
+                    L.marker([e.latlng.lat, e.latlng.lng], {
+                        icon: L.divIcon({
+                            className: 'user-marker',
+                            html: `<div style="background-color: #10b981; width: 20px; height: 20px; border-radius: 50%; border: 3px solid white;"></div>`,
+                            iconSize: [20, 20],
+                            iconAnchor: [10, 20]
+                        })
+                    }).addTo(map)
+                    .bindPopup("Votre position actuelle").openPopup();
+                });
+
+            } else {
+                document.getElementById('map-container').innerHTML = `
+                    <div style="height: 100%; display: flex; align-items: center; justify-content: center; background: #f3f4f6; border-radius: 8px;">
+                        <div style="text-align: center; padding: 20px;">
+                            <i class="bi bi-map" style="font-size: 2rem; color: #9ca3af;"></i>
+                            <p style="margin-top: 10px; color: #6b7280;">Coordonnées non disponibles</p>
+                        </div>
+                    </div>
+                `;
+            }
+        }
+
+        // Animation des éléments au chargement
+        function animateElements() {
+            document.querySelectorAll('.animate-fade-in').forEach((el, index) => {
+                el.style.animationDelay = `${index * 0.1}s`;
+            });
+        }
+
+        // Gestion des tooltips
+        function initTooltips() {
+            document.querySelectorAll('[data-tooltip]').forEach(el => {
+                const tooltipText = el.getAttribute('data-tooltip');
+                const tooltip = document.createElement('span');
+                tooltip.className = 'tooltip-text';
+                tooltip.textContent = tooltipText;
+                el.appendChild(tooltip);
+                el.classList.add('tooltip');
+            });
+        }
+
+        // Confirmation de suppression améliorée
+        function setupDeleteConfirmation() {
+            const deleteForm = document.querySelector('#deleteModal form');
+            const deleteButton = document.querySelector('#deleteModal [type="submit"]');
+            
+            deleteButton.addEventListener('click', function(e) {
+                e.preventDefault();
+                
+                // Animation de confirmation
+                deleteButton.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Suppression...';
+                deleteButton.disabled = true;
+                
+                // Simulation de délai pour l'effet
+                setTimeout(() => {
+                    deleteForm.submit();
+                }, 1500);
+            });
+        }
+
+        // Initialisation des graphiques (exemple)
+        function initCharts() {
+            const ctx = document.createElement('canvas');
+            ctx.style.maxHeight = '200px';
+            document.querySelector('.detail-section:nth-child(3)').appendChild(ctx);
+            
+            new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: ['Terminé', 'En cours', 'En attente'],
+                    datasets: [{
+                        data: [30, 45, 25],
+                        backgroundColor: [
+                            '#10b981',
+                            '#f59e0b',
+                            '#9ca3af'
+                        ],
+                        borderWidth: 0
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    cutout: '70%',
+                    plugins: {
+                        legend: {
+                            position: 'bottom'
+                        }
+                    }
+                }
+            });
+        }
+
+        // Initialisation au chargement
+        document.addEventListener('DOMContentLoaded', () => {
+            initMap();
+            animateElements();
+            initTooltips();
+            setupDeleteConfirmation();
+            
+            // initCharts(); // Décommentez si vous voulez voir un exemple de graphique
+            
+            // Gestion des raccourcis clavier
+            document.addEventListener('keydown', (e) => {
+                if (e.key === 'Escape') window.history.back();
+                if (e.key === 'e' && e.ctrlKey) {
+                    window.location.href = "{{ path('app_tache_edit', {'id': tache.id}) }}";
+                }
+            });
+        });
+
+        // Fonction pour exporter les données
+        function exportTaskData(format) {
+            const taskData = {
+                id: {{ tache.id }},
+                message: "{{ tache.message }}",
+                etat: "{{ tache.etat }}",
+                altitude: {{ tache.altitude }},
+                longitude: {{ tache.longitude }},
+                idCentre: {{ tache.idCentre }},
+                idEmploye: {{ tache.idEmploye }},
+            };
+            
+            if (format === 'json') {
+                const dataStr = JSON.stringify(taskData, null, 2);
+                const dataUri = 'data:application/json;charset=utf-8,'+ encodeURIComponent(dataStr);
+                const exportName = `tache_{{ tache.id }}.json`;
+                
+                const linkElement = document.createElement('a');
+                linkElement.setAttribute('href', dataUri);
+                linkElement.setAttribute('download', exportName);
+                linkElement.click();
+            } else {
+                // Implémentez d'autres formats si nécessaire (CSV, XML, etc.)
+                alert('Format non supporté pour le moment');
+            }
+        }
+    </script>
+    {% endblock %}
+</body>
+</html>
