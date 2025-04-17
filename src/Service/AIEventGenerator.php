@@ -101,32 +101,35 @@ EOT;
             'content_length' => strlen($content)
         ]);
 
-        // Try to decode the content as JSON
-        $decodedContent = json_decode($content, true);
+        // Clean the content by removing markdown code fences and extra formatting
+        $cleanedContent = $this->cleanResponseContent($content);
+
+        // Try to decode the cleaned content as JSON
+        $decodedContent = json_decode($cleanedContent, true);
         $jsonError = json_last_error();
 
         if ($jsonError === JSON_ERROR_NONE && is_array($decodedContent)) {
             // Case 1: Content is already in the expected format with 'events' key
             if (isset($decodedContent['events']) && is_array($decodedContent['events'])) {
                 $this->logger->debug('Content already in expected format with events key');
-                return $decodedContent;
+                return $this->sanitizeEventDescriptions($decodedContent);
             }
 
             // Case 2: Content is a single event object
             if ($this->isAssociativeArray($decodedContent) && isset($decodedContent['title'])) {
                 $this->logger->debug('Content is a single event object');
-                return ['events' => [$decodedContent]];
+                return ['events' => [$this->sanitizeEventDescription($decodedContent)]];
             }
 
             // Case 3: Content is an array of event objects
             if (count($decodedContent) > 0 && isset($decodedContent[0]['title'])) {
                 $this->logger->debug('Content is an array of event objects');
-                return ['events' => $decodedContent];
+                return ['events' => array_map([$this, 'sanitizeEventDescription'], $decodedContent)];
             }
 
-            // Case 4: Some other JSON structure, return as is
+            // Case 4: Some other JSON structure, return as is after sanitizing
             $this->logger->debug('Content is in an unexpected JSON format');
-            return $decodedContent;
+            return $this->sanitizeEventDescriptions($decodedContent);
         }
 
         // If JSON decoding failed, try to extract JSON from the content
@@ -137,16 +140,16 @@ EOT;
             
             // Try to extract JSON from malformed response
             $matches = [];
-            if (preg_match('/\\{.*\\}/s', $content, $matches)) {
+            if (preg_match('/\\{.*\\}/s', $cleanedContent, $matches)) {
                 $jsonContent = $matches[0];
                 $this->logger->debug('Extracted potential JSON from content');
                 
                 $decodedContent = json_decode($jsonContent, true);
                 if (json_last_error() === JSON_ERROR_NONE && is_array($decodedContent)) {
                     if (isset($decodedContent['title'])) {
-                        return ['events' => [$decodedContent]];
+                        return ['events' => [$this->sanitizeEventDescription($decodedContent)]];
                     } elseif (isset($decodedContent['events'])) {
-                        return $decodedContent;
+                        return $this->sanitizeEventDescriptions($decodedContent);
                     }
                 }
             }
@@ -158,12 +161,71 @@ EOT;
             'events' => [
                 [
                     'title' => 'Suggestion from AI',
-                    'description' => $content,
+                    'description' => $cleanedContent,
                     'location' => 'To be determined',
                     'capacity' => 50,
                 ],
             ],
         ];
+    }
+
+    /**
+     * Clean the AI response content by removing markdown code fences and extra formatting
+     *
+     * @param string $content The raw content from the AI response
+     * @return string The cleaned content
+     */
+    private function cleanResponseContent(string $content): string
+    {
+        // Remove markdown code fences (```json, ```, etc.)
+        $cleaned = preg_replace('/^```[a-zA-Z]*\n|\n```$/m', '', trim($content));
+        
+        // Remove any remaining backticks
+        $cleaned = str_replace('```', '', $cleaned);
+        
+        // Remove extra whitespace and newlines
+        $cleaned = trim(preg_replace('/\n\s*\n/', "\n", $cleaned));
+        
+        return $cleaned;
+    }
+
+    /**
+     * Sanitize event descriptions in the response to ensure clean content
+     *
+     * @param array $data The decoded JSON data
+     * @return array The sanitized data
+     */
+    private function sanitizeEventDescriptions(array $data): array
+    {
+        if (isset($data['events']) && is_array($data['events'])) {
+            $data['events'] = array_map([$this, 'sanitizeEventDescription'], $data['events']);
+        }
+        return $data;
+    }
+
+    /**
+     * Sanitize a single event description
+     *
+     * @param array $event The event data
+     * @return array The sanitized event data
+     */
+    private function sanitizeEventDescription(array $event): array
+    {
+        if (isset($event['description'])) {
+            // Remove any JSON-like formatting or extra quotes
+            $event['description'] = trim($event['description'], '"');
+            
+            // Remove any remaining markdown or code-like syntax
+            $event['description'] = preg_replace('/^```[a-zA-Z]*\n|\n```$/m', '', $event['description']);
+            $event['description'] = str_replace('```', '', $event['description']);
+            
+            // Ensure the description is plain text
+            $event['description'] = strip_tags($event['description']);
+            
+            // Trim and clean up whitespace
+            $event['description'] = trim(preg_replace('/\s+/', ' ', $event['description']));
+        }
+        return $event;
     }
 
     /**

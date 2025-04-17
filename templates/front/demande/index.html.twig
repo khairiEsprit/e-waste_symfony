@@ -3,15 +3,15 @@
 {% block title %}Liste des Demandes{% endblock %}
 
 {% block body %}
-<br>
-<br>
-<div class="container mt-5">
+<div class="full-page-bg"></div>
+<section class="content-wrapper py-5" style="margin-top: 80px;">
+<div class="container">
     <div class="title-container">
-        <h1 class="main-title">Liste des Demandes</h1>
+        <h1 class="section-title text-white animate-fade-in">Liste des Demandes</h1>
     </div>
 
-    <div class="demandes-container">
-        <div class="demandes-header">
+    <div class="row justify-content-center mb-4">
+        <div class="col-md-6">
             <div class="search-container">
                 <div class="input-group">
                     <input type="text" id="searchInput" class="form-control" placeholder="Rechercher une demande...">
@@ -20,24 +20,30 @@
                     </span>
                 </div>
             </div>
+        </div>
+        <div class="col-md-3 text-end">
+            <a href="{{ path('app_demande_new') }}" class="btn-custom">
+                <i class="fas fa-plus-circle"></i> Nouvelle demande
+            </a>
+        </div>
+    </div>
 
-            <div class="actions-container">
-                <a href="{{ path('app_demande_new') }}" class="custom-btn btn-edit">
-                    <i class="fas fa-plus-circle"></i> Nouvelle demande
-                </a>
+    {% if demandes is empty %}
+        <div class="card-custom animate-slide-up">
+            <div class="card-body text-center py-5">
+                <i class="fas fa-inbox fa-3x text-muted mb-3"></i>
+                <h3 class="text-muted">Aucune demande trouvée</h3>
+                <p class="lead">Créez une nouvelle demande pour commencer</p>
             </div>
         </div>
-
-        {% if demandes is empty %}
-            <div class="alert alert-info text-center">Aucune demande trouvée.</div>
-        {% else %}
-            <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center" id="demandesContainer">
+    {% else %}
+        <div class="row row-cols-1 row-cols-md-3 g-4 justify-content-center" id="demandesContainer">
                 {% for demande in demandes %}
                     {% set dernierTraitement = demande.traitements|last %}
                     <div class="col demande-card" data-search="{{ demande.type|lower }} {{ demande.adresse|lower }} {{ demande.emailUtilisateur|lower }} {{ demande.message|lower }}">
-                        <div class="card custom-card">
+                        <div class="card-custom animate-slide-up">
                             <div class="card-body">
-                                <div class="card-header">
+                                <div class="card-header" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
                                     <h5 class="type-badge">{{ demande.type }}</h5>
                                     <div class="status-badge-container">
                                         {% if dernierTraitement and dernierTraitement.status == 'Traité' %}
@@ -58,7 +64,7 @@
                                             </div>
                                             <div class="info-content">{{ demande.adresse }}</div>
                                         </div>
-                                        
+
                                         <div class="info-item">
                                             <div class="info-label">
                                                 <i class="fas fa-envelope"></i>
@@ -88,10 +94,10 @@
                                 </div>
                             </div>
                             <div class="card-footer">
-                                <a href="{{ path('app_demande_show', {'id': demande.id}) }}" class="custom-btn btn-back">
+                                <a href="{{ path('app_demande_show', {'id': demande.id}) }}" class="btn-custom">
                                     <i class="fas fa-eye"></i> Voir
                                 </a>
-                                <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="custom-btn btn-edit">
+                                <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="btn-custom">
                                     <i class="fas fa-edit"></i> Modifier
                                 </a>
                             </div>
@@ -100,22 +106,16 @@
                 {% endfor %}
             </div>
         {% endif %}
-    </div>
 </div>
+</section>
 {% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
+    /* Status Colors */
     :root {
-        --primary-color: #2C5E1A;
-        --primary-light: #1a7718;
-        --secondary-color: #f8f9fa;
-        --text-color: #333;
-        --text-light: #666;
-        --border-color: #e0e0e0;
-        /* Status Colors */
         --success-bg: #e8f5e9;
         --success-color: #2e7d32;
         --success-border: #a5d6a7;
@@ -127,55 +127,15 @@
         --warning-border: #ffcc80;
     }
 
-    body {
-        background-color: #f5f7fa;
-        font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
-    }
-
     .title-container {
         text-align: center;
         margin-bottom: 40px;
         position: relative;
     }
 
-    .main-title {
-        color: var(--text-color);
-        font-size: 2.8rem;
-        font-weight: 700;
-        margin: 0;
-        padding: 0;
-        position: relative;
-        display: inline-block;
-    }
 
-    .main-title::after {
-        content: '';
-        position: absolute;
-        bottom: -10px;
-        left: 50%;
-        transform: translateX(-50%);
-        width: 100px;
-        height: 4px;
-        background: linear-gradient(90deg, var(--primary-color), var(--primary-light));
-        border-radius: 2px;
-    }
 
-    .demandes-container {
-        background: white;
-        border-radius: 15px;
-        box-shadow: 0 2px 10px rgba(0, 0, 0, 0.05);
-        padding: 20px;
-        margin-top: 30px;
-    }
 
-    .demandes-header {
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
-        margin-bottom: 25px;
-        gap: 20px;
-        flex-wrap: wrap;
-    }
 
     .search-container {
         flex: 1;
@@ -183,11 +143,12 @@
     }
 
     .input-group {
-        background: var(--secondary-color);
+        background: white;
         border-radius: 12px;
         overflow: hidden;
         border: 1px solid var(--border-color);
         transition: all 0.3s ease;
+        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.05);
     }
 
     .input-group:focus-within {
@@ -200,6 +161,7 @@
         padding: 12px 15px;
         font-size: 0.95rem;
         background: transparent;
+        color: #333;
     }
 
     .input-group .form-control:focus {
@@ -207,14 +169,14 @@
     }
 
     .input-group .form-control::placeholder {
-        color: var(--text-light);
+        color: #666;
         opacity: 0.7;
     }
 
     .input-group-text {
         background: transparent;
         border: none;
-        color: var(--primary-color);
+        color: var(--primary-medium);
         padding: 0 15px;
     }
 
@@ -227,22 +189,7 @@
         gap: 10px;
     }
 
-    .custom-card {
-        background: white;
-        border-radius: 20px;
-        box-shadow: 0 4px 20px rgba(0, 0, 0, 0.05);
-        border: none;
-        overflow: hidden;
-        height: 100%;
-        max-width: 400px;
-        margin: 0 auto;
-        transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
 
-    .custom-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-    }
 
     .card-header {
         display: flex;
@@ -397,71 +344,21 @@
         margin-top: 10px;
     }
 
-    .custom-btn {
-        display: inline-flex;
-        align-items: center;
-        gap: 8px;
-        padding: 8px 15px;
-        border-radius: 20px;
-        font-size: 0.9rem;
-        font-weight: 500;
-    }
 
-    .btn-back {
-        background: linear-gradient(135deg, var(--primary-color), var(--primary-light));
-        color: white;
-    }
-
-    .btn-edit {
-        background: linear-gradient(135deg, var(--primary-light), var(--primary-color));
-        color: white;
-    }
-
-    .custom-btn:hover {
-        transform: translateY(-2px);
-        box-shadow: 0 4px 12px rgba(0,0,0,0.15);
-    }
 
     @media (max-width: 768px) {
-        .main-title {
-            font-size: 2.2rem;
-        }
-        
-        .demandes-header {
-            flex-direction: column;
-            gap: 15px;
-        }
-        
-        .search-container {
-            width: 100%;
-        }
-        
-        .actions-container {
-            width: 100%;
-        }
-        
-        .actions-container .custom-btn {
-            width: 100%;
-            justify-content: center;
-        }
-        
         .info-row {
             flex-direction: column;
             gap: 8px;
         }
-        
+
         .info-item {
             width: 100%;
         }
-        
+
         .card-footer {
             flex-direction: column;
             gap: 8px;
-        }
-        
-        .custom-btn {
-            width: 100%;
-            justify-content: center;
         }
     }
 </style>
@@ -475,49 +372,55 @@ document.addEventListener('DOMContentLoaded', function() {
     const demandesContainer = document.getElementById('demandesContainer');
     const demandeCards = document.querySelectorAll('.demande-card');
 
-    // Add animation class to cards on load
-    demandeCards.forEach((card, index) => {
-        setTimeout(() => {
-            card.style.opacity = '1';
-            card.style.transform = 'translateY(0)';
-        }, index * 100);
-    });
-
-    searchInput.addEventListener('input', function() {
-        const searchTerm = this.value.toLowerCase();
-        
-        demandeCards.forEach(card => {
-            const searchableText = card.getAttribute('data-search');
-            if (searchableText.includes(searchTerm)) {
-                card.style.display = '';
-                card.style.opacity = '1';
-                card.style.transform = 'translateY(0)';
-            } else {
-                card.style.opacity = '0';
-                card.style.transform = 'translateY(20px)';
-                setTimeout(() => {
-                    card.style.display = 'none';
-                }, 300);
+    if (searchInput && demandeCards.length > 0) {
+        // Add staggered animation to cards
+        demandeCards.forEach((card, index) => {
+            const cardElement = card.querySelector('.card-custom');
+            if (cardElement) {
+                cardElement.style.animationDelay = `${index * 0.1}s`;
             }
         });
 
-        const visibleCards = Array.from(demandesContainer.querySelectorAll('.demande-card'))
-            .filter(card => card.style.display !== 'none');
+        // Handle search functionality
+        searchInput.addEventListener('input', function() {
+            const searchTerm = this.value.toLowerCase();
+            let hasResults = false;
 
-        if (visibleCards.length === 0) {
-            if (!document.querySelector('.no-results-message')) {
-                const noResults = document.createElement('div');
-                noResults.className = 'alert alert-info text-center no-results-message';
-                noResults.textContent = 'Aucune demande ne correspond à votre recherche.';
-                demandesContainer.appendChild(noResults);
+            demandeCards.forEach(card => {
+                const searchableText = card.getAttribute('data-search');
+                if (searchableText && searchableText.includes(searchTerm)) {
+                    card.style.display = '';
+                    hasResults = true;
+                } else {
+                    card.style.display = 'none';
+                }
+            });
+
+            // Show no results message if needed
+            if (!hasResults && demandeCards.length > 0) {
+                if (!document.getElementById('no-results-message')) {
+                    const noResults = document.createElement('div');
+                    noResults.id = 'no-results-message';
+                    noResults.className = 'col-12';
+                    noResults.innerHTML = `
+                        <div class="card-custom animate-slide-up">
+                            <div class="card-body text-center py-5">
+                                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                                <h3 class="text-muted">Aucun résultat trouvé</h3>
+                                <p class="lead">Essayez d'autres termes de recherche</p>
+                            </div>
+                        </div>
+                    `;
+                    demandesContainer.appendChild(noResults);
+                }
+            } else {
+                const noResults = document.getElementById('no-results-message');
+                if (noResults) {
+                    noResults.remove();
+                }
             }
-        } else {
-            const noResults = document.querySelector('.no-results-message');
-            if (noResults) {
-                noResults.remove();
-            }
-        }
-    });
+        });
+    }
 });
 </script>
 {% endblock %}

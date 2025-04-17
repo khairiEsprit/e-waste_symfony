@@ -8,10 +8,11 @@
 {% endblock %}
 
 {% block body %}
-<div class="gamification-container">
+<div class="full-page-bg"></div>
+<section class="content-wrapper py-5" style="margin-top: 80px;">
     <div class="container">
-        <h1 class="page-title animate-fadeIn">Submit Recycling Actions</h1>
-        <p class="page-subtitle animate-fadeIn delay-100">Complete eco-friendly actions to earn points and badges!</p>
+        <h1 class="section-title text-white animate-fade-in">Submit Recycling Actions</h1>
+        <p class="lead text-white text-center mb-5 animate-fade-in delay-100">Complete eco-friendly actions to earn points and badges!</p>
 
         <div class="row">
             <div class="col-md-8 mx-auto">
@@ -24,8 +25,8 @@
                     {% endfor %}
                 {% endfor %}
 
-                <div class="gamification-card animate-fadeIn delay-200">
-                    <div class="card-header bg-primary text-white">
+                <div class="card-custom animate-slide-up delay-200">
+                    <div class="card-header" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
                         <h3 class="mb-0"><i class="bi bi-plus-circle me-2"></i>Submit Waste Disposal Action</h3>
                     </div>
                     <div class="card-body">
@@ -44,15 +45,15 @@
                                 {{ form_errors(form.comment) }}
                             </div>
 
-                            <button type="submit" class="btn btn-gamification btn-primary">
+                            <button type="submit" class="btn-custom">
                                 <i class="bi bi-check-circle me-2"></i>Submit Action
                             </button>
                         {{ form_end(form) }}
                     </div>
                 </div>
 
-                <div class="gamification-card animate-fadeIn delay-300">
-                    <div class="card-header bg-success text-white">
+                <div class="card-custom animate-slide-up delay-300 mt-4">
+                    <div class="card-header" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
                         <h3 class="mb-0"><i class="bi bi-list-check me-2"></i>Available Actions</h3>
                     </div>
                     <div class="card-body">
@@ -82,7 +83,7 @@
             </div>
         </div>
     </div>
-</div>
+</section>
 {% endblock %}
 
 {% block javascripts %}

@@ -1,210 +1,101 @@
-{% extends 'back/index.html.twig' %}
+{% extends 'back/base.html.twig' %}
+
+{% block title %}Gestion des Événements{% endblock %}
 
 {% block content %}
-    <div class="app-content">
-        <div class="container-fluid">
-            <div class="d-flex justify-content-between align-items-center mb-4">
-                <h1 class="h3 mb-0" style="color: #013220;">Gestion des Événements</h1>
-                <a href="{{ path('app_event_new') }}" class="btn btn-new-event" style="background-color: #29AB87; color: white;">
-                    <i class="fas fa-plus-circle me-1"></i> Nouvel Événement
-                </a>
-            </div>
-
-            <div class="card border-0 shadow-sm">
+<div class="container-fluid py-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card shadow-sm" style="border-radius: 15px; overflow: hidden;">
+                <div class="card-header d-flex justify-content-between align-items-center" style="background-color: #013220; color: white;">
+                    <h4 class="m-0">
+                        <i class="bi bi-calendar-event-fill me-2"></i>
+                        Gestion des Événements
+                    </h4>
+                    <a href="{{ path('app_event_new') }}" class="btn" style="background-color: #00693E; color: white;">
+                        <i class="bi bi-plus-circle me-1"></i> Nouvel Événement
+                    </a>
+                </div>
+                
                 <div class="card-body p-0">
                     <div class="table-responsive">
-                        <table class="table table-hover align-middle">
-                            <thead style="background-color: #013220; color: #FEFEFA;">
-                            <tr>
-                                <th class="ps-4">Titre</th>
-                                <th>Date</th>
-                                <th>Lieu</th>
-                                <th>Places</th>
-                                <th class="text-end pe-4">Actions</th>
-                            </tr>
+                        <table class="table table-hover mb-0">
+                            <thead style="background-color: #ACE1AF;">
+                                <tr>
+                                    <th class="px-3">Titre</th>
+                                    <th>Date</th>
+                                    <th>Lieu</th>
+                                    <th>Places</th>
+                                    <th class="text-center">Actions</th>
+                                </tr>
                             </thead>
-                            <tbody>
-                            {% for event in events %}
-                                <tr style="border-left: 4px solid #29AB87;">
-                                    <td class="ps-4 fw-bold">{{ event.title }}</td>
-                                    <td>{{ event.date|date('d/m/Y H:i') }}</td>
-                                    <td>{{ event.location }}</td>
-                                    <td>
-                                    <span class="badge" style="background-color: #ACE1AF; color: #013220;">
-                                        {{ event.remainingPlaces }} places
-                                    </span>
-                                    </td>
-                                    <td class="text-end pe-4">
-                                        <div class="d-flex justify-content-end action-buttons">
-                                            <!-- Bouton Voir -->
-                                            <a href="{{ path('app_event_show', {'id': event.id}) }}"
-                                               class="btn btn-action btn-view me-2"
-                                               data-bs-toggle="tooltip"
-                                               data-bs-placement="top"
-                                               title="Voir détails">
-                                                <span class="btn-icon"><i class="fas fa-eye"></i></span>
-                                                <span class="btn-text">Voir</span>
-                                            </a>
-
-                                            <!-- Bouton Modifier -->
-                                            <a href="{{ path('app_event_edit', {'id': event.id}) }}"
-                                               class="btn btn-action btn-edit me-2"
-                                               data-bs-toggle="tooltip"
-                                               data-bs-placement="top"
-                                               title="Modifier">
-                                                <span class="btn-icon"><i class="fas fa-edit"></i></span>
-                                                <span class="btn-text">Modifier</span>
-                                            </a>
-
-                                            <!-- Bouton Supprimer -->
-                                            <form method="post" action="{{ path('app_event_delete', {'id': event.id}) }}" class="d-inline delete-form" id="delete-form-{{ event.id }}">
-                                                <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ event.id) }}">
-                                                <button type="button" class="btn btn-action btn-delete delete-btn"
-                                                        data-bs-toggle="tooltip"
-                                                        data-bs-placement="top"
-                                                        title="Supprimer"
+                            <tbody style="background-color: #FEFEFA;">
+                            {% if events|length > 0 %}
+                                {% for event in events %}
+                                    <tr class="clickable-row" data-href="{{ path('app_event_show', {'id': event.id}) }}">
+                                        <td class="px-3 fw-bold">{{ event.title }}</td>
+                                        <td>{{ event.date|date('d/m/Y H:i') }}</td>
+                                        <td>{{ event.location }}</td>
+                                        <td>
+                                            <span class="badge rounded-pill text-bg-success px-3 py-2">
+                                                <i class="bi bi-ticket-perforated me-1"></i>
+                                                {{ event.remainingPlaces }} places
+                                            </span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="btn-group action-buttons">
+                                                <a href="{{ path('app_event_show', {'id': event.id}) }}" 
+                                                   class="btn btn-sm btn-outline-primary" 
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Voir les détails">
+                                                    <i class="bi bi-eye"></i>
+                                                </a>
+                                                <a href="{{ path('app_event_edit', {'id': event.id}) }}" 
+                                                   class="btn btn-sm btn-outline-success" 
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Modifier">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button type="button" 
+                                                        class="btn btn-sm btn-outline-danger delete-item"
                                                         data-id="{{ event.id }}"
-                                                        data-title="{{ event.title }}">
-                                                    <span class="btn-icon"><i class="fas fa-trash-alt"></i></span>
-                                                    <span class="btn-text">Supprimer</span>
+                                                        data-title="{{ event.title }}"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-title="Supprimer">
+                                                    <i class="bi bi-trash"></i>
                                                 </button>
-                                            </form>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endfor %}
+                            {% else %}
+                                <tr>
+                                    <td colspan="5" class="text-center py-5">
+                                        <div class="d-flex flex-column align-items-center">
+                                            <i class="bi bi-calendar-x text-muted" style="font-size: 3rem;"></i>
+                                            <p class="mt-3 mb-1 fw-bold">Aucun événement programmé</p>
+                                            <p class="text-muted">Commencez par ajouter un nouvel événement</p>
+                                            <a href="{{ path('app_event_new') }}" class="btn mt-2" style="background-color: #00693E; color: white;">
+                                                <i class="bi bi-plus-circle me-1"></i> Ajouter un événement
+                                            </a>
                                         </div>
                                     </td>
                                 </tr>
-                            {% else %}
-                                <tr>
-                                    <td colspan="5" class="text-center py-4">
-                                        <i class="fas fa-calendar-times fa-2x mb-2" style="color: #29AB87;"></i>
-                                        <p class="mb-0">Aucun événement programmé</p>
-                                    </td>
-                                </tr>
-                            {% endfor %}
+                            {% endif %}
                             </tbody>
                         </table>
                     </div>
                 </div>
+                <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                    <div>
+                        <small class="text-muted">Total: {{ events|length }} événement(s)</small>
+                    </div>
+                    <div class="d-none"> {# Pagination à ajouter ici si nécessaire #} </div>
+                </div>
             </div>
         </div>
     </div>
-
-    <style>
-        .table-hover tbody tr:hover {
-            background-color: rgba(172, 225, 175, 0.2);
-            transform: translateY(-1px);
-            transition: all 0.3s ease;
-        }
-        .card {
-            border-radius: 10px;
-            overflow: hidden;
-            transition: all 0.3s ease;
-        }
-        .btn-new-event:hover {
-            transform: translateY(-2px);
-            box-shadow: 0 4px 12px rgba(41, 171, 135, 0.3);
-        }
-        .action-buttons {
-            gap: 8px;
-        }
-        .btn-action {
-            border-radius: 6px !important;
-            padding: 6px 12px;
-            display: inline-flex;
-            align-items: center;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            box-shadow: 0 2px 5px rgba(0,0,0,0.1);
-            font-size: 0.875rem;
-            border: 1px solid transparent;
-            position: relative;
-            overflow: hidden;
-        }
-        .btn-action .btn-icon {
-            transition: all 0.3s ease;
-        }
-        .btn-action .btn-text {
-            transition: all 0.3s ease;
-        }
-        .btn-view {
-            background-color: #FEFEFA;
-            color: #29AB87;
-            border-color: #29AB87;
-        }
-        .btn-view:hover {
-            background-color: #29AB87;
-            color: white;
-        }
-        .btn-view:hover .btn-icon {
-            animation: bounce 0.6s ease;
-        }
-        .btn-edit {
-            background-color: #FEFEFA;
-            color: #29AB87;
-            border-color: #29AB87;
-        }
-        .btn-edit:hover {
-            background-color: #29AB87;
-            color: white;
-        }
-        .btn-edit:hover .btn-icon {
-            animation: spin 0.6s ease;
-        }
-        .btn-delete {
-            background-color: #FEFEFA;
-            color: #e74c3c;
-            border-color: #e74c3c;
-        }
-        .btn-delete:hover {
-            background-color: #e74c3c;
-            color: white;
-        }
-        .btn-delete:hover .btn-icon {
-            animation: shake 0.6s ease;
-        }
-        .btn-action:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
-        }
-        .btn-action:active {
-            transform: translateY(1px);
-        }
-        .badge {
-            padding: 6px 10px;
-            border-radius: 12px;
-            font-weight: 500;
-            transition: all 0.3s ease;
-        }
-        @keyframes bounce {
-            0%, 100% { transform: translateY(0); }
-            50% { transform: translateY(-5px); }
-        }
-        @keyframes spin {
-            0% { transform: rotate(0deg); }
-            100% { transform: rotate(360deg); }
-        }
-        @keyframes shake {
-            0%, 100% { transform: translateX(0); }
-            20%, 60% { transform: translateX(-3px); }
-            40%, 80% { transform: translateX(3px); }
-        }
-        .btn-action::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: rgba(255,255,255,0.1);
-            transform: scaleX(0);
-            transform-origin: right;
-            transition: transform 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
-            z-index: 0;
-        }
-        .btn-action:hover::after {
-            transform: scaleX(1);
-            transform-origin: left;
-        }
-    </style>
-
+</div>
 {% endblock %}
 
 {% block javascripts %}
@@ -213,76 +104,67 @@
     
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialiser les tooltips Bootstrap
-            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
-            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
-                return new bootstrap.Tooltip(tooltipTriggerEl, {
-                    trigger: 'hover'
-                });
-            });
-
-            // Effet de vague au clic
-            const buttons = document.querySelectorAll('.btn-action');
-            buttons.forEach(button => {
-                button.addEventListener('click', function(e) {
-                    if(this.tagName === 'A' || this.tagName === 'BUTTON') {
-                        const x = e.pageX - this.getBoundingClientRect().left;
-                        const y = e.pageY - this.getBoundingClientRect().top;
-
-                        const ripple = document.createElement('span');
-                        ripple.classList.add('ripple-effect');
-                        ripple.style.left = `${x}px`;
-                        ripple.style.top = `${y}px`;
-                        this.appendChild(ripple);
-
-                        setTimeout(() => {
-                            ripple.remove();
-                        }, 600);
-                    }
-                });
-            });
+            // Activer les tooltips Bootstrap
+            const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+            [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
             
-            // Gestion de la confirmation de suppression avec SweetAlert2
-            const deleteButtons = document.querySelectorAll('.delete-btn');
+            // Gestion des boutons de suppression
+            const deleteButtons = document.querySelectorAll('.delete-item');
             deleteButtons.forEach(button => {
                 button.addEventListener('click', function() {
-                    const eventId = this.getAttribute('data-id');
-                    const eventTitle = this.getAttribute('data-title');
-                    const form = document.getElementById('delete-form-' + eventId);
+                    const id = this.getAttribute('data-id');
+                    const title = this.getAttribute('data-title');
                     
                     Swal.fire({
-                        title: 'Confirmer la suppression',
-                        text: 'Voulez-vous vraiment supprimer l\'événement "' + eventTitle + '" ?',
+                        title: 'Êtes-vous sûr?',
+                        text: `Voulez-vous vraiment supprimer l'événement "${title}" ?`,
                         icon: 'warning',
                         showCancelButton: true,
-                        confirmButtonColor: '#d33',
-                        cancelButtonColor: '#29AB87',
+                        confirmButtonColor: '#00693E',
+                        cancelButtonColor: '#6c757d',
                         confirmButtonText: 'Oui, supprimer',
-                        cancelButtonText: 'Annuler',
-                        background: '#FEFEFA',
-                        customClass: {
-                            popup: 'animated bounceIn'
-                        }
+                        cancelButtonText: 'Annuler'
                     }).then((result) => {
                         if (result.isConfirmed) {
+                            // Créer et soumettre un formulaire de suppression
+                            const form = document.createElement('form');
+                            form.method = 'POST';
+                            form.action = "{{ path('app_event_delete', {'id': 'ID'}) }}".replace('ID', id);
+                            form.style.display = 'none';
+                            
+                            const csrfToken = document.createElement('input');
+                            csrfToken.type = 'hidden';
+                            csrfToken.name = '_token';
+                            csrfToken.value = "{{ csrf_token('delete') }}" + id;
+                            
+                            form.appendChild(csrfToken);
+                            document.body.appendChild(form);
+                            
                             form.submit();
                         }
                     });
                 });
             });
-            
+
+            // Rendre les lignes du tableau cliquables
+            const clickableRows = document.querySelectorAll('.clickable-row');
+            clickableRows.forEach(row => {
+                row.addEventListener('click', function(e) {
+                    // Vérifier si le clic n'est pas sur un bouton d'action
+                    if (!e.target.closest('.action-buttons')) {
+                        window.location.href = this.getAttribute('data-href');
+                    }
+                });
+            });
+
             // Afficher les alertes de succès avec SweetAlert2 si présentes
             {% for message in app.flashes('success') %}
                 Swal.fire({
                     title: 'Succès !',
                     text: "{{ message|e('js') }}",
                     icon: 'success',
-                    confirmButtonColor: '#29AB87',
-                    confirmButtonText: 'OK',
-                    background: '#FEFEFA',
-                    customClass: {
-                        popup: 'animated fadeInDown'
-                    }
+                    confirmButtonColor: '#00693E',
+                    confirmButtonText: 'OK'
                 });
             {% endfor %}
             
@@ -292,12 +174,8 @@
                     title: 'Erreur',
                     text: "{{ message|e('js') }}",
                     icon: 'error',
-                    confirmButtonColor: '#d33',
-                    confirmButtonText: 'OK',
-                    background: '#FEFEFA',
-                    customClass: {
-                        popup: 'animated fadeInDown'
-                    }
+                    confirmButtonColor: '#dc3545',
+                    confirmButtonText: 'OK'
                 });
             {% endfor %}
         });

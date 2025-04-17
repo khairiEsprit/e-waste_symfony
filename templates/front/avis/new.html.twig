@@ -282,17 +282,16 @@
 {% endblock %}
 
 {% block body %}
-    <div class="translated-content">
+    <div class="full-page-bg"></div>
+    <section class="content-wrapper py-5" style="margin-top: 80px;">
         <div class="container mb-3 mt-4">
-            <div class="alert alert-info mb-4 animate__animated animate__fadeInDown">
-                <i class="fas fa-info-circle"></i> Votre avis nous intéresse !
-            </div>
+            <h1 class="section-title text-white animate-fade-in mb-4">Votre avis nous intéresse !</h1>
 
             <div class="row">
                 <!-- Carte du formulaire -->
                 <div class="col-md-9">
-                    <div class="card form-card shadow-sm animate__animated animate__fadeIn">
-                        <div class="card-header bg-primary text-white">
+                    <div class="card-custom animate-slide-up">
+                        <div class="card-header" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
                             <h5 class="card-title mb-0">Donnez votre avis</h5>
                         </div>
                         <div class="card-body">
@@ -303,7 +302,7 @@
 
                 <!-- Carte de l'image avec slideshow (Unchanged) -->
                 <div class="col-md-3">
-                    <div class="image-card h-100 animate__animated animate__fadeIn">
+                    <div class="card-custom h-100 animate-slide-up">
                         <div class="card-body p-0">
                             <div class="slideshow-container">
                                 <img src="{{ asset('assets/front/assets/img/image-avis-1.png') }}"
@@ -324,7 +323,7 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 {% endblock %}
 
 {% block javascripts %}
@@ -340,14 +339,14 @@
 
             stars.on('click', function() {
                 const value = $(this).prev('input').val();
-                
+
                 // Mettre à jour les inputs radio visibles
                 noteInputs.prop('checked', false);
                 noteInputs.filter(`[value="${value}"]`).prop('checked', true);
-                
+
                 // Mettre à jour le champ caché
                 hiddenNoteField.val(value);
-                
+
                 // Supprimer le message d'erreur si présent
                 $('#note-error').text('');
             });
@@ -421,17 +420,17 @@
 
                 // Soumission du formulaire via AJAX
                 let formData = new FormData(this);
-                
+
                 // S'assurer que le champ note est inclus dans les données du formulaire
                 const noteValue = $('input.star-rating-input:checked').val();
                 if (noteValue) {
                     // Forcer la valeur de note dans le formulaire
                     formData.set('avis[note]', noteValue);
-                    
+
                     // Mettre à jour le champ caché aussi
                     $('#avis_note_hidden').val(noteValue);
                 }
-                
+
                 $.ajax({
                     url: $(this).attr('action'),
                     type: $(this).attr('method'),
@@ -475,25 +474,25 @@
                     },
                     error: function(xhr) {
                         let errorMessage = 'Une erreur s\'est produite lors de l\'enregistrement de votre avis.';
-                        
+
                         // Traiter les erreurs renvoyées par le serveur
                         if (xhr.responseJSON) {
                             if (xhr.responseJSON.message) {
                                 errorMessage = xhr.responseJSON.message;
                             }
-                            
+
                             if (xhr.responseJSON.errors) {
                                 // Si errors est un tableau
                                 if (Array.isArray(xhr.responseJSON.errors)) {
                                     errorMessage = xhr.responseJSON.errors.join('<br>');
-                                } 
+                                }
                                 // Si errors est un objet avec des champs nommés
                                 else {
                                     errorMessage = '';
                                     for (const field in xhr.responseJSON.errors) {
                                         // Afficher l'erreur dans le champ correspondant
                                         $('#' + field + '-error').text(xhr.responseJSON.errors[field]);
-                                        
+
                                         // Ajouter au message d'erreur global
                                         errorMessage += xhr.responseJSON.errors[field] + '<br>';
                                     }

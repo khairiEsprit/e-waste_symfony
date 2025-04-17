@@ -48,10 +48,10 @@
     </div>
 
     <div class="button-group mt-4">
-        <a href="{{ path('app_demande_index') }}" class="custom-btn btn-back">
+        <a href="{{ path('app_demande_index') }}" class="btn-custom">
             <i class="fas fa-arrow-left"></i> Retour à la liste
         </a>
-        <button type="submit" class="custom-btn btn-edit">
+        <button type="submit" class="btn-custom">
             {% if button_label is defined and button_label == 'Créer' %}
                 <i class="fas fa-plus-circle"></i> {{ button_label }}
             {% else %}

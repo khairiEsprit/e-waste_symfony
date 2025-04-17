@@ -1,16 +1,16 @@
 {# filepath: c:\Users\asus\OneDrive\Bureau\e-waste_symfony\e-waste_symfony\templates\front\poubelle\_search_results.html.twig #}
 
 {% if error is defined %}
-    <div class="alert alert-danger text-center w-100">
+    <div class="alert-custom alert-custom-danger text-center w-100">
         <i class="fas fa-exclamation-triangle me-2"></i> Erreur: {{ error }}
     </div>
 {% elseif poubelles is empty %}
-    <div class="alert alert-info text-center w-100">Aucune poubelle trouvée</div>
+    <div class="alert-custom alert-custom-info text-center w-100">Aucune poubelle trouvée</div>
 {% else %}
     {% for poubelle in poubelles %}
-        <div class="card poubelle-card mb-3">
+        <div class="card-custom poubelle-card mb-3">
             <div class="card-header status-{{ poubelle.etat|lower == 'fonctionnel' ? 'fonctionnel' : 'panne' }}">
-                <h5 class="card-title mb-0">Poubelle #{{ poubelle.id }}</h5>
+                <h5 class="card-title mb-0 text-white">Poubelle #{{ poubelle.id }}</h5>
             </div>
             <div class="card-body">
                 {# Affichage de l'adresse #}
@@ -50,14 +50,14 @@
                 </div>
 
                 {# Bouton pour afficher/masquer les détails #}
-                <button type="button" class="toggle-details btn btn-success w-100 mb-3">
-                    <strong>Afficher les détails</strong> <i class="fas fa-chevron-down icon-toggle ms-1"></i>
+                <button type="button" class="toggle-details btn-custom w-100 mb-3" data-state="closed">
+                    <span class="toggle-text">Afficher les détails</span> <i class="fas fa-chevron-down icon-toggle ms-1"></i>
                 </button>
 
                 {# Contenu détaillé à afficher/masquer #}
                 <div class="card-body-content">
                     <hr>
-                    <h6 class="mb-3">Détails de la poubelle</h6>
+                    <h6 class="mb-3 text-primary-dark">Détails de la poubelle</h6>
 
                     <div class="mb-2">
                         <p class="mb-1 small text-muted">Centre</p>
@@ -75,7 +75,7 @@
                     </div>
 
                     {% if poubelle.capteur %}
-                    <h6 class="mt-4 mb-3">Capteur de distance</h6>
+                    <h6 class="mt-4 mb-3 text-primary-dark">Capteur de distance</h6>
                     <div class="mb-2">
                         <p class="mb-1 small text-muted">Distance mesurée</p>
                         <p class="mb-0">{{ poubelle.capteur.distanceMesuree }} cm</p>
@@ -91,7 +91,7 @@
                     {% endif %}
 
                     {% if poubelle.capteurp %}
-                    <h6 class="mt-4 mb-3">Capteur de poids</h6>
+                    <h6 class="mt-4 mb-3 text-primary-dark">Capteur de poids</h6>
                     <div class="mb-2">
                         <p class="mb-1 small text-muted">Quantité</p>
                         <p class="mb-0">{{ poubelle.capteurp.quantite }} kg</p>

@@ -6,15 +6,9 @@
     {{ parent() }}
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
-        /* Background gradient */
-        .content-translate {
-            background: linear-gradient(135deg, #29AB87 0%, #1E7D65 100%);
-            margin-bottom: 70px;
-            margin-top: 50px;
-            padding-bottom: 50px;
-        }
+        /* Using unified theme variables */
 
-        /* Search bar styles */
+        /* Using unified search styles */
         .search-container {
             margin-bottom: 40px;
             max-width: 600px;
@@ -25,19 +19,19 @@
 
         .search-input {
             padding: 15px 25px;
-            border-radius: 50px;
+            border-radius: var(--radius-pill);
             border: none;
             width: 100%;
             font-size: 1.1rem;
-            box-shadow: 0 4px 15px rgba(0,0,0,0.1);
-            transition: all 0.3s ease;
+            box-shadow: var(--shadow-md);
+            transition: var(--transition-normal);
             background-color: rgba(255,255,255,0.95);
             padding-right: 60px;
         }
 
         .search-input:focus {
             outline: none;
-            box-shadow: 0 6px 20px rgba(41, 171, 135, 0.4);
+            box-shadow: 0 6px 20px rgba(var(--primary-medium), 0.4);
             background-color: white;
         }
 
@@ -46,21 +40,21 @@
             right: 5px;
             top: 50%;
             transform: translateY(-50%);
-            background: #29AB87;
+            background: var(--primary-medium);
             border: none;
             color: white;
             width: 50px;
             height: 50px;
             border-radius: 50%;
             cursor: pointer;
-            transition: all 0.3s ease;
+            transition: var(--transition-normal);
             display: flex;
             align-items: center;
             justify-content: center;
         }
 
         .search-btn:hover {
-            background: #1E7D65;
+            background: var(--primary-dark);
             transform: translateY(-50%) scale(1.05);
         }
 
@@ -71,7 +65,7 @@
             right: 60px;
             top: 50%;
             transform: translateY(-50%);
-            color: #29AB87;
+            color: var(--primary-medium);
         }
 
         /* Event card styles */
@@ -80,7 +74,7 @@
             border: none;
             border-radius: 20px;
             overflow: hidden;
-            box-shadow: 0 12px 40px rgba(0,0,0,0.2);
+            box-shadow: var(--shadow-lg);
             background: linear-gradient(145deg, rgba(255,255,255,0.95), rgba(240,242,245,0.9));
             backdrop-filter: blur(8px);
             height: 100%;
@@ -97,7 +91,7 @@
 
         .event-card:hover {
             transform: translateY(-15px) rotate(0deg);
-            box-shadow: 0 25px 60px rgba(0,0,0,0.3);
+            box-shadow: var(--shadow-lg);
         }
 
         .card-img-container {
@@ -143,7 +137,7 @@
 
         .no-image-placeholder i {
             font-size: 4.5rem;
-            color: #29AB87;
+            color: var(--primary-medium);
             opacity: 0.7;
             transition: transform 0.4s ease;
         }
@@ -159,7 +153,7 @@
         }
 
         .card-title {
-            color: #013220;
+            color: var(--primary-dark);
             font-weight: 700;
             margin-bottom: 1.2rem;
             font-size: 1.5rem;
@@ -184,7 +178,7 @@
         }
 
         .event-meta i {
-            color: #29AB87;
+            color: var(--primary-medium);
             width: 22px;
             text-align: center;
             font-size: 1.1rem;
@@ -193,7 +187,7 @@
 
         .event-card:hover .event-meta i {
             transform: scale(1.2);
-            color: #1E7D65;
+            color: var(--primary-dark);
         }
 
         /* Button styles */
@@ -238,29 +232,29 @@
         }
 
         .btn-details {
-            background: linear-gradient(135deg, #f8f9fa, #e9ecef);
-            color: #29AB87;
-            border: 2px solid #29AB87;
-            box-shadow: 0 6px 15px rgba(41, 171, 135, 0.3);
+            background: linear-gradient(135deg, var(--light), #e9ecef);
+            color: var(--primary-medium);
+            border: 2px solid var(--primary-medium);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-details:hover {
-            background: #29AB87;
+            background: var(--primary-medium);
             color: white;
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(41, 171, 135, 0.5);
+            box-shadow: var(--shadow-lg);
         }
 
         .btn-register {
-            background: linear-gradient(135deg, #29AB87 0%, #1E7D65 100%);
+            background: var(--background-gradient);
             color: white;
-            box-shadow: 0 6px 15px rgba(41, 171, 135, 0.4);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-register:hover {
-            background: linear-gradient(135deg, #1E7D65 0%, #29AB87 100%);
+            background: linear-gradient(135deg, var(--primary-dark) 0%, var(--primary-light) 100%);
             transform: translateY(-5px);
-            box-shadow: 0 10px 25px rgba(41, 171, 135, 0.6);
+            box-shadow: var(--shadow-lg);
             animation: pulse 1.5s infinite;
         }
 
@@ -312,7 +306,7 @@
         .reset-search {
             margin-top: 20px;
             background: white;
-            color: #29AB87;
+            color: var(--primary-medium);
             border: none;
             padding: 10px 25px;
             border-radius: 50px;
@@ -321,7 +315,7 @@
         }
 
         .reset-search:hover {
-            background: #29AB87;
+            background: var(--primary-medium);
             color: white;
             transform: translateY(-2px);
             box-shadow: 0 4px 12px rgba(0,0,0,0.15);
@@ -387,14 +381,14 @@
             // Function to update events grid
             function updateEventsGrid(data) {
                 eventsGrid.innerHTML = '';
-                
+
                 if (data.events.length > 0) {
                     data.events.forEach(event => {
                         const eventCard = `
                             <div class="col-lg-4 col-md-6 mb-4">
                                 <div class="event-card">
                                     <div class="card-img-container">
-                                        ${event.imageName 
+                                        ${event.imageName
                                             ? `<img src="{{ asset('Uploads/events/') }}${event.imageName}" class="card-img-top" alt="${event.title}">`
                                             : `<div class="no-image-placeholder"><i class="fas fa-calendar-alt"></i></div>`
                                         }
@@ -433,7 +427,7 @@
                             <div class="no-results">
                                 <i class="fas fa-calendar-times"></i>
                                 <h4>Aucun événement trouvé</h4>
-                                ${data.searchTerm 
+                                ${data.searchTerm
                                     ? `<p>Nous n'avons trouvé aucun résultat pour "${data.searchTerm}"</p>
                                        <a href="{{ path('app_front_event_list') }}" class="reset-search">Réinitialiser la recherche</a>`
                                     : `<p>Aucun événement programmé pour le moment</p>`
@@ -450,16 +444,17 @@
 {% endblock %}
 
 {% block body %}
-    <div class="content-translate">
+    <div class="full-page-bg"></div>
+    <div class="content-wrapper">
         <div class="container py-5">
             <h1 class="mb-4 text-white text-center">Nos Événements</h1>
 
             <!-- Search Bar -->
             <form method="get" action="{{ path('app_front_event_list') }}" class="search-container">
-                <input type="text" 
-                       name="q" 
-                       class="search-input" 
-                       placeholder="Rechercher un événement par nom ou description..." 
+                <input type="text"
+                       name="q"
+                       class="search-input"
+                       placeholder="Rechercher un événement par nom ou description..."
                        value="{{ searchTerm }}"
                        autocomplete="off">
                 <button type="submit" class="search-btn">
@@ -485,17 +480,17 @@
                                 <div class="card-body">
                                     <h5 class="card-title">{{ event.title }}</h5>
                                     <p class="card-text">{{ event.description|u.truncate(120, '...') }}</p>
-                                    
+
                                     <div class="event-meta">
                                         <i class="fas fa-calendar-alt"></i>
                                         <span>{{ event.date|date('d/m/Y à H:i') }}</span>
                                     </div>
-                                    
+
                                     <div class="event-meta">
                                         <i class="fas fa-map-marker-alt"></i>
                                         <span>{{ event.location|u.truncate(30, '...') }}</span>
                                     </div>
-                                    
+
                                     <div class="event-meta">
                                         <i class="fas fa-users"></i>
                                         <span>{{ event.remainingPlaces }} places disponibles</span>

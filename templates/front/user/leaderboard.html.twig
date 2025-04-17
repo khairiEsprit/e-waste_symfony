@@ -8,29 +8,30 @@
 {% endblock %}
 
 {% block body %}
-<div class="gamification-container">
+<div class="full-page-bg"></div>
+<div class="content-wrapper">
     <div class="container">
         <h1 class="page-title animate-fadeIn">E-Waste Recycling Leaderboard</h1>
         <p class="page-subtitle animate-fadeIn delay-100">Top recyclers making a difference in our community!</p>
-
+ 
         <div class="row">
             <div class="col-md-8 mx-auto">
                 {% if app.user and userRank %}
-                    <div class="alert alert-info animate-fadeIn delay-200">
+                    <div class="alert-custom alert-custom-info animate-fadeIn delay-200">
                         <div class="d-flex align-items-center">
                             <div class="me-3">
                                 <i class="bi bi-trophy animate-pulse" style="font-size: 2rem;"></i>
                             </div>
                             <div>
-                                <strong>Your current rank: #{{ userRank }}</strong><br>
+                                <strong style="color: #4caf50;">Your current rank: #{{ userRank }}</strong><br>
                                 Keep recycling to climb the leaderboard!
                             </div>
                         </div>
                     </div>
                 {% endif %}
 
-                <div class="gamification-card animate-fadeIn delay-300">
-                    <div class="card-header bg-success text-white">
+                <div class="card-custom animate-fadeIn delay-300">
+                    <div class="card-header bg-primary text-white">
                         <h3 class="mb-0"><i class="bi bi-trophy me-2"></i>Leaderboard Rankings</h3>
                     </div>
                     <div class="card-body">
@@ -46,7 +47,7 @@
                                             <div class="badge-icon" style="background: linear-gradient(135deg, #e0e0e0, #f5f5f5);">
                                                 <i class="bi bi-trophy-fill text-secondary" style="font-size: 2.5rem;"></i>
                                             </div>
-                                            <h5 class="mt-3">{{ topUsers[1].firstName }} {{ topUsers[1].lastName }}</h5>
+                                            <h5 class="mt-3" >{{ topUsers[1].firstName }} {{ topUsers[1].lastName }}</h5>
                                             <div class="value text-secondary">{{ topUsers[1].totalPoints }} pts</div>
                                             <div class="mt-2">
                                                 <span class="badge bg-secondary">2nd Place</span>
@@ -61,7 +62,7 @@
                                         <div class="badge-icon" style="background: linear-gradient(135deg, #ffd700, #ffeb3b);">
                                             <i class="bi bi-trophy-fill text-warning" style="font-size: 3rem;"></i>
                                         </div>
-                                        <h5 class="mt-3">{{ topUsers[0].firstName }} {{ topUsers[0].lastName }}</h5>
+                                        <h5 class="mt-3" style="color: #f57f17;">{{ topUsers[0].firstName }} {{ topUsers[0].lastName }}</h5>
                                         <div class="value text-warning">{{ topUsers[0].totalPoints }} pts</div>
                                         <div class="mt-2">
                                             <span class="badge bg-warning text-dark">1st Place</span>
@@ -132,11 +133,11 @@
                         </div>
 
                         <div class="text-center mt-4 animate-fadeIn delay-600">
-                            <a href="{{ path('user_actions') }}" class="btn btn-gamification btn-primary me-2">
+                            <a href="{{ path('user_actions') }}" class="btn-custom me-2">
                                 <i class="bi bi-plus-circle me-1"></i> Submit Action
                             </a>
                             {% if app.user %}
-                                <a href="{{ path('user_rewards') }}" class="btn btn-gamification btn-success">
+                                <a href="{{ path('user_rewards') }}" class="btn-custom-light">
                                     <i class="bi bi-award me-1"></i> View My Rewards
                                 </a>
                             {% endif %}
@@ -146,7 +147,7 @@
             </div>
         </div>
     </div>
-</div>
+</div><!-- End content-wrapper -->
 {% endblock %}
 
 {% block javascripts %}

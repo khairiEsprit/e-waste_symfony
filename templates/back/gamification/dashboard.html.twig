@@ -3,355 +3,399 @@
 {% block title %}Gamification Dashboard{% endblock %}
 
 {% block content %}
-<!--begin::App Content Header-->
-<div class="app-content-header">
-    <!--begin::Container-->
-    <div class="container-fluid">
-        <!--begin::Row-->
-        <div class="row">
-            <div class="col-sm-6">
-                <h3 class="mb-0">Gamification Dashboard</h3>
+<div class="container-fluid py-4">
+    <!-- Flash messages -->
+    {% for label, messages in app.flashes %}
+        {% for message in messages %}
+            <div class="alert alert-{{ label }} alert-dismissible fade show">
+                {{ message }}
+                <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
             </div>
-            <div class="col-sm-6">
-                <ol class="breadcrumb float-sm-end">
-                    <li class="breadcrumb-item"><a href="{{ path('back_dashboard') }}">Home</a></li>
-                    <li class="breadcrumb-item active" aria-current="page">Gamification</li>
-                </ol>
-            </div>
-        </div>
-        <!--end::Row-->
-    </div>
-    <!--end::Container-->
-</div>
-<!--end::App Content Header-->
-
-<!--begin::App Content-->
-<div class="app-content">
-    <!--begin::Container-->
-    <div class="container-fluid">
-        <!-- Flash messages -->
-        {% for label, messages in app.flashes %}
-            {% for message in messages %}
-                <div class="alert alert-{{ label }} alert-dismissible fade show">
-                    {{ message }}
-                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
-                </div>
-            {% endfor %}
         {% endfor %}
+    {% endfor %}
 
-        <!-- Stats Cards -->
-        <div class="row">
-            <div class="col-lg-3 col-6">
-                <div class="small-box text-bg-primary">
-                    <div class="inner">
-                        <h3>{{ actions|length }}</h3>
-                        <p>Actions</p>
-                    </div>
-                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"></path>
-                    </svg>
-                    <a href="{{ path('admin_gamification_action_new') }}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                        Add New <i class="bi bi-arrow-right-circle-fill"></i>
-                    </a>
+    <!-- Stats Cards -->
+    <div class="row">
+        <div class="col-lg-3 col-6">
+            <div class="small-box" style="background: linear-gradient(135deg, var(--primary-dark), var(--primary-medium)); color: white;">
+                <div class="inner">
+                    <h3>{{ actions|length }}</h3>
+                    <p>Actions</p>
                 </div>
-            </div>
-
-            <div class="col-lg-3 col-6">
-                <div class="small-box text-bg-success">
-                    <div class="inner">
-                        <h3>{{ rewards|length }}</h3>
-                        <p>Rewards</p>
-                    </div>
-                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 10c-.3 0-.62.17-.79.44l-1.99 2.97c-.17.26-.26.57-.26.9 0 .9.73 1.63 1.63 1.63s1.63-.73 1.63-1.63c0-.33-.09-.64-.26-.9l-1.99-2.97c-.17-.27-.49-.44-.79-.44z"></path>
-                    </svg>
-                    <a href="{{ path('admin_gamification_reward_new') }}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                        Add New <i class="bi bi-arrow-right-circle-fill"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-6">
-                <div class="small-box text-bg-warning">
-                    <div class="inner">
-                        <h3>{{ highEngagementUsers|length }}</h3>
-                        <p>High Engagement Users</p>
-                    </div>
-                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path>
-                    </svg>
-                    <a href="{{ path('admin_gamification_assign_reward') }}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                        Assign Rewards <i class="bi bi-arrow-right-circle-fill"></i>
-                    </a>
-                </div>
-            </div>
-
-            <div class="col-lg-3 col-6">
-                <div class="small-box text-bg-danger">
-                    <div class="inner">
-                        <h3>{{ leaderboard|length }}</h3>
-                        <p>Leaderboard Users</p>
-                    </div>
-                    <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
-                        <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2V9h-2V7h4v10z"></path>
-                    </svg>
-                    <a href="#leaderboard" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
-                        View Leaderboard <i class="bi bi-arrow-right-circle-fill"></i>
-                    </a>
-                </div>
+                <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm0 18c-4.41 0-8-3.59-8-8s3.59-8 8-8 8 3.59 8 8-3.59 8-8 8zm-5-9h10v2H7z"></path>
+                </svg>
+                <a href="{{ path('admin_gamification_action_new') }}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                    Add New <i class="bi bi-arrow-right-circle-fill"></i>
+                </a>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Actions Table -->
-            <div class="col-md-6">
-                <div class="card">
+        <div class="col-lg-3 col-6">
+            <div class="small-box" style="background: linear-gradient(135deg, var(--primary-medium), var(--primary-light)); color: white;">
+                <div class="inner">
+                    <h3>{{ rewards|length }}</h3>
+                    <p>Rewards</p>
+                </div>
+                <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M11.99 2C6.47 2 2 6.48 2 12s4.47 10 9.99 10C17.52 22 22 17.52 22 12S17.52 2 11.99 2zm4.24 10c-.3 0-.62.17-.79.44l-1.99 2.97c-.17.26-.26.57-.26.9 0 .9.73 1.63 1.63 1.63s1.63-.73 1.63-1.63c0-.33-.09-.64-.26-.9l-1.99-2.97c-.17-.27-.49-.44-.79-.44z"></path>
+                </svg>
+                <a href="{{ path('admin_gamification_reward_new') }}" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                    Add New <i class="bi bi-arrow-right-circle-fill"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box" style="background: linear-gradient(135deg, #ACE1AF, #E8F5E9); color: var(--primary-dark);">
+                <div class="inner">
+                    <h3>{{ highEngagementUsers|length }}</h3>
+                    <p>High Engagement Users</p>
+                </div>
+                <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M16 11c1.66 0 2.99-1.34 2.99-3S17.66 5 16 5c-1.66 0-3 1.34-3 3s1.34 3 3 3zm-8 0c1.66 0 2.99-1.34 2.99-3S9.66 5 8 5C6.34 5 5 6.34 5 8s1.34 3 3 3zm0 2c-2.33 0-7 1.17-7 3.5V19h14v-2.5c0-2.33-4.67-3.5-7-3.5zm8 0c-.29 0-.62.02-.97.05 1.16.84 1.97 1.97 1.97 3.45V19h6v-2.5c0-2.33-4.67-3.5-7-3.5z"></path>
+                </svg>
+                <a href="{{ path('admin_gamification_assign_reward') }}" class="small-box-footer link-dark link-underline-opacity-0 link-underline-opacity-50-hover">
+                    Assign Rewards <i class="bi bi-arrow-right-circle-fill"></i>
+                </a>
+            </div>
+        </div>
+
+        <div class="col-lg-3 col-6">
+            <div class="small-box" style="background: linear-gradient(135deg, #2e7d32, #4caf50); color: white;">
+                <div class="inner">
+                    <h3>{{ leaderboard|length }}</h3>
+                    <p>Leaderboard Users</p>
+                </div>
+                <svg class="small-box-icon" fill="currentColor" viewBox="0 0 24 24" xmlns="http://www.w3.org/2000/svg" aria-hidden="true">
+                    <path d="M19 3H5c-1.1 0-2 .9-2 2v14c0 1.1.9 2 2 2h14c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm-5 14h-2V9h-2V7h4v10z"></path>
+                </svg>
+                <a href="#leaderboard" class="small-box-footer link-light link-underline-opacity-0 link-underline-opacity-50-hover">
+                    View Leaderboard <i class="bi bi-arrow-right-circle-fill"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+
+    <div class="row">
+        <!-- Actions Table -->
+        <div class="col-md-6">
+            <div class="admin-card">
                     <div class="card-header">
-                        <h3 class="card-title">Gamification Actions</h3>
-                        <div class="card-tools">
-                            <a href="{{ path('admin_gamification_action_new') }}" class="btn btn-sm btn-primary">
-                                <i class="bi bi-plus-circle"></i> Add Action
-                            </a>
+                        <h4 class="m-0">
+                            <i class="bi bi-lightning-fill me-2"></i>
+                            Gamification Actions
+                        </h4>
+                        <a href="{{ path('admin_gamification_action_new') }}" class="admin-btn admin-btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i> Add Action
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="admin-table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="px-3">ID</th>
+                                        <th>Name</th>
+                                        <th>Points</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% if actions|length > 0 %}
+                                    {% for action in actions %}
+                                    <tr>
+                                        <td class="px-3">{{ action.id }}</td>
+                                        <td>{{ action.name }}</td>
+                                        <td>
+                                            <span class="badge bg-success px-3 py-2">{{ action.points }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="action-buttons">
+                                                <a href="{{ path('admin_gamification_action_edit', {'id': action.id}) }}"
+                                                   class="btn btn-sm btn-outline-success"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger delete-action"
+                                                        data-id="{{ action.id }}"
+                                                        data-name="{{ action.name }}"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <i class="bi bi-lightning text-muted" style="font-size: 3rem;"></i>
+                                                <p class="mt-3 mb-1 fw-bold">No actions found</p>
+                                                <p class="text-muted">Start by adding a new action</p>
+                                                <a href="{{ path('admin_gamification_action_new') }}" class="admin-btn admin-btn-primary mt-2">
+                                                    <i class="bi bi-plus-circle me-1"></i> Add Action
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Points</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for action in actions %}
-                                <tr>
-                                    <td>{{ action.id }}</td>
-                                    <td>{{ action.name }}</td>
-                                    <td>{{ action.points }}</td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="{{ path('admin_gamification_action_edit', {'id': action.id}) }}" class="btn btn-sm btn-info">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteActionModal{{ action.id }}">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-
-                                        <!-- Delete Modal -->
-                                        <div class="modal fade" id="deleteActionModal{{ action.id }}" tabindex="-1" aria-labelledby="deleteActionModalLabel{{ action.id }}" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="deleteActionModalLabel{{ action.id }}">Confirm Delete</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        Are you sure you want to delete the action "{{ action.name }}"?
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        <form action="{{ path('admin_gamification_action_delete', {'id': action.id}) }}" method="post">
-                                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ action.id) }}">
-                                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% else %}
-                                <tr>
-                                    <td colspan="4" class="text-center">No actions found</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">Total: {{ actions|length }} action(s)</small>
+                        </div>
                     </div>
                 </div>
             </div>
 
             <!-- Rewards Table -->
             <div class="col-md-6">
-                <div class="card">
+                <div class="admin-card">
                     <div class="card-header">
-                        <h3 class="card-title">Rewards</h3>
-                        <div class="card-tools">
-                            <a href="{{ path('admin_gamification_reward_new') }}" class="btn btn-sm btn-primary">
-                                <i class="bi bi-plus-circle"></i> Add Reward
-                            </a>
+                        <h4 class="m-0">
+                            <i class="bi bi-gift-fill me-2"></i>
+                            Rewards
+                        </h4>
+                        <a href="{{ path('admin_gamification_reward_new') }}" class="admin-btn admin-btn-primary">
+                            <i class="bi bi-plus-circle me-1"></i> Add Reward
+                        </a>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="admin-table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="px-3">ID</th>
+                                        <th>Name</th>
+                                        <th>Type</th>
+                                        <th>Points Required</th>
+                                        <th class="text-center">Actions</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% if rewards|length > 0 %}
+                                    {% for reward in rewards %}
+                                    <tr>
+                                        <td class="px-3">{{ reward.id }}</td>
+                                        <td>{{ reward.name }}</td>
+                                        <td>
+                                            <span class="badge bg-info px-3 py-2">{{ reward.type }}</span>
+                                        </td>
+                                        <td>
+                                            <span class="badge bg-warning text-dark px-3 py-2">{{ reward.pointsRequired }}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <div class="action-buttons">
+                                                <a href="{{ path('admin_gamification_reward_edit', {'id': reward.id}) }}"
+                                                   class="btn btn-sm btn-outline-success"
+                                                   data-bs-toggle="tooltip"
+                                                   data-bs-title="Edit">
+                                                    <i class="bi bi-pencil"></i>
+                                                </a>
+                                                <button type="button"
+                                                        class="btn btn-sm btn-outline-danger delete-reward"
+                                                        data-id="{{ reward.id }}"
+                                                        data-name="{{ reward.name }}"
+                                                        data-bs-toggle="tooltip"
+                                                        data-bs-title="Delete">
+                                                    <i class="bi bi-trash"></i>
+                                                </button>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
+                                {% else %}
+                                    <tr>
+                                        <td colspan="5" class="text-center py-5">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <i class="bi bi-gift text-muted" style="font-size: 3rem;"></i>
+                                                <p class="mt-3 mb-1 fw-bold">No rewards found</p>
+                                                <p class="text-muted">Start by adding a new reward</p>
+                                                <a href="{{ path('admin_gamification_reward_new') }}" class="admin-btn admin-btn-primary mt-2">
+                                                    <i class="bi bi-plus-circle me-1"></i> Add Reward
+                                                </a>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
                         </div>
                     </div>
-                    <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>ID</th>
-                                    <th>Name</th>
-                                    <th>Type</th>
-                                    <th>Points Required</th>
-                                    <th>Actions</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for reward in rewards %}
-                                <tr>
-                                    <td>{{ reward.id }}</td>
-                                    <td>{{ reward.name }}</td>
-                                    <td>{{ reward.type }}</td>
-                                    <td>{{ reward.pointsRequired }}</td>
-                                    <td>
-                                        <div class="btn-group">
-                                            <a href="{{ path('admin_gamification_reward_edit', {'id': reward.id}) }}" class="btn btn-sm btn-info">
-                                                <i class="bi bi-pencil"></i>
-                                            </a>
-                                            <button type="button" class="btn btn-sm btn-danger" data-bs-toggle="modal" data-bs-target="#deleteRewardModal{{ reward.id }}">
-                                                <i class="bi bi-trash"></i>
-                                            </button>
-                                        </div>
-
-                                        <!-- Delete Modal -->
-                                        <div class="modal fade" id="deleteRewardModal{{ reward.id }}" tabindex="-1" aria-labelledby="deleteRewardModalLabel{{ reward.id }}" aria-hidden="true">
-                                            <div class="modal-dialog">
-                                                <div class="modal-content">
-                                                    <div class="modal-header">
-                                                        <h5 class="modal-title" id="deleteRewardModalLabel{{ reward.id }}">Confirm Delete</h5>
-                                                        <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-                                                    </div>
-                                                    <div class="modal-body">
-                                                        Are you sure you want to delete the reward "{{ reward.name }}"?
-                                                    </div>
-                                                    <div class="modal-footer">
-                                                        <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
-                                                        <form action="{{ path('admin_gamification_reward_delete', {'id': reward.id}) }}" method="post">
-                                                            <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ reward.id) }}">
-                                                            <button type="submit" class="btn btn-danger">Delete</button>
-                                                        </form>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </td>
-                                </tr>
-                                {% else %}
-                                <tr>
-                                    <td colspan="5" class="text-center">No rewards found</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                    <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">Total: {{ rewards|length }} reward(s)</small>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
 
-        <div class="row">
-            <!-- Engagement Chart -->
-            <div class="col-md-8">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">Points Earned (Last 30 Days)</h3>
-                    </div>
-                    <div class="card-body">
-                        <canvas id="pointsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
-                    </div>
+    <div class="row">
+        <!-- Engagement Chart -->
+        <div class="col-md-8">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h4 class="m-0">
+                        <i class="bi bi-graph-up-arrow me-2"></i>
+                        Points Earned (Last 30 Days)
+                    </h4>
+                </div>
+                <div class="card-body p-3">
+                    <canvas id="pointsChart" style="min-height: 250px; height: 250px; max-height: 250px; max-width: 100%;"></canvas>
                 </div>
             </div>
+        </div>
 
-            <!-- AI Predictions -->
-            <div class="col-md-4">
-                <div class="card">
-                    <div class="card-header">
-                        <h3 class="card-title">AI Engagement Predictions</h3>
-                        <div class="card-tools">
-                            <a href="{{ path('admin_gamification_assign_reward') }}" class="btn btn-sm btn-primary">
-                                <i class="bi bi-gift"></i> Assign Reward
-                            </a>
-                            <a href="{{ path('admin_gamification_generate_predictions') }}" class="btn btn-sm btn-info ms-1">
-                                <i class="bi bi-lightning-charge"></i> View All Predictions
-                            </a>
-                        </div>
+        <!-- AI Predictions -->
+        <div class="col-md-4">
+            <div class="admin-card">
+                <div class="card-header">
+                    <h4 class="m-0">
+                        <i class="bi bi-robot me-2"></i>
+                        AI Engagement Predictions
+                    </h4>
+                    <div>
+                        <a href="{{ path('admin_gamification_assign_reward') }}" class="admin-btn admin-btn-primary btn-sm">
+                            <i class="bi bi-gift me-1"></i> Assign Reward
+                        </a>
+                        <a href="{{ path('admin_gamification_generate_predictions') }}" class="btn btn-sm btn-outline-success ms-1">
+                            <i class="bi bi-lightning-charge me-1"></i> All Predictions
+                        </a>
                     </div>
-                    <div class="card-body p-0">
-                        <ul class="list-group list-group-flush">
+                </div>
+                <div class="card-body p-0">
+                    <ul class="list-group list-group-flush">
+                        {% if highEngagementUsers|length > 0 %}
                             {% for prediction in highEngagementUsers %}
                                 <li class="list-group-item">
                                     <div class="d-flex justify-content-between align-items-center">
-                                        <div>
+                                        <div class="d-flex align-items-center">
                                             <img src="{{ prediction.profile_image ?: asset('assets/back/assets/img/avatar.png') }}"
-                                                 class="img-circle elevation-2"
+                                                 class="rounded-circle"
                                                  alt="User Image"
-                                                 style="width: 35px; height: 35px; margin-right: 10px;">
+                                                 style="width: 40px; height: 40px; margin-right: 10px; object-fit: cover;">
                                             <span>{{ prediction.first_name }} {{ prediction.last_name }}</span>
                                         </div>
-                                        <span class="badge bg-primary rounded-pill">{{ prediction.score|number_format(0) }}%</span>
+                                        <span class="badge" style="background-color: var(--primary-medium); color: white; padding: 8px 12px; border-radius: 20px;">
+                                            {{ prediction.score|number_format(0) }}% <i class="bi bi-arrow-up-circle-fill ms-1"></i>
+                                        </span>
                                     </div>
                                 </li>
-                            {% else %}
-                                <li class="list-group-item text-center">No predictions available</li>
                             {% endfor %}
-                        </ul>
-                    </div>
+                        {% else %}
+                            <li class="list-group-item py-4">
+                                <div class="d-flex flex-column align-items-center text-center">
+                                    <i class="bi bi-robot text-muted" style="font-size: 2.5rem;"></i>
+                                    <p class="mt-3 mb-1 fw-bold">No predictions available</p>
+                                    <p class="text-muted">AI predictions will appear here once generated</p>
+                                </div>
+                            </li>
+                        {% endif %}
+                    </ul>
+                </div>
+                <div class="card-footer bg-light">
+                    <small class="text-muted">Predictions based on user activity patterns</small>
                 </div>
             </div>
         </div>
+    </div>
 
-        <!-- Leaderboard -->
-        <div class="row">
-            <div class="col-md-12">
-                <div class="card" id="leaderboard">
+    <!-- Leaderboard -->
+    <div class="row">
+        <div class="col-md-12">
+            <div class="admin-card" id="leaderboard">
                     <div class="card-header">
-                        <h3 class="card-title">Leaderboard</h3>
+                        <h4 class="m-0">
+                            <i class="bi bi-trophy-fill me-2"></i>
+                            Leaderboard
+                        </h4>
                     </div>
-                    <div class="card-body table-responsive p-0">
-                        <table class="table table-hover text-nowrap">
-                            <thead>
-                                <tr>
-                                    <th>Rank</th>
-                                    <th>User</th>
-                                    <th>Email</th>
-                                    <th>Points</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for user in leaderboard %}
-                                <tr>
-                                    <td>{{ loop.index }}</td>
-                                    <td>
-                                        <img src="{{ user.profileImage ?: asset('assets/back/assets/img/avatar.png') }}"
-                                             class="img-circle elevation-2"
-                                             alt="User Image"
-                                             style="width: 35px; height: 35px; margin-right: 10px;">
-                                        {{ user.firstName }} {{ user.lastName }}
-                                    </td>
-                                    <td>{{ user.email }}</td>
-                                    <td>{{ user.totalPoints }}</td>
-                                </tr>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="admin-table table-hover mb-0">
+                                <thead>
+                                    <tr>
+                                        <th class="px-3">Rank</th>
+                                        <th>User</th>
+                                        <th>Email</th>
+                                        <th>Points</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                {% if leaderboard|length > 0 %}
+                                    {% for user in leaderboard %}
+                                    <tr>
+                                        <td class="px-3">
+                                            {% if loop.index == 1 %}
+                                                <span class="badge bg-warning text-dark px-3 py-2"><i class="bi bi-trophy-fill me-1"></i>{{ loop.index }}</span>
+                                            {% elseif loop.index == 2 %}
+                                                <span class="badge bg-secondary px-3 py-2"><i class="bi bi-trophy-fill me-1"></i>{{ loop.index }}</span>
+                                            {% elseif loop.index == 3 %}
+                                                <span class="badge bg-danger px-3 py-2"><i class="bi bi-trophy-fill me-1"></i>{{ loop.index }}</span>
+                                            {% else %}
+                                                <span class="badge bg-light text-dark px-3 py-2">{{ loop.index }}</span>
+                                            {% endif %}
+                                        </td>
+                                        <td>
+                                            <div class="d-flex align-items-center">
+                                                <img src="{{ user.profileImage ?: asset('assets/back/assets/img/avatar.png') }}"
+                                                     class="rounded-circle"
+                                                     alt="User Image"
+                                                     style="width: 40px; height: 40px; margin-right: 10px; object-fit: cover;">
+                                                <span>{{ user.firstName }} {{ user.lastName }}</span>
+                                            </div>
+                                        </td>
+                                        <td>{{ user.email }}</td>
+                                        <td>
+                                            <span class="badge bg-success px-3 py-2">{{ user.totalPoints }} points</span>
+                                        </td>
+                                    </tr>
+                                    {% endfor %}
                                 {% else %}
-                                <tr>
-                                    <td colspan="4" class="text-center">No users found</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
+                                    <tr>
+                                        <td colspan="4" class="text-center py-5">
+                                            <div class="d-flex flex-column align-items-center">
+                                                <i class="bi bi-people text-muted" style="font-size: 3rem;"></i>
+                                                <p class="mt-3 mb-1 fw-bold">No users found</p>
+                                                <p class="text-muted">Users will appear here once they start earning points</p>
+                                            </div>
+                                        </td>
+                                    </tr>
+                                {% endif %}
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                    <div class="card-footer bg-light d-flex justify-content-between align-items-center">
+                        <div>
+                            <small class="text-muted">Total: {{ leaderboard|length }} user(s)</small>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
     </div>
-    <!--end::Container-->
-</div>
-<!--end::App Content-->
 {% endblock %}
 
 {% block javascripts %}
 {{ parent() }}
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Activer les tooltips Bootstrap
+        const tooltipTriggerList = document.querySelectorAll('[data-bs-toggle="tooltip"]');
+        [...tooltipTriggerList].map(tooltipTriggerEl => new bootstrap.Tooltip(tooltipTriggerEl));
+
         // Points Chart
         var ctx = document.getElementById('pointsChart').getContext('2d');
         var labels = {{ chartLabels|raw }};
@@ -364,11 +408,11 @@
                 datasets: [{
                     label: 'Points Earned',
                     data: data,
-                    backgroundColor: 'rgba(60, 141, 188, 0.2)',
-                    borderColor: 'rgba(60, 141, 188, 1)',
+                    backgroundColor: 'rgba(0, 105, 62, 0.2)',
+                    borderColor: '#00693E',
                     borderWidth: 2,
                     pointRadius: 4,
-                    pointBackgroundColor: 'rgba(60, 141, 188, 1)',
+                    pointBackgroundColor: '#00693E',
                     tension: 0.4
                 }]
             },
@@ -381,6 +425,82 @@
                     }
                 }
             }
+        });
+
+        // Gestion des boutons de suppression d'actions
+        const deleteActionButtons = document.querySelectorAll('.delete-action');
+        deleteActionButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete the action "${name}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00693E',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete it',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Créer et soumettre un formulaire de suppression
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = "{{ path('admin_gamification_action_delete', {'id': 'ID'}) }}".replace('ID', id);
+                        form.style.display = 'none';
+
+                        const csrfToken = document.createElement('input');
+                        csrfToken.type = 'hidden';
+                        csrfToken.name = '_token';
+                        csrfToken.value = "{{ csrf_token('delete') }}" + id;
+
+                        form.appendChild(csrfToken);
+                        document.body.appendChild(form);
+
+                        form.submit();
+                    }
+                });
+            });
+        });
+
+        // Gestion des boutons de suppression de récompenses
+        const deleteRewardButtons = document.querySelectorAll('.delete-reward');
+        deleteRewardButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                const id = this.getAttribute('data-id');
+                const name = this.getAttribute('data-name');
+
+                Swal.fire({
+                    title: 'Are you sure?',
+                    text: `Do you want to delete the reward "${name}"?`,
+                    icon: 'warning',
+                    showCancelButton: true,
+                    confirmButtonColor: '#00693E',
+                    cancelButtonColor: '#6c757d',
+                    confirmButtonText: 'Yes, delete it',
+                    cancelButtonText: 'Cancel'
+                }).then((result) => {
+                    if (result.isConfirmed) {
+                        // Créer et soumettre un formulaire de suppression
+                        const form = document.createElement('form');
+                        form.method = 'POST';
+                        form.action = "{{ path('admin_gamification_reward_delete', {'id': 'ID'}) }}".replace('ID', id);
+                        form.style.display = 'none';
+
+                        const csrfToken = document.createElement('input');
+                        csrfToken.type = 'hidden';
+                        csrfToken.name = '_token';
+                        csrfToken.value = "{{ csrf_token('delete') }}" + id;
+
+                        form.appendChild(csrfToken);
+                        document.body.appendChild(form);
+
+                        form.submit();
+                    }
+                });
+            });
         });
     });
 </script>

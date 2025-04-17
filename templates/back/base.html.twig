@@ -30,6 +30,7 @@
 
             {# Load AdminLTE and your custom CSS #}
             <link rel="stylesheet" href="{{ asset('assets/back/css/adminlte.min.css') }}">
+            <link rel="stylesheet" href="{{ asset('assets/back/css/admin-dashboard.css') }}">
             {# <link rel="stylesheet" href="{{ asset('assets/css/custom.css') }}"> #}
             <style>
         /* Variables de couleurs pour la cohérence */
@@ -45,31 +46,31 @@
             --dark: #343a40;
             --shadow: rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Style global pour les tableaux */
         .table thead th {
             font-weight: 600;
             color: var(--primary-dark);
         }
-        
+
         /* Style pour les cartes */
         .card {
             border-radius: 15px;
             overflow: hidden;
             box-shadow: 0 5px 15px var(--shadow);
         }
-        
+
         /* Style des boutons principaux */
         .btn-primary {
             background-color: var(--primary-medium) !important;
             border-color: var(--primary-medium) !important;
         }
-        
+
         .btn-primary:hover {
             background-color: var(--primary-dark) !important;
             border-color: var(--primary-dark) !important;
         }
-        
+
         /* Style des badges d'état */
         .badge {
             padding: 0.5rem 0.8rem;
@@ -77,22 +78,22 @@
             border-radius: 30px;
             transition: all 0.3s ease;
         }
-        
+
         /* Animation des boutons */
         .btn {
             transition: all 0.3s ease;
         }
-        
+
         .btn:hover {
             transform: translateY(-2px);
             box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
         }
-        
+
         /* Style des headers de carte */
         .card-header {
             padding: 1rem 1.5rem;
         }
-        
+
         /* Style des barres de progression */
         .progress {
             height: 15px;
@@ -100,7 +101,7 @@
             background-color: rgba(0, 0, 0, 0.05);
             overflow: hidden;
         }
-        
+
         .progress-bar {
             transition: width 0.6s ease;
             position: relative;

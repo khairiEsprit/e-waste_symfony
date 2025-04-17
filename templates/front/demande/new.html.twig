@@ -3,19 +3,23 @@
 {% block title %}Nouvelle Demande{% endblock %}
 
 {% block body %}
-<br>
-<br>
-<div class="container mt-5">
+<div class="full-page-bg"></div>
+<section class="content-wrapper py-5" style="margin-top: 80px;">
+<div class="container mb-3 mt-4">
     <div class="title-container">
-        <h1 class="main-title">Créer une Nouvelle Demande</h1>
+        <h1 class="section-title text-white animate-fade-in">Créer une Nouvelle Demande</h1>
     </div>
 
-    <div class="card custom-card">
+    <div class="card-custom animate-slide-up">
+        <div class="card-header" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
+            <h5 class="card-title mb-0">Créer une nouvelle demande</h5>
+        </div>
         <div class="card-body">
             {{ include('front/demande/_form.html.twig', {'button_label': 'Créer'}) }}
         </div>
     </div>
 </div>
+</section>
 {% endblock %}
 
 {% block stylesheets %}
@@ -177,15 +181,15 @@
         .main-title {
             font-size: 2.2rem;
         }
-        
+
         .card-body {
             padding: 1.5rem;
         }
-        
+
         .custom-card {
             margin: 0 15px;
         }
-        
+
         .form-control {
             padding: 10px 12px;
         }

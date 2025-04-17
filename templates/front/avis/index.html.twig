@@ -331,12 +331,12 @@
             .main-title {
                 font-size: 2rem;
             }
-            
+
             .avis-grid {
                 grid-template-columns: 1fr;
                 gap: 20px;
             }
-            
+
             .search-container {
                 margin-bottom: 20px;
             }
@@ -351,7 +351,7 @@
 {% block javascripts %}
     {{ parent() }}
     <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Gestion de la confirmation de suppression avec SweetAlert2
@@ -361,7 +361,7 @@
                     const aviId = this.getAttribute('data-id');
                     const aviName = this.getAttribute('data-name');
                     const form = document.getElementById('delete-form-' + aviId);
-                    
+
                     Swal.fire({
                         title: 'Confirmer la suppression',
                         html: `Voulez-vous vraiment supprimer l'avis de <strong>${aviName}</strong> ?`,
@@ -384,7 +384,7 @@
                     });
                 });
             });
-            
+
             // Afficher les alertes de succès avec SweetAlert2 si présentes
             {% for message in app.flashes('success') %}
                 Swal.fire({
@@ -399,7 +399,7 @@
                     }
                 });
             {% endfor %}
-            
+
             // Afficher les alertes d'erreur avec SweetAlert2 si présentes
             {% for message in app.flashes('error') %}
                 Swal.fire({
@@ -414,14 +414,14 @@
                     }
                 });
             {% endfor %}
-            
+
             // Animation de la barre de recherche
             const searchInput = document.querySelector('.search-container .form-control');
             if (searchInput) {
                 searchInput.addEventListener('focus', function() {
                     this.parentElement.querySelector('.search-btn').style.width = '100px';
                 });
-                
+
                 searchInput.addEventListener('blur', function() {
                     if (this.value === '') {
                         this.parentElement.querySelector('.search-btn').style.width = '50px';
@@ -433,9 +433,10 @@
 {% endblock %}
 
 {% block body %}
-    <div class="translated-content">
-        <div class="container py-4">
-            <h1 class="main-title">Avis des Utilisateurs</h1>
+    <div class="full-page-bg"></div>
+    <section class="content-wrapper py-5" style="margin-top: 80px;">
+        <div class="container">
+            <h1 class="section-title text-white animate-fade-in">Avis des Utilisateurs</h1>
 
             <!-- Barre de recherche améliorée -->
             <div class="search-container">
@@ -478,7 +479,7 @@
 
             <!-- Bouton Nouvel Avis -->
             <div class="text-center mb-5">
-                <a href="{{ path('app_avis_new') }}" class="btn-new-avis">
+                <a href="{{ path('app_avis_new') }}" class="btn-custom">
                     <i class="fas fa-plus me-2"></i> Nouvel Avis
                 </a>
             </div>
@@ -486,8 +487,8 @@
             <!-- Grille des avis -->
             <div class="avis-grid">
                 {% for avi in avis %}
-                    <div class="card">
-                        <div class="card-header d-flex justify-content-between align-items-center">
+                    <div class="card-custom animate-slide-up">
+                        <div class="card-header d-flex justify-content-between align-items-center" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
                             <h5 class="card-title mb-0">{{ avi.nom ?: 'Anonyme' }}</h5>
                             <div class="star-rating">
                                 {% for i in 1..5 %}
@@ -521,9 +522,9 @@
                                     </a>
                                     <form method="post" action="{{ path('app_avis_delete', {'id': avi.id}) }}" class="d-inline" id="delete-form-{{ avi.id }}">
                                         <input type="hidden" name="_token" value="{{ csrf_token('delete' ~ avi.id) }}">
-                                        <button type="button" class="btn btn-action btn-delete delete-btn" 
-                                                title="Supprimer" 
-                                                data-id="{{ avi.id }}" 
+                                        <button type="button" class="btn btn-action btn-delete delete-btn"
+                                                title="Supprimer"
+                                                data-id="{{ avi.id }}"
                                                 data-name="{{ avi.nom ?: 'Anonyme' }}">
                                             <i class="fas fa-trash"></i>
                                         </button>
@@ -553,5 +554,5 @@
                 {% endfor %}
             </div>
         </div>
-    </div>
+    </section>
 {% endblock %}
