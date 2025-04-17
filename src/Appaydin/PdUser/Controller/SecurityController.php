@@ -63,7 +63,7 @@ class SecurityController extends AbstractController
     public function login(AuthenticationUtils $authenticationUtils): Response
     {
 
-   
+
         if ($this->getUser()) {
             return $this->redirectToDashboard();
         }
@@ -84,12 +84,14 @@ class SecurityController extends AbstractController
     {
         $defaultRedirect = $this->getParameter('login_redirect');
 
+        // Prioritize roles in a specific order
+        // Admin first, then Employee, then Citoyen
         if ($this->isGranted('ROLE_ADMIN')) {
             return $this->redirectToRoute('back_dashboard');
-        } elseif ($this->isGranted('ROLE_CITOYEN')) {
-            return $this->redirectToRoute('front_dashboard');
         } elseif ($this->isGranted('ROLE_EMPLOYEE')) {
             return $this->redirectToRoute('app_tache_index');
+        } elseif ($this->isGranted('ROLE_CITOYEN')) {
+            return $this->redirectToRoute('front_home');
         }
 
         return $this->redirectToRoute($defaultRedirect);
@@ -151,7 +153,7 @@ class SecurityController extends AbstractController
                     error_log('Form validation errors: ' . json_encode($errors));
                 }
 
-             
+
 
                 // Handle file upload
                 error_log('Checking for file upload');
@@ -171,7 +173,7 @@ class SecurityController extends AbstractController
                                 'resource_type' => 'image',
                             ]
                         );
-                        
+
                         // Save the secure URL to the user's profile
                         $user->setProfileImage($uploadResult['secure_url']);
                         error_log('File successfully uploaded to Cloudinary');
@@ -233,7 +235,7 @@ class SecurityController extends AbstractController
                 $notification->setMessage(sprintf(
                     'New user "%s" signed up ',
                     $user->getFirstName()
-                   
+
                 ));
                 $em->persist($notification);
                 $em->flush();

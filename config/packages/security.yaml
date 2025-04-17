@@ -1,71 +1,77 @@
 security:
-    enable_authenticator_manager: true
-    password_hashers:
-        App\Entity\User:
-            algorithm: auto
-    role_hierarchy:
-        ROLE_ADMIN: [ROLE_USER]
-        ROLE_EMPLOYEE: [ROLE_USER]
-        ROLE_CITOYEN: [ROLE_USER]
-    providers:
-        pdadmin_auth:
-            entity:
-                class: App\Entity\User
-                property: email
-        oauth_provider:
-            id: App\Security\MyOAuthUserProvider
-        chain_provider:
-            chain:
-                providers: [pdadmin_auth, oauth_provider]
-    firewalls:
-        dev:
-            pattern: ^/(_(profiler|wdt)|css|images|js)/
-            security: false
-        main:
-            pattern: ^/
-            provider: chain_provider
-            lazy: true
-            user_checker: App\Appaydin\PdUser\Security\UserChecker
-            entry_point: form_login
-            form_login:
-                use_referer: true
-                login_path: security_login
-                check_path: security_login
-                success_handler: App\Security\AuthenticationSuccessHandler
-            logout:
-                path: security_logout
-                target: front_home
-            remember_me:
-                secret: '%env(APP_SECRET)%'
-                lifetime: 604800 # 1 week
-                path: /
-            oauth:
-                resource_owners:
-                    google: "/login/check-google"
-                login_path: security_login
-                failure_path: security_login
-                oauth_user_provider:
-                    service: App\Security\MyOAuthUserProvider
-                failure_handler: security.authentication.failure_handler
-                default_target_path: back_dashboard
+  enable_authenticator_manager: true
+  password_hashers:
+    App\Entity\User:
+      algorithm: auto
+  role_hierarchy:
+    ROLE_ADMIN: [ROLE_USER, ROLE_EMPLOYEE, ROLE_CITOYEN]
+    ROLE_EMPLOYEE: [ROLE_USER]
+    ROLE_CITOYEN: [ROLE_USER]
+  providers:
+    pdadmin_auth:
+      entity:
+        class: App\Entity\User
+        property: email
+    oauth_provider:
+      id: App\Security\MyOAuthUserProvider
+    chain_provider:
+      chain:
+        providers: [pdadmin_auth, oauth_provider]
+  firewalls:
+    dev:
+      pattern: ^/(_(profiler|wdt)|css|images|js)/
+      security: false
+    main:
+      pattern: ^/
+      provider: chain_provider
+      lazy: true
+      user_checker: App\Appaydin\PdUser\Security\UserChecker
+      entry_point: form_login
+      form_login:
+        use_referer: true
+        login_path: security_login
+        check_path: security_login
+        success_handler: App\Security\AuthenticationSuccessHandler
+      logout:
+        path: security_logout
+        target: front_home
+      remember_me:
+        secret: "%env(APP_SECRET)%"
+        lifetime: 604800 # 1 week
+        path: /
+      oauth:
+        resource_owners:
+          google: "/login/check-google"
+        login_path: security_login
+        failure_path: security_login
+        oauth_user_provider:
+          service: App\Security\MyOAuthUserProvider
+        failure_handler: security.authentication.failure_handler
+        success_handler: App\Security\AuthenticationSuccessHandler
 
-            access_denied_handler: App\Controller\SecurityExceptionController
-    access_control:
-        # Public access routes
-        - { path: ^/auth/login$, role: PUBLIC_ACCESS }
-        - { path: ^/auth/register, role: PUBLIC_ACCESS }
-        - { path: ^/auth/resetting, role: PUBLIC_ACCESS }
-        - { path: ^/login, role: PUBLIC_ACCESS }
-        - { path: ^/$, role: PUBLIC_ACCESS }
-        
-        # Admin routes
-        - { path: ^/admin, roles: ROLE_ADMIN }
-        - { path: ^/back, roles: ROLE_ADMIN }
-        
-        # Citoyen routes
-        - { path: ^/front, roles: ROLE_CITOYEN }
-        - { path: ^/profile, roles: [ROLE_CITOYEN, ROLE_ADMIN, ROLE_EMPLOYEE] }
-        
-        # Employee routes
-        - { path: ^/tache, roles: ROLE_EMPLOYEE }
-        - { path: ^/plannificationtache, roles: ROLE_EMPLOYEE }
+      access_denied_handler: App\Controller\SecurityExceptionController
+  access_control:
+    # Public access routes
+    - { path: ^/auth/login$, role: PUBLIC_ACCESS }
+    - { path: ^/auth/register, role: PUBLIC_ACCESS }
+    - { path: ^/auth/resetting, role: PUBLIC_ACCESS }
+    - { path: ^/login, role: PUBLIC_ACCESS }
+    - { path: ^/connect, role: PUBLIC_ACCESS }
+    - { path: ^/login/check-google, role: PUBLIC_ACCESS }
+    - { path: ^/$, role: PUBLIC_ACCESS }
+    - { path: ^/assets, role: PUBLIC_ACCESS }
+    - { path: ^/debug/user, role: PUBLIC_ACCESS }
+
+    # Admin routes - only accessible by admins
+    - { path: ^/admin, roles: ROLE_ADMIN }
+    - { path: ^/back, roles: ROLE_ADMIN }
+
+    # Employee routes - only accessible by employees and admins (via role hierarchy)
+    - { path: ^/tache, roles: ROLE_EMPLOYEE }
+    - { path: ^/plannificationtache, roles: ROLE_EMPLOYEE }
+
+    # Citoyen routes - only accessible by citizens and admins (via role hierarchy)
+    - { path: ^/front, roles: ROLE_CITOYEN }
+
+    # Shared routes - accessible by all authenticated users
+    - { path: ^/profile, roles: [ROLE_USER] }

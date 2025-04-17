@@ -75,7 +75,10 @@ class SecurityRedirectListener implements EventSubscriberInterface
             '/auth/register',
             '/auth/resetting',
             '/login',
+            '/connect',
+            '/login/check-google',
             '/',
+            '/debug/user',
         ];
 
         foreach ($publicRoutes as $route) {
@@ -110,24 +113,28 @@ class SecurityRedirectListener implements EventSubscriberInterface
 
     private function checkRoleAccess(string $path): void
     {
+        // Admin routes
         if (strpos($path, '/admin') === 0 || strpos($path, '/back') === 0) {
             if (!$this->security->isGranted('ROLE_ADMIN')) {
                 throw new AccessDeniedException('Access denied. Admin role required.');
             }
-        } elseif (strpos($path, '/tache') === 0) {
-            if (!$this->security->isGranted('ROLE_EMPLOYEE')) {
+        }
+        // Employee routes
+        elseif (strpos($path, '/tache') === 0 || strpos($path, '/plannificationtache') === 0) {
+            if (!$this->security->isGranted('ROLE_EMPLOYEE') && !$this->security->isGranted('ROLE_ADMIN')) {
                 throw new AccessDeniedException('Access denied. Employee role required.');
             }
-            elseif (strpos($path, '/plannificationtache') === 0) {
-                if (!$this->security->isGranted('ROLE_EMPLOYEE')) {
-                    throw new AccessDeniedException('Access denied. Employee role required.');
-                }
+        }
+        // Citoyen routes
+        elseif (strpos($path, '/front') === 0) {
+            if (!$this->security->isGranted('ROLE_CITOYEN') && !$this->security->isGranted('ROLE_ADMIN')) {
+                throw new AccessDeniedException('Access denied. Citoyen role required.');
             }
-        } elseif (strpos($path, '/front') === 0 || strpos($path, '/profile') === 0) {
-            if (!$this->security->isGranted('ROLE_CITOYEN') && 
-                !$this->security->isGranted('ROLE_ADMIN') && 
-                !$this->security->isGranted('ROLE_EMPLOYEE')) {
-                throw new AccessDeniedException('Access denied. User role required.');
+        }
+        // Shared routes
+        elseif (strpos($path, '/profile') === 0) {
+            if (!$this->security->isGranted('ROLE_USER')) {
+                throw new AccessDeniedException('Access denied. Authentication required.');
             }
         }
     }
@@ -137,7 +144,7 @@ class SecurityRedirectListener implements EventSubscriberInterface
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return 'back_dashboard';
         } elseif ($this->security->isGranted('ROLE_EMPLOYEE')) {
-            return 'employee_dashboard';
+            return 'app_tache_index';
         } elseif ($this->security->isGranted('ROLE_CITOYEN')) {
             return 'front_home';
         }

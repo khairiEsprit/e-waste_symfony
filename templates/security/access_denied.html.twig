@@ -14,7 +14,7 @@
             display: flex;
             align-items: center;
         }
-        
+
         .access-denied-card {
             background: #fff;
             border-radius: 15px;
@@ -26,35 +26,35 @@
             max-width: 800px;
             margin: 0 auto;
         }
-        
+
         .access-denied-icon {
             font-size: 80px;
             color: #013220;
             margin-bottom: 20px;
         }
-        
+
         .access-denied-title {
             font-size: 36px;
             font-weight: 700;
             color: #013220;
             margin-bottom: 15px;
         }
-        
+
         .access-denied-message {
             font-size: 18px;
             color: #555;
             margin-bottom: 30px;
         }
-        
+
         .access-denied-details {
             background: #f8f9fa;
             padding: 20px;
-            
+
             border-radius: 10px;
             margin-bottom: 30px;
             text-align: left;
         }
-        
+
         .return-btn {
             background: #013220;
             color: #fff;
@@ -66,14 +66,14 @@
             text-decoration: none;
             display: inline-block;
         }
-        
+
         .return-btn:hover {
             background: #00693E;
             color: #fff;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .error-code {
             position: absolute;
             font-size: 200px;
@@ -84,7 +84,7 @@
             transform: translate(-50%, -50%);
             z-index: -1;
         }
-        
+
         @keyframes float {
             0% {
                 transform: translateY(0px);
@@ -96,12 +96,12 @@
                 transform: translateY(0px);
             }
         }
-        
+
         .floating-leaf {
             position: absolute;
             animation: float 6s ease-in-out infinite;
         }
-        
+
         .leaf-1 {
             top: 20%;
             left: 10%;
@@ -109,7 +109,7 @@
             color: rgba(255, 255, 255, 0.3);
             animation-delay: 0s;
         }
-        
+
         .leaf-2 {
             top: 60%;
             right: 10%;
@@ -117,7 +117,7 @@
             color: rgba(255, 255, 255, 0.2);
             animation-delay: 1s;
         }
-        
+
         .leaf-3 {
             bottom: 10%;
             left: 20%;
@@ -132,7 +132,7 @@
 <section class="access-denied-section">
     <div class="container" data-aos="fade-up">
         <div class="error-code">403</div>
-        
+
         <div class="floating-leaf leaf-1">
             <i class="bi bi-tree"></i>
         </div>
@@ -142,21 +142,21 @@
         <div class="floating-leaf leaf-3">
             <i class="bi bi-tree"></i>
         </div>
-        
+
         <div class="access-denied-card" data-aos="zoom-in" data-aos-delay="100">
             <div class="access-denied-icon">
                 <i class="bi bi-shield-lock"></i>
             </div>
-            
+
             <h1 class="access-denied-title">Access Denied</h1>
-            <p class="access-denied-message">Sorry, you don't have permission to access this page.</p>
-            
+            <p class="access-denied-message">{{ message|default('Sorry, you don\'t have permission to access this page.') }}</p>
+
             <div class="access-denied-details">
                 <p><strong style="color:#013220">Why am I seeing this?</strong></p>
                 <p>You're trying to access a page that requires different permissions than what your account currently has.</p>
                 <p>If you believe this is an error, please contact the administrator for assistance.</p>
             </div>
-            
+
             <a href="{{ path(return_route) }}" class="return-btn">
                 <i class="bi bi-arrow-left"></i> Return to Safe Zone
             </a>
