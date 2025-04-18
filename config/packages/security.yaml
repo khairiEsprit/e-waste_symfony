@@ -67,6 +67,7 @@ security:
     - { path: ^/back, roles: ROLE_ADMIN }
 
     # Employee routes - only accessible by employees and admins (via role hierarchy)
+    - { path: ^/employee, roles: ROLE_EMPLOYEE }
     - { path: ^/tache, roles: ROLE_EMPLOYEE }
     - { path: ^/plannificationtache, roles: ROLE_EMPLOYEE }
 

@@ -78,9 +78,6 @@
 
         /* Container des poubelles */
         #poubelles-container {
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
-            gap: 25px;
             padding: 1rem 0;
         }
 
@@ -97,7 +94,7 @@
         }
 
         /* Styles des cards */
-        .card.poubelle-card {
+        .card-custom.poubelle-card {
             cursor: default;
             border-radius: 15px;
             overflow: hidden;
@@ -107,6 +104,9 @@
             animation-fill-mode: both;
             border: none;
             background: white;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Animation séquentielle des cards */
@@ -140,6 +140,9 @@
 
         .card-body {
             padding: 1.5rem;
+            flex: 1;
+            display: flex;
+            flex-direction: column;
         }
 
         /* Styles des icônes dans les cards */
@@ -206,7 +209,6 @@
             width: 100%;
             text-align: center;
             padding: 0.8rem 1rem;
-            margin: 1rem 0;
             border-radius: 10px;
             background: var(--primary-medium);
             color: white;
@@ -256,18 +258,24 @@
 
         /* Contenu détaillé à afficher/masquer */
         .card-body-content {
-            max-height: 0;
-            overflow: hidden;
-            transition: all 0.5s cubic-bezier(0.645, 0.045, 0.355, 1);
+            display: none;
+            background: white;
+            border-radius: 10px;
+            margin-top: 15px;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
             opacity: 0;
             transform: translateY(-10px);
+            transition: opacity 0.3s ease, transform 0.3s ease;
+            color: #000000;
+            border: 1px solid rgba(0, 0, 0, 0.1);
+            overflow: hidden;
         }
 
         .card-body-content.show {
-            max-height: 1000px;
+            display: block;
             opacity: 1;
             transform: translateY(0);
-            padding: 1rem 0;
+            padding: 1rem;
         }
 
         .card-body-content hr {
@@ -313,6 +321,87 @@
             text-transform: uppercase;
             letter-spacing: 0.5px;
             font-size: 0.7rem;
+        }
+
+        /* Quick info grid styling */
+        .row.g-2 {
+            margin-left: -0.5rem;
+            margin-right: -0.5rem;
+        }
+
+        .quick-info-card {
+            display: flex;
+            align-items: flex-start;
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 8px;
+            padding: 12px;
+            box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
+            transition: all 0.2s ease;
+            min-height: 80px;
+            height: 100%;
+            margin-bottom: 0;
+        }
+
+        .quick-info-card:hover {
+            background-color: white;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            transform: translateY(-2px);
+        }
+
+        .quick-info-icon {
+            min-width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            background-color: rgba(0, 105, 62, 0.1);
+            color: var(--primary-medium);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-right: 10px;
+            font-size: 1rem;
+            margin-top: 2px;
+        }
+
+        .quick-info-content {
+            flex: 1;
+            overflow: hidden;
+            display: flex;
+            flex-direction: column;
+        }
+
+        .quick-info-title {
+            font-size: 0.75rem;
+            color: var(--text-medium);
+            margin-bottom: 2px;
+            font-weight: 500;
+        }
+
+        .quick-info-value {
+            font-size: 0.9rem;
+            color: var(--text-dark);
+            margin-bottom: 0;
+            font-weight: 600;
+            word-break: break-word;
+            overflow-wrap: break-word;
+        }
+
+        .fw-medium {
+            font-weight: 500;
+        }
+
+        /* Responsive adjustments */
+        @media (max-width: 767px) {
+            .quick-info-card {
+                min-height: 70px;
+            }
+
+            .quick-info-title {
+                font-size: 0.7rem;
+            }
+
+            .quick-info-value {
+                font-size: 0.8rem;
+            }
         }
     </style>
 {% endblock %}
@@ -390,25 +479,35 @@
 
             // Fonction pour basculer l'affichage des détails
             function toggleDetailSection(button) {
-                const contentDiv = button.nextElementSibling;
+                console.log('Toggle button clicked');
+                // Trouver la carte parente
+                const card = button.closest('.poubelle-card');
+                console.log('Card found:', card);
+
+                // Trouver le contenu détaillé dans cette carte spécifique
+                const contentDiv = card.querySelector('.card-body-content');
+                console.log('Content div found:', contentDiv);
+
                 const icon = button.querySelector('.icon-toggle');
                 const textSpan = button.querySelector('.toggle-text');
                 const currentState = button.getAttribute('data-state');
+                console.log('Current state:', currentState);
 
-                // Basculer l'état du contenu
-                contentDiv.classList.toggle('show');
-
-                // Mettre à jour le bouton en fonction du nouvel état
+                // Basculer l'état du contenu actuel
                 if (currentState === 'closed') {
                     // Ouvrir les détails
+                    contentDiv.classList.add('show');
                     icon.style.transform = 'rotate(180deg)';
                     textSpan.textContent = 'Masquer les détails';
                     button.setAttribute('data-state', 'open');
+                    console.log('Opening details');
                 } else {
                     // Fermer les détails
+                    contentDiv.classList.remove('show');
                     icon.style.transform = 'rotate(0)';
-                    textSpan.textContent = 'Afficher les détails';
+                    textSpan.textContent = 'Plus de détails';
                     button.setAttribute('data-state', 'closed');
+                    console.log('Closing details');
                 }
             }
 

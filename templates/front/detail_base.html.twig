@@ -1,0 +1,30 @@
+{% extends 'front/base.html.twig' %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <link href="{{ asset('assets/front/assets/css/detail-pages.css') }}?v={{ random() }}" rel="stylesheet">
+{% endblock %}
+
+{% block body %}
+<!-- Full-page background that extends under navbar -->
+<div class="full-page-bg"></div>
+<div class="content-wrapper">
+    <!-- Breadcrumbs -->
+    <div class="container">
+        <nav aria-label="breadcrumb" class="detail-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('front_home') }}">Home</a></li>
+                {% if parent_route is defined and parent_label is defined %}
+                    <li class="breadcrumb-item"><a href="{{ path(parent_route) }}">{{ parent_label }}</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active" aria-current="page">{{ current_item|default('Details') }}</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Detail Content -->
+    <div class="container py-4">
+        {% block detail_content %}{% endblock %}
+    </div>
+</div><!-- End content-wrapper -->
+{% endblock %}

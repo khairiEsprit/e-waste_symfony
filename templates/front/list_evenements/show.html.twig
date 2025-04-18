@@ -1,6 +1,10 @@
-{% extends 'front/base.html.twig' %}
+{% extends 'front/detail_base.html.twig' %}
 
 {% block title %}Détails de l'événement - {{ event.title }}{% endblock %}
+
+{% set parent_route = 'app_front_event_list' %}
+{% set parent_label = 'Evénements' %}
+{% set current_item = event.title %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -28,7 +32,7 @@
             width: 24px;
             text-align: center;
         }
-        
+
         /* Styles des boutons premium */
         .btn-premium {
             position: relative;
@@ -43,14 +47,14 @@
             align-items: center;
             justify-content: center;
         }
-        
+
         .btn-back {
             background-color: white;
             color: #29AB87;
             border: 2px solid #29AB87;
             z-index: 1;
         }
-        
+
         .btn-back:before {
             content: '';
             position: absolute;
@@ -63,23 +67,23 @@
             z-index: -1;
             border-radius: 50px;
         }
-        
+
         .btn-back:hover {
             color: white;
             transform: translateY(-3px);
             box-shadow: 0 8px 20px rgba(41, 171, 135, 0.3);
         }
-        
+
         .btn-back:hover:before {
             width: 100%;
         }
-        
+
         .btn-primary {
             background: linear-gradient(135deg, #29AB87 0%, #1E7D65 100%);
             color: white;
             z-index: 1;
         }
-        
+
         .btn-primary:before {
             content: '';
             position: absolute;
@@ -92,40 +96,40 @@
             z-index: -1;
             border-radius: 50px;
         }
-        
+
         .btn-primary:hover {
             transform: translateY(-3px);
             box-shadow: 0 8px 25px rgba(41, 171, 135, 0.4);
         }
-        
+
         .btn-primary:hover:before {
             width: 100%;
         }
-        
+
         /* Animation des icônes */
         .btn-premium i {
             transition: transform 0.3s ease;
         }
-        
+
         .btn-back:hover i {
             transform: translateX(-5px);
         }
-        
+
         .btn-primary:hover i {
             transform: translateX(5px);
         }
-        
+
         /* Effet de pulse au survol */
         @keyframes pulse {
             0% { transform: scale(1); }
             50% { transform: scale(1.05); }
             100% { transform: scale(1); }
         }
-        
+
         .btn-primary:hover {
             animation: pulse 1.5s infinite;
         }
-        
+
         /* Style pour le badge des places */
         .places-badge {
             font-size: 0.9rem;
@@ -138,23 +142,17 @@
     </style>
 {% endblock %}
 
-{% block body %}
-    <div style="transform: translateY(70px); margin-bottom: 70px;">
-        <div class="container py-5">
-            {# Bouton de retour premium #}
-            <a href="{{ path('app_front_event_list') }}" class="btn btn-premium btn-back mb-4">
-                <i class="fas fa-arrow-left me-2"></i> Retour aux événements
-            </a>
+{% block detail_content %}
 
             <div class="row">
                 {# Colonne image #}
                 <div class="col-lg-5 mb-4">
                     {% if event.imageName %}
-                        <img src="{{ asset('uploads/events/' ~ event.imageName) }}" 
-                             alt="{{ event.title }}" 
+                        <img src="{{ asset('uploads/events/' ~ event.imageName) }}"
+                             alt="{{ event.title }}"
                              class="img-fluid event-image w-100">
                     {% else %}
-                        <div class="bg-light d-flex align-items-center justify-content-center rounded" 
+                        <div class="bg-light d-flex align-items-center justify-content-center rounded"
                              style="height: 300px; border: 2px dashed #29AB87;">
                             <div class="text-center">
                                 <i class="fas fa-image fa-4x mb-3 text-muted"></i>
@@ -208,7 +206,7 @@
 
                         {# Bouton d'inscription premium #}
                         <div class="mt-4">
-                            <a href="{{ path('app_participation_new', {'event_id': event.id}) }}" 
+                            <a href="{{ path('app_participation_new', {'event_id': event.id}) }}"
                                class="btn btn-premium btn-primary">
                                 <i class="fas fa-calendar-check me-2"></i> S'inscrire à l'événement
                             </a>
@@ -216,6 +214,4 @@
                     </div>
                 </div>
             </div>
-        </div>
-    </div>
 {% endblock %}

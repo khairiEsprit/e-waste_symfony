@@ -2,11 +2,13 @@
 
 namespace App\Controller\Front;
 
+use App\Entity\Poubelle;
 use App\Repository\PoubelleRepository;
 use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Bridge\Doctrine\Attribute\MapEntity;
 
 class PoubelleFrontController extends AbstractController
 {
@@ -60,5 +62,13 @@ class PoubelleFrontController extends AbstractController
     {
         // Pour la compatibilité avec le code existant, rediriger vers la route principale
         return $this->redirectToRoute('app_poubelles', $request->query->all());
+    }
+
+    #[Route('/poubelles/{id}', name: 'app_poubelle_details')]
+    public function details(Poubelle $poubelle): Response
+    {
+        return $this->render('front/poubelle/details.html.twig', [
+            'poubelle' => $poubelle,
+        ]);
     }
 }

@@ -10,11 +10,11 @@
         <nav id="navbar" class="navbar">
             <ul>
                 <li><a class="nav-link scrollto {{ app.request.attributes.get('_route') == 'front_home' ? 'active' : '' }}" href="{{ path('front_home') }}"><span class="fa fa-home"> Home </span></a></li>
-                <li><a class="nav-link scrollto {{ app.request.attributes.get('_route') starts with 'app_front_event' ? 'active' : '' }}" href="{{ path('app_front_event_list') }}"><span class="fa fa-info-circle" aria-hidden="true">Evenements</span></a></li>
-                <li><a class="nav-link scrollto {{ app.request.attributes.get('_route') starts with 'app_centre' ? 'active' : '' }}" href="{{ path('app_centreFront') }}"><span class="fa fa-trash"> Centres</span></a></li>
+                <li><a class="nav-link scrollto {{ app.request.attributes.get('_route') starts with 'app_front_event' ? 'active' : '' }}" href="{{ path('app_front_event_list') }}"><span class="fa fa-info-circle" aria-hidden="true">Events</span></a></li>
+                <li><a class="nav-link scrollto {{ app.request.attributes.get('_route') starts with 'app_centre' ? 'active' : '' }}" href="{{ path('app_centreFront') }}"><span class="fa fa-trash"> Centers</span></a></li>
                 <li><a class="nav-link scrollto {{ app.request.attributes.get('_route') == 'chat' ? 'active' : '' }}" href="{{ path('chat') }}"><span class="fa fa-comment"> Chat </span></a></li>
                 <li><a class="nav-link scrollto {{ app.request.attributes.get('_route') starts with 'user_leaderboard' ? 'active' : '' }}" href="{{ path('user_leaderboard') }}"><span class="fa fa-trophy"> Leaderboard </span></a></li>
-                <li><a class="nav-link scrollto {{ app.request.attributes.get('_route') starts with 'app_poubelles' ? 'active' : '' }}" href="{{ path('app_poubelles') }}"><span class="fa fa-question-circle">Poubelles</span></a></li>
+                <li><a class="nav-link scrollto {{ app.request.attributes.get('_route') starts with 'app_poubelles' ? 'active' : '' }}" href="{{ path('app_poubelles') }}"><span class="fa fa-question-circle">Bins</span></a></li>
 
             {% if app.user %}
     <li class="dropdown">

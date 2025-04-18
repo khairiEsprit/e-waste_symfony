@@ -158,9 +158,17 @@
     </head>
   <body class="layout-fixed sidebar-expand-lg bg-body-tertiary">
 <div class="app-wrapper">
-            {# Include partials for the navbar and sidebar #}
-            {% include 'back/partials/topbar.html.twig' %}
-            {% include 'back/partials/sidebar.html.twig' %}
+            {# Include partials for the navbar and sidebar based on user role #}
+            {% if is_granted('ROLE_ADMIN') %}
+                {% include 'back/partials/topbar.html.twig' %}
+                {% include 'back/partials/sidebar.html.twig' %}
+            {% elseif is_granted('ROLE_EMPLOYEE') %}
+                {% include 'back/partials/employee_topbar.html.twig' %}
+                {% include 'back/partials/employee_sidebar.html.twig' %}
+            {% else %}
+                {% include 'back/partials/topbar.html.twig' %}
+                {% include 'back/partials/sidebar.html.twig' %}
+            {% endif %}
 
             {# Content Wrapper: where the page content will go #}
          <main class="app-main">

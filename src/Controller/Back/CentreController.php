@@ -16,10 +16,79 @@ use Symfony\Component\Validator\Validator\ValidatorInterface;
 final class CentreController extends AbstractController
 {
     #[Route(name: 'app_centre_index', methods: ['GET'])]
-    public function index(CentreRepository $centreRepository): Response
+    public function index(Request $request, CentreRepository $centreRepository): Response
     {
+        $searchTerm = $request->query->get('search', '');
+        $regionFilter = $request->query->get('region', '');
+
+        // Default Tunisia map boundaries
+        $minLongitude = 7.5;
+        $maxLongitude = 11.6;
+        $minLatitude = 30.2;
+        $maxLatitude = 37.5;
+
+        // Apply region filter if selected
+        if ($regionFilter) {
+            // Define region boundaries (simplified for example)
+            $regions = [
+                'north' => ['minLong' => 8.0, 'maxLong' => 11.0, 'minLat' => 36.0, 'maxLat' => 37.5],
+                'central' => ['minLong' => 8.0, 'maxLong' => 11.0, 'minLat' => 34.0, 'maxLat' => 36.0],
+                'south' => ['minLong' => 7.5, 'maxLong' => 11.6, 'minLat' => 30.2, 'maxLat' => 34.0],
+                'coastal' => ['minLong' => 10.0, 'maxLong' => 11.6, 'minLat' => 32.0, 'maxLat' => 37.5],
+                'inland' => ['minLong' => 7.5, 'maxLong' => 10.0, 'minLat' => 32.0, 'maxLat' => 37.5],
+            ];
+
+            if (isset($regions[$regionFilter])) {
+                $region = $regions[$regionFilter];
+                $minLongitude = $region['minLong'];
+                $maxLongitude = $region['maxLong'];
+                $minLatitude = $region['minLat'];
+                $maxLatitude = $region['maxLat'];
+
+                $centres = $centreRepository->filterByLocation(
+                    $minLongitude,
+                    $maxLongitude,
+                    $minLatitude,
+                    $maxLatitude
+                );
+            } else {
+                $centres = $centreRepository->findAll();
+            }
+        } else if ($searchTerm) {
+            // Search by term if provided
+            $centres = $centreRepository->searchByTerm($searchTerm);
+        } else {
+            // Default: get all centres
+            $centres = $centreRepository->findAll();
+        }
+
+        // Handle AJAX requests for DataTables
+        if ($request->isXmlHttpRequest()) {
+            return $this->json([
+                'data' => array_map(function ($centre) {
+                    return [
+                        'id' => $centre->getId(),
+                        'nom' => $centre->getNom(),
+                        'coordinates' => [
+                            'longitude' => $centre->getLongitude(),
+                            'latitude' => $centre->getAltitude()
+                        ],
+                        'contact' => [
+                            'telephone' => $centre->getTelephone(),
+                            'email' => $centre->getEmail()
+                        ],
+                        'actions' => $this->renderView('back/centre/_row_actions.html.twig', [
+                            'centre' => $centre
+                        ])
+                    ];
+                }, $centres)
+            ]);
+        }
+
         return $this->render('back/centre/index.html.twig', [
-            'centres' => $centreRepository->findAll(),
+            'centres' => $centres,
+            'searchTerm' => $searchTerm,
+            'regionFilter' => $regionFilter
         ]);
     }
 
@@ -98,7 +167,7 @@ final class CentreController extends AbstractController
     #[Route('/{id}', name: 'app_centre_delete', methods: ['POST'])]
     public function delete(Request $request, Centre $centre, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$centre->getId(), $request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $centre->getId(), $request->get('_token'))) {
             $entityManager->remove($centre);
             $entityManager->flush();
         }

@@ -1,0 +1,21 @@
+<!-- Full-page background that extends under navbar -->
+<div class="full-page-bg"></div>
+<div class="content-wrapper">
+    <!-- Breadcrumbs -->
+    <div class="container">
+        <nav aria-label="breadcrumb" class="detail-breadcrumb">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ path('front_home') }}">Home</a></li>
+                {% if breadcrumb_parent_route is defined and breadcrumb_parent_label is defined %}
+                    <li class="breadcrumb-item"><a href="{{ path(breadcrumb_parent_route) }}">{{ breadcrumb_parent_label }}</a></li>
+                {% endif %}
+                <li class="breadcrumb-item active" aria-current="page">{{ breadcrumb_current|default('Details') }}</li>
+            </ol>
+        </nav>
+    </div>
+
+    <!-- Detail Content -->
+    <div class="container py-4">
+        {{ block('detail_content') }}
+    </div>
+</div><!-- End content-wrapper -->

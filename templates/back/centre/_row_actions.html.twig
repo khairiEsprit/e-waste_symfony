@@ -1,0 +1,21 @@
+<div class="action-buttons">
+    <a href="{{ path('app_centre_show', {'id': centre.id}) }}"
+       class="btn btn-sm btn-outline-primary"
+       data-bs-toggle="tooltip"
+       data-bs-title="Voir les détails">
+        <i class="bi bi-eye"></i>
+    </a>
+    <a href="{{ path('app_centre_edit', {'id': centre.id}) }}"
+       class="btn btn-sm btn-outline-success"
+       data-bs-toggle="tooltip"
+       data-bs-title="Modifier">
+        <i class="bi bi-pencil"></i>
+    </a>
+    <button type="button"
+            class="btn btn-sm btn-outline-danger delete-item"
+            data-id="{{ centre.id }}"
+            data-bs-toggle="tooltip"
+            data-bs-title="Supprimer">
+        <i class="bi bi-trash"></i>
+    </button>
+</div>

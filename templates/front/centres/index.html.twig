@@ -1,138 +1,241 @@
+
 {% extends 'front/base.html.twig' %}
 
 {% block title %}Our Centres | ASD{% endblock %}
 
 {% block body %}
-<!-- Full-page background that extends under navbar -->
+<!-- Full-page background -->
 <div class="full-page-bg"></div>
 <div class="content-wrapper">
-  <!-- ======= Centres Header Section ======= -->
+  <!-- Centres Header Section -->
   <div class="container pt-5" data-aos="fade-up">
-    <div class="section-title">
-      <h2 class="text-white">Our Centres</h2>
-      <p class="text-white">Discover our network of professional centres across the country, each offering top-quality services and facilities.</p>
+    <div class="header-container text-center">
+      <h2 class="text-white mb-3">Our Centres</h2>
+      <p class="text-white mb-5">Explore our network of professional centres offering top-quality services nationwide.</p>
     </div>
 
-  <!-- ======= Centres Grid Section ======= -->
-  <div class="py-4" data-aos="fade-up">
-    <div class="row">
-      {% for centre in centres %}
-        <div class="col-sm-12 col-md-6 col-lg-4 mb-4">
-                  <a href="{{ path('app_centre_detailsFront', {'id': centre.id}) }}" class="card-link">
-
-          <div class="card-custom text-white centre-card" style="background-image:url('{{ asset('assets/front/assets/img/centres/centre1.jpeg') }}');">
-            <img class="card-img d-none" src="{{ asset('assets/front/assets/img/centres/centre1.jpeg') }}" alt="{{ centre.nom }}">
-            <div class="card-img-overlay d-flex flex-column">
-              <div class="card-body">
-                <h4 class="card-title mt-0">{{ centre.nom }}</h4>
-                <p><i class="bi bi-geo-alt"></i> Coordinates: {{ centre.longitude }}, {{ centre.altitude }}</p>
-                <p><i class="bi bi-telephone"></i> {{ centre.telephone|slice(0, 2) }} {{ centre.telephone|slice(2, 2) }} {{ centre.telephone|slice(4, 2) }} {{ centre.telephone|slice(6, 2) }}</p>
+    <!-- Centres Grid Section -->
+    <div class="py-4" data-aos="fade-up">
+      <div class="row">
+        {% for centre in centres %}
+          <div class="col-sm-12 col-md-6 col-lg-4 mb-4" data-aos="fade-up" data-aos-delay="{{ loop.index * 100 }}">
+            <a href="{{ path('app_centre_detailsFront', {'id': centre.id}) }}" class="card-link" aria-label="View details for {{ centre.nom }}">
+              <div class="card-custom centre-card" style="background-image: url('{{ asset('assets/front/assets/img/centres/centre1.jpeg') }}');">
+                <img class="card-img d-none" src="{{ asset('assets/front/assets/img/centres/centre1.jpeg') }}" alt="{{ centre.nom }}" loading="lazy">
+                <div class="card-img-overlay d-flex flex-column">
+                  <div class="card-body">
+                    <h4 class="card-title">{{ centre.nom }}</h4>
+                    <p><i class="bi bi-geo-alt" aria-hidden="true"></i> {{ centre.longitude }}, {{ centre.altitude }}</p>
+                    <p><i class="bi bi-telephone" aria-hidden="true"></i> {{ centre.telephone|slice(0, 2) }} {{ centre.telephone|slice(2, 2) }} {{ centre.telephone|slice(4, 2) }} {{ centre.telephone|slice(6, 2) }}</p>
+                  </div>
+                  <div class="card-footer">
+                    <span class="btn-custom">View Details</span>
+                  </div>
+                </div>
               </div>
-              <div class="card-footer">
-                <a href="{{ path('app_centre_detailsFront', {'id': centre.id}) }}" class="btn-custom">View Details</a>
-              </div>
+            </a>
+          </div>
+        {% else %}
+          <div class="col-12">
+            <div class="no-centres text-center py-5">
+              <i class="bi bi-building-exclamation" style="font-size: 3rem; color: var(--primary-medium);" aria-hidden="true"></i>
+              <h4 class="mt-3">No centres available</h4>
+              <p>Please check back later or contact our support team.</p>
             </div>
           </div>
-        </div>
-      {% else %}
-        <div class="col-12">
-          <div class="no-centres text-center py-5">
-            <i class="bi bi-building-exclamation" style="font-size: 3rem; color: var(--primary-medium);"></i>
-            <h4 class="mt-3">No centres available at the moment</h4>
-            <p>Please check back later or contact our support team.</p>
-          </div>
-        </div>
-      {% endfor %}
+        {% endfor %}
+      </div>
     </div>
   </div>
-  </div>
-</div><!-- End content-wrapper -->
+</div>
 
 <style>
-/* Using our unified theme variables */
+/* CSS Custom Properties for Theme Consistency */
+:root {
+  --primary: #00693e;
+  --primary-light: #00a865;
+  --primary-dark: #013220;
+  --text-light: #ffffff;
+  --shadow-sm: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --shadow-md: 0 8px 16px rgba(0, 0, 0, 0.15);
+  --shadow-lg: 0 12px 24px rgba(0, 0, 0, 0.2);
+  --radius-md: 12px;
+  --transition-fast: all 0.3s ease;
+  --transition-normal: all 0.5s ease;
+}
 
+/* Header Section */
+.header-container {
+  margin-bottom: 2.5rem;
+}
+
+.header-container h2 {
+  font-size: 2.5rem;
+  font-weight: 700;
+  letter-spacing: 0.5px;
+}
+
+.header-container p {
+  font-size: 1.1rem;
+  max-width: 600px;
+  margin: 0 auto;
+  opacity: 0.9;
+}
+
+/* Centre Card */
 .centre-card {
-  border: none;
-  transition: all 500ms cubic-bezier(0.19, 1, 0.22, 1);
+  position: relative;
+  border-radius: var(--radius-md);
   overflow: hidden;
-  border-radius: var(--radius-lg);
-  min-height: 350px;
-  box-shadow: var(--shadow-md);
+  min-height: 360px;
   background-size: cover;
   background-position: center;
-  position: relative;
-}
-
-.card-title {
-  font-weight: 700;
-  color: white;
-  text-shadow: 1px 1px 3px rgba(0,0,0,0.5);
-  transition: var(--transition-normal);
-}
-
-.centre-card:hover .card-title {
-  color: white;
-  text-shadow: 2px 2px 4px rgba(0,0,0,0.7);
-}
-
-.centre-card:before {
-  content: '';
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
-  left: 0;
-  background: inherit;
-  filter: grayscale(80%);
-  transition: var(--transition-normal);
+  box-shadow: var(--shadow-md);
+  transition: var(--transition-fast);
 }
 
 .centre-card:hover {
-  transform: translateY(-5px);
+  transform: translateY(-8px) scale(1.02);
   box-shadow: var(--shadow-lg);
-  background-size: 110%;
 }
 
-.centre-card:hover:before {
-  filter: grayscale(0%);
-}
-
-.card-img-overlay {
-  transition: var(--transition-normal);
-  background: linear-gradient(0deg, rgba(var(--primary-dark), 0.7) 0%, rgba(var(--primary-medium), 0.4) 100%);
+/* Overlay for better text readability */
+.centre-card::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(180deg, rgba(1, 50, 32, 0.7) 0%, rgba(0, 105, 62, 0.4) 100%);
+  transition: var(--transition-fast);
   z-index: 1;
 }
 
-.card-footer {
-  background: transparent;
-  border-top: none;
+.centre-card:hover::before {
+  background: linear-gradient(180deg, rgba(1, 50, 32, 0.6) 0%, rgba(0, 105, 62, 0.3) 100%);
+}
+
+/* Card Content */
+.card-img-overlay {
   position: relative;
   z-index: 2;
+  padding: 1.5rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
 }
 
 .card-body {
-  transition: var(--transition-normal);
-  position: relative;
-  z-index: 2;
+  flex-grow: 1;
 }
 
-.centre-card:hover .card-body {
-  transform: translateY(-10px);
+.card-title {
+  font-size: 1.6rem;
+  font-weight: 700;
+  color: var(--text-light);
+  text-shadow: 1px 1px 3px rgba(0, 0, 0, 0.4);
+  margin-bottom: 1rem;
+  transition: var(--transition-fast);
 }
 
-.centre-card {
-  cursor: pointer;
+.centre-card:hover .card-title {
+  text-shadow: 2px 2px 5px rgba(0, 0, 0, 0.6);
 }
 
+.card-body p {
+  font-size: 0.95rem;
+  color: var(--text-light);
+  margin-bottom: 0.75rem;
+  display: flex;
+  align-items: center;
+  opacity: 0.9;
+}
+
+.card-body p i {
+  margin-right: 0.5rem;
+  font-size: 1.1rem;
+  color: var(--text-light);
+}
+
+/* Card Footer */
+/* Card Footer */
+.card-footer {
+  background-color: transparent !important; /* Force transparent background */
+  border: none;
+  padding: 0.5rem 0;
+  text-align: center;
+  margin-top: auto;
+}
+/* Button Styling */
+.btn-custom {
+  display: inline-block;
+  padding: 0.75rem 2rem;
+  background: var(--primary-light); /* Green background */
+  color: var(--text-light);
+  font-weight: 600;
+  border-radius: 8px;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  transition: var(--transition-fast);
+  box-shadow: var(--shadow-sm);
+  border: none; /* Ensure no border contributes to container effect */
+}
+
+.btn-custom:hover,
+.centre-card:hover .btn-custom {
+  background: var(--primary); /* Darker green on hover */
+  transform: translateY(-2px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Accessibility */
+.card-link {
+  text-decoration: none;
+  color: inherit;
+}
+
+.card-link:focus .centre-card {
+  outline: 3px solid var(--primary-light);
+  outline-offset: 2px;
+}
+
+/* No Centres Section */
+.no-centres h4 {
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.no-centres p {
+  font-size: 1rem;
+  color: var(--text-light);
+  opacity: 0.8;
+}
+
+/* Responsive Design */
 @media (max-width: 768px) {
-  .card {
-    min-height: 300px;
+  .centre-card {
+    min-height: 320px;
+  }
+
+  .card-title {
+    font-size: 1.4rem;
+  }
+
+  .header-container h2 {
+    font-size: 2rem;
   }
 }
 
 @media (max-width: 420px) {
-  .card {
-    min-height: 250px;
+  .centre-card {
+    min-height: 280px;
+  }
+
+  .card-title {
+    font-size: 1.2rem;
+  }
+
+  .btn-custom {
+    padding: 0.6rem 1.5rem;
+    font-size: 0.9rem;
   }
 }
 </style>

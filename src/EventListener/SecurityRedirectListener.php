@@ -120,7 +120,7 @@ class SecurityRedirectListener implements EventSubscriberInterface
             }
         }
         // Employee routes
-        elseif (strpos($path, '/tache') === 0 || strpos($path, '/plannificationtache') === 0) {
+        elseif (strpos($path, '/employee') === 0 || strpos($path, '/tache') === 0 || strpos($path, '/plannificationtache') === 0) {
             if (!$this->security->isGranted('ROLE_EMPLOYEE') && !$this->security->isGranted('ROLE_ADMIN')) {
                 throw new AccessDeniedException('Access denied. Employee role required.');
             }
@@ -144,7 +144,7 @@ class SecurityRedirectListener implements EventSubscriberInterface
         if ($this->security->isGranted('ROLE_ADMIN')) {
             return 'back_dashboard';
         } elseif ($this->security->isGranted('ROLE_EMPLOYEE')) {
-            return 'app_tache_index';
+            return 'employee_dashboard';
         } elseif ($this->security->isGranted('ROLE_CITOYEN')) {
             return 'front_home';
         }

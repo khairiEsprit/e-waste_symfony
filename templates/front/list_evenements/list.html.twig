@@ -414,7 +414,7 @@
                                             <i class="fas fa-eye"></i> Détails
                                         </a>
                                         <a href="{{ path('app_participation_new', {'event_id': 'EVENT_ID'}) }}".replace('EVENT_ID', event.id) class="card-btn btn-register">
-                                            <i class="fas fa-calendar-check"></i> S'inscrire
+                                            <i class="fas fa-calendar-check"></i> Register
                                         </a>
                                     </div>
                                 </div>
@@ -426,11 +426,11 @@
                         <div class="col-12">
                             <div class="no-results">
                                 <i class="fas fa-calendar-times"></i>
-                                <h4>Aucun événement trouvé</h4>
+                                <h4>No events found</h4>
                                 ${data.searchTerm
-                                    ? `<p>Nous n'avons trouvé aucun résultat pour "${data.searchTerm}"</p>
-                                       <a href="{{ path('app_front_event_list') }}" class="reset-search">Réinitialiser la recherche</a>`
-                                    : `<p>Aucun événement programmé pour le moment</p>`
+                                    ? `<p>We found no results for "${data.searchTerm}"</p>
+                                       <a href="{{ path('app_front_event_list') }}" class="reset-search">Reset search</a>`
+                                    : `<p>No events scheduled at the moment</p>`
                                 }
                             </div>
                         </div>`;
@@ -447,14 +447,14 @@
     <div class="full-page-bg"></div>
     <div class="content-wrapper">
         <div class="container py-5">
-            <h1 class="mb-4 text-white text-center">Nos Événements</h1>
+            <h1 class="mb-4 text-white text-center">Our Events</h1>
 
             <!-- Search Bar -->
             <form method="get" action="{{ path('app_front_event_list') }}" class="search-container">
                 <input type="text"
                        name="q"
                        class="search-input"
-                       placeholder="Rechercher un événement par nom ou description..."
+                       placeholder="Search for an event by name or description..."
                        value="{{ searchTerm }}"
                        autocomplete="off">
                 <button type="submit" class="search-btn">

@@ -1,0 +1,241 @@
+/* Detail Pages Unified Styling
+   Consistent styling for all detail pages in the front-end
+*/
+
+/* Breadcrumbs styling */
+.detail-breadcrumb {
+  margin-top: 1.5rem;
+  margin-bottom: 1.5rem;
+}
+
+.breadcrumb {
+  background-color: rgba(255, 255, 255, 0.1);
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius-pill);
+  display: inline-flex;
+  margin-bottom: 0;
+}
+
+.breadcrumb-item {
+  color: rgba(255, 255, 255, 0.8);
+  font-weight: 500;
+}
+
+.breadcrumb-item a {
+  color: rgba(255, 255, 255, 0.8);
+  text-decoration: none;
+  transition: var(--transition-fast);
+}
+
+.breadcrumb-item a:hover {
+  color: white;
+  text-decoration: none;
+}
+
+.breadcrumb-item.active {
+  color: white;
+  font-weight: 600;
+}
+
+.breadcrumb-item + .breadcrumb-item::before {
+  color: rgba(255, 255, 255, 0.5);
+}
+
+/* Detail card styling */
+.detail-card {
+  background-color: white;
+  border-radius: var(--radius-lg);
+  overflow: hidden;
+  box-shadow: var(--shadow-md);
+  margin-bottom: 2rem;
+  transition: var(--transition-normal);
+  color: var(--text-dark);
+}
+
+.detail-card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-5px);
+}
+
+.detail-header {
+  background: linear-gradient(
+    145deg,
+    var(--primary-medium),
+    var(--primary-dark)
+  );
+  color: white;
+  padding: 1.5rem;
+  position: relative;
+}
+
+.detail-header h2 {
+  margin-bottom: 0.5rem;
+  font-weight: 700;
+  color: white;
+  text-shadow: 0 2px 4px rgba(0, 0, 0, 0.2);
+}
+
+.detail-header p {
+  margin-bottom: 0;
+  opacity: 0.9;
+}
+
+.detail-body {
+  padding: 1.5rem;
+  color: var(--text-dark);
+}
+
+.detail-body h4,
+.detail-body h5,
+.detail-body h6 {
+  color: var(--primary-dark);
+  font-weight: 600;
+}
+
+.detail-body p {
+  color: var(--text-dark);
+  text-shadow: none;
+}
+
+.detail-footer {
+  background-color: var(--background-off-white);
+  padding: 1rem 1.5rem;
+  border-top: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+/* Info boxes */
+.info-box {
+  background-color: white;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition-normal);
+  border-left: 4px solid var(--primary-medium);
+}
+
+.info-box:hover {
+  transform: translateY(-5px);
+  box-shadow: var(--shadow-md);
+}
+
+.info-box-icon {
+  font-size: 2rem;
+  color: var(--primary-medium);
+  margin-bottom: 1rem;
+}
+
+.info-box h4 {
+  color: var(--primary-dark);
+  font-weight: 600;
+  margin-bottom: 0.5rem;
+}
+
+.info-box p {
+  color: var(--text-medium);
+  margin-bottom: 0;
+}
+
+/* Map container */
+.map-container {
+  border-radius: var(--radius-md);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  margin-bottom: 1.5rem;
+}
+
+.map-container iframe {
+  display: block;
+  border: none;
+}
+
+/* Sidebar */
+.sidebar-widget {
+  background-color: white;
+  border-radius: var(--radius-md);
+  padding: 1.5rem;
+  margin-bottom: 1.5rem;
+  box-shadow: var(--shadow-sm);
+}
+
+.sidebar-widget h4 {
+  color: var(--primary-dark);
+  font-weight: 600;
+  margin-bottom: 1rem;
+  padding-bottom: 0.5rem;
+  border-bottom: 2px solid var(--primary-light);
+}
+
+/* Opening hours */
+.opening-hours {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+}
+
+.opening-hours li {
+  display: flex;
+  justify-content: space-between;
+  padding: 0.5rem 0;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+}
+
+.opening-hours li:last-child {
+  border-bottom: none;
+}
+
+.opening-hours span {
+  font-weight: 600;
+  color: var(--primary-medium);
+}
+
+/* Contact form */
+.contact-form .form-control {
+  border-radius: var(--radius-md);
+  padding: 0.75rem 1rem;
+  margin-bottom: 1rem;
+  border: 1px solid rgba(0, 0, 0, 0.1);
+  transition: var(--transition-fast);
+}
+
+.contact-form .form-control:focus {
+  border-color: var(--primary-light);
+  box-shadow: 0 0 0 0.2rem rgba(0, 105, 62, 0.25);
+}
+
+.contact-form .btn {
+  background: linear-gradient(
+    145deg,
+    var(--primary-medium),
+    var(--primary-dark)
+  );
+  border: none;
+  border-radius: var(--radius-pill);
+  padding: 0.75rem 1.5rem;
+  font-weight: 600;
+  transition: var(--transition-normal);
+}
+
+.contact-form .btn:hover {
+  transform: translateY(-3px);
+  box-shadow: var(--shadow-md);
+}
+
+/* Responsive adjustments */
+@media (max-width: 768px) {
+  .detail-header {
+    padding: 1.25rem;
+  }
+
+  .detail-body {
+    padding: 1.25rem;
+  }
+
+  .info-box {
+    padding: 1.25rem;
+  }
+
+  .sidebar-widget {
+    padding: 1.25rem;
+  }
+}

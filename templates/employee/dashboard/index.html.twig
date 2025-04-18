@@ -1,0 +1,74 @@
+{% extends 'employee/base.html.twig' %}
+
+{% block title %}E-Waste Employee Dashboard{% endblock %}
+
+{% block content %}
+    <div class="user-welcome">
+        <h1>Welcome, {{ app.user.userIdentifier }}</h1>
+        <p>Access your tasks and schedules from this dashboard.</p>
+    </div>
+
+    <div class="row">
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <i class="bi bi-list-task dashboard-icon"></i>
+                    <h2 class="dashboard-title">Task Management</h2>
+                    <p class="dashboard-description">
+                        View and manage your assigned tasks. Track their progress and update their status.
+                    </p>
+                    <a href="{{ path('app_tache_index') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-right-circle"></i> Access Tasks
+                    </a>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-md-6 mb-4">
+            <div class="card dashboard-card">
+                <div class="card-body">
+                    <i class="bi bi-calendar-check dashboard-icon"></i>
+                    <h2 class="dashboard-title">Task Scheduling</h2>
+                    <p class="dashboard-description">
+                        View the schedule of planned tasks and manage priorities and deadlines.
+                    </p>
+                    <a href="{{ path('app_plannificationtache_index') }}" class="btn btn-primary btn-lg">
+                        <i class="bi bi-arrow-right-circle"></i> Access Scheduling
+                    </a>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <div class="row mt-4">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header">
+                    <h5 class="mb-0">Quick Statistics</h5>
+                </div>
+                <div class="card-body">
+                    <div class="row text-center">
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="p-3 border rounded">
+                                <h3 class="text-primary">{{ random(5, 15) }}</h3>
+                                <p class="mb-0 text-muted">Tasks in progress</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4 mb-3 mb-md-0">
+                            <div class="p-3 border rounded">
+                                <h3 class="text-success">{{ random(10, 30) }}</h3>
+                                <p class="mb-0 text-muted">Completed tasks</p>
+                            </div>
+                        </div>
+                        <div class="col-md-4">
+                            <div class="p-3 border rounded">
+                                <h3 class="text-warning">{{ random(1, 5) }}</h3>
+                                <p class="mb-0 text-muted">Upcoming tasks</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+{% endblock %}

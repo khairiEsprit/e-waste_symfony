@@ -17,32 +17,52 @@ class CentreRepository extends ServiceEntityRepository
     }
 
     public function findOneById(int $id): ?Centre
-{
-    return $this->findOneBy(['id' => $id]);
-}
+    {
+        return $this->findOneBy(['id' => $id]);
+    }
 
-//    /**
-//     * @return Centre[] Returns an array of Centre objects
-//     */
-//    public function findByExampleField($value): array
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->orderBy('c.id', 'ASC')
-//            ->setMaxResults(10)
-//            ->getQuery()
-//            ->getResult()
-//        ;
-//    }
+    /**
+     * Search centres by term
+     *
+     * @param string $term The search term
+     * @return Centre[] Returns an array of Centre objects
+     */
+    public function searchByTerm(string $term): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.nom LIKE :term')
+            ->orWhere('c.email LIKE :term')
+            ->orWhere('c.telephone LIKE :term')
+            ->orWhere('c.id = :exactId')
+            ->setParameter('term', '%' . $term . '%')
+            ->setParameter('exactId', is_numeric($term) ? $term : -1)
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 
-//    public function findOneBySomeField($value): ?Centre
-//    {
-//        return $this->createQueryBuilder('c')
-//            ->andWhere('c.exampleField = :val')
-//            ->setParameter('val', $value)
-//            ->getQuery()
-//            ->getOneOrNullResult()
-//        ;
-//    }
+    /**
+     * Filter centres by location range
+     *
+     * @param float $minLongitude Minimum longitude
+     * @param float $maxLongitude Maximum longitude
+     * @param float $minLatitude Minimum latitude
+     * @param float $maxLatitude Maximum latitude
+     * @return Centre[] Returns an array of Centre objects
+     */
+    public function filterByLocation(float $minLongitude, float $maxLongitude, float $minLatitude, float $maxLatitude): array
+    {
+        return $this->createQueryBuilder('c')
+            ->where('c.longitude BETWEEN :minLong AND :maxLong')
+            ->andWhere('c.altitude BETWEEN :minLat AND :maxLat')
+            ->setParameter('minLong', $minLongitude)
+            ->setParameter('maxLong', $maxLongitude)
+            ->setParameter('minLat', $minLatitude)
+            ->setParameter('maxLat', $maxLatitude)
+            ->orderBy('c.nom', 'ASC')
+            ->getQuery()
+            ->getResult()
+        ;
+    }
 }

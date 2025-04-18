@@ -13,7 +13,7 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
     private const ROLE_REDIRECTS = [
         'ROLE_ADMIN' => 'back_dashboard',
         'ROLE_CITOYEN' => 'front_home',
-        'ROLE_EMPLOYEE' => 'app_tache_index',
+        'ROLE_EMPLOYEE' => 'employee_dashboard',
     ];
 
     private const DEFAULT_REDIRECT = 'front_home';
@@ -54,7 +54,7 @@ class AuthenticationSuccessHandler implements AuthenticationSuccessHandlerInterf
         }
 
         if (in_array('ROLE_EMPLOYEE', $roles, true)) {
-            error_log('AuthenticationSuccessHandler: User has ROLE_EMPLOYEE, redirecting to app_tache_index');
+            error_log('AuthenticationSuccessHandler: User has ROLE_EMPLOYEE, redirecting to employee_dashboard');
             return new RedirectResponse($this->router->generate(self::ROLE_REDIRECTS['ROLE_EMPLOYEE']));
         }
 

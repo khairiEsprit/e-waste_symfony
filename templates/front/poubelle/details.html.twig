@@ -1,0 +1,166 @@
+{% extends 'front/detail_base.html.twig' %}
+
+{% block title %}Poubelle #{{ poubelle.id }} | ASD{% endblock %}
+
+{% set parent_route = 'app_poubelles' %}
+{% set parent_label = 'Poubelles' %}
+{% set current_item = 'Poubelle #' ~ poubelle.id %}
+
+{% block detail_content %}
+    <div class="row" data-aos="fade-up">
+        <div class="col-lg-8">
+            <div class="detail-card">
+                <div class="detail-header">
+                    <h2>Poubelle #{{ poubelle.id }}</h2>
+                    <p><i class="bi bi-geo-alt-fill"></i> {{ poubelle.adresse }}</p>
+                </div>
+
+                <div class="detail-body text-dark">
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <div class="info-box-icon">
+                                    <i class="bi bi-building"></i>
+                                </div>
+                                <h4>Centre</h4>
+                                <p class="text-dark">{{ poubelle.centre ? poubelle.centre.nom : 'Non assigné' }}</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <div class="info-box-icon">
+                                    <i class="bi bi-calendar-check"></i>
+                                </div>
+                                <h4>Date d'installation</h4>
+                                <p class="text-dark">{{ poubelle.dateInstallation|date('d/m/Y') }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <div class="info-box-icon">
+                                    <i class="bi bi-rulers"></i>
+                                </div>
+                                <h4>Hauteur totale</h4>
+                                <p class="text-dark">{{ poubelle.hauteurTotale }} cm</p>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="info-box">
+                                <div class="info-box-icon">
+                                    <i class="bi bi-check-circle{% if poubelle.etat != 'Fonctionnel' %}-fill{% endif %}"></i>
+                                </div>
+                                <h4>État</h4>
+                                <p class="text-dark">{{ poubelle.etat }}</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="fill-level-container mb-4">
+                        <h4 class="mb-3 text-dark">Niveau de remplissage</h4>
+                        <div class="progress" style="height: 30px; border-radius: 15px; background-color: rgba(0, 0, 0, 0.05);">
+                            <div class="progress-bar
+                                {% if poubelle.niveau > 80 %}bg-danger
+                                {% elseif poubelle.niveau > 50 %}bg-warning
+                                {% else %}bg-success{% endif %}"
+                                role="progressbar"
+                                style="width: {{ poubelle.niveau }}%; border-radius: 15px;"
+                                aria-valuenow="{{ poubelle.niveau }}"
+                                aria-valuemin="0"
+                                aria-valuemax="100">
+                                <span style="font-weight: bold; font-size: 1rem;">{{ poubelle.niveau }}%</span>
+                            </div>
+                        </div>
+                    </div>
+
+                    {% if poubelle.capteur %}
+                    <div class="sensor-data mb-4">
+                        <h4 class="mb-3 text-dark">Données du capteur</h4>
+                        <div class="row">
+                            <div class="col-md-4">
+                                <div class="info-box">
+                                    <h5>Distance mesurée</h5>
+                                    <p class="text-dark">{{ poubelle.capteur.distanceMesuree }} cm</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-box">
+                                    <h5>Portée maximale</h5>
+                                    <p class="text-dark">{{ poubelle.capteur.porteeMaximale }} cm</p>
+                                </div>
+                            </div>
+                            <div class="col-md-4">
+                                <div class="info-box">
+                                    <h5>Date de mesure</h5>
+                                    <p class="text-dark">{{ poubelle.capteur.dateMesure|date('d/m/Y H:i') }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    {% endif %}
+
+                    <div class="map-container">
+                        <iframe
+                            width="100%"
+                            height="400"
+                            src="https://maps.google.com/maps?q={{ poubelle.latitude|default(36.8) }},{{ poubelle.longitude|default(10.2) }}&hl=es&z=14&amp;output=embed">
+                        </iframe>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="col-lg-4">
+            <div class="sidebar-widget">
+                <h4>Historique récent</h4>
+                {% if poubelle.historiques is defined and poubelle.historiques|length > 0 %}
+                    <ul class="list-group">
+                        {% for historique in poubelle.historiques|slice(0, 5) %}
+                            <li class="list-group-item d-flex justify-content-between align-items-center">
+                                <div>
+                                    <span class="badge
+                                        {% if historique.typeEvenement == 'Collecte' %}bg-success
+                                        {% elseif historique.typeEvenement == 'Maintenance' %}bg-warning
+                                        {% elseif historique.typeEvenement == 'Panne' %}bg-danger
+                                        {% else %}bg-info{% endif %} me-2">
+                                        {{ historique.typeEvenement }}
+                                    </span>
+                                    {{ historique.description|slice(0, 30) }}{% if historique.description|length > 30 %}...{% endif %}
+                                </div>
+                                <small class="text-muted">{{ historique.dateEvenement|date('d/m/Y') }}</small>
+                            </li>
+                        {% endfor %}
+                    </ul>
+                {% else %}
+                    <p class="text-muted">Aucun historique disponible</p>
+                {% endif %}
+            </div>
+
+            <div class="sidebar-widget">
+                <h4>Signaler un problème</h4>
+                <form class="contact-form">
+                    <div class="form-group">
+                        <input type="text" class="form-control" placeholder="Votre nom">
+                    </div>
+                    <div class="form-group">
+                        <input type="email" class="form-control" placeholder="Votre email">
+                    </div>
+                    <div class="form-group">
+                        <select class="form-control">
+                            <option value="">Type de problème</option>
+                            <option value="full">Poubelle pleine</option>
+                            <option value="damaged">Poubelle endommagée</option>
+                            <option value="other">Autre problème</option>
+                        </select>
+                    </div>
+                    <div class="form-group">
+                        <textarea class="form-control" rows="3" placeholder="Description du problème"></textarea>
+                    </div>
+                    <button type="submit" class="btn btn-primary w-100">Envoyer</button>
+                </form>
+            </div>
+        </div>
+    </div>
+{% endblock %}

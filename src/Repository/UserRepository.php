@@ -93,10 +93,10 @@ class UserRepository extends ServiceEntityRepository
             ->orderBy('u.id', 'ASC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
-    
+
         return $qb->getQuery()->getResult();
     }
-    
+
     public function searchByNamePaginated(string $term, int $page, int $limit): array
     {
         $qb = $this->createQueryBuilder('u')
@@ -106,7 +106,7 @@ class UserRepository extends ServiceEntityRepository
             ->orderBy('u.id', 'ASC')
             ->setFirstResult(($page - 1) * $limit)
             ->setMaxResults($limit);
-    
+
         return $qb->getQuery()->getResult();
     }
 
@@ -127,5 +127,21 @@ class UserRepository extends ServiceEntityRepository
             ->setParameter('term', '%' . $term . '%')
             ->getQuery()
             ->getSingleScalarResult();
+    }
+
+    /**
+     * Find users by role
+     *
+     * @param string $role The role to search for
+     * @return User[] Returns an array of User objects
+     */
+    public function findByRole(string $role): array
+    {
+        return $this->createQueryBuilder('u')
+            ->where('u.roles LIKE :role')
+            ->setParameter('role', '%"' . $role . '%')
+            ->orderBy('u.id', 'ASC')
+            ->getQuery()
+            ->getResult();
     }
 }
