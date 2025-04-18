@@ -145,7 +145,6 @@ def detect_face_endpoint():
     except Exception as e:
         logger.error(f"Error in detect-face endpoint: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
-
 @app.route('/extract-embedding', methods=['POST'])
 def extract_embedding_endpoint():
     """Endpoint to extract face embeddings from an image"""
@@ -162,15 +161,17 @@ def extract_embedding_endpoint():
         # Extract embeddings
         result = extract_embeddings(img)
         
-        # Convert numpy array to list for JSON serialization
+        # Convert numpy array to list for JSON serialization, if necessary
         if result["success"] and "embedding" in result:
-            result["embedding"] = result["embedding"].tolist()
+            if isinstance(result["embedding"], np.ndarray):
+                result["embedding"] = result["embedding"].tolist()
+            # If it's already a list, no conversion is needed
         
         return jsonify(result)
     except Exception as e:
         logger.error(f"Error in extract-embedding endpoint: {str(e)}")
         return jsonify({"success": False, "message": str(e)}), 500
-
+    
 @app.route('/compare-embeddings', methods=['POST'])
 def compare_embeddings_endpoint():
     """Endpoint to compare two face embeddings"""

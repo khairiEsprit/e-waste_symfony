@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\AbstractController;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Annotation\Route;
+use Symfony\Component\Routing\Attribute\Route;
 use Symfony\Component\Security\Core\Security;
 use Symfony\Component\Security\Http\Authentication\AuthenticationUtils;
 
@@ -29,9 +29,7 @@ class FaceRecognitionController extends AbstractController
         $this->security = $security;
     }
 
-    /**
-     * @Route("/profile/face-recognition", name="profile_face_recognition")
-     */
+    #[Route('/profile/face-recognition', name: 'profile_face_recognition')]
     public function faceRecognitionSetup(): Response
     {
         /** @var User $user */
@@ -49,9 +47,7 @@ class FaceRecognitionController extends AbstractController
         ]);
     }
 
-    /**
-     * @Route("/profile/face-recognition/setup", name="profile_face_recognition_setup", methods={"POST"})
-     */
+    #[Route('/profile/face-recognition/setup', name: 'profile_face_recognition_setup', methods: ['POST'])]
     public function setupFaceRecognition(Request $request): JsonResponse
     {
         /** @var User $user */
@@ -74,9 +70,7 @@ class FaceRecognitionController extends AbstractController
         return $this->json($result);
     }
 
-    /**
-     * @Route("/profile/face-recognition/disable", name="profile_face_recognition_disable", methods={"POST"})
-     */
+    #[Route('/profile/face-recognition/disable', name: 'profile_face_recognition_disable', methods: ['POST'])]
     public function disableFaceRecognition(): JsonResponse
     {
         /** @var User $user */
@@ -95,9 +89,7 @@ class FaceRecognitionController extends AbstractController
         return $this->json(['success' => true, 'message' => 'Face recognition has been disabled']);
     }
 
-    /**
-     * @Route("/login/face", name="login_face", methods={"POST"})
-     */
+    #[Route('/login/face', name: 'login_face', methods: ['POST'])]
     public function loginWithFace(Request $request): JsonResponse
     {
         // This route is handled by the FaceRecognitionAuthenticator
@@ -105,9 +97,7 @@ class FaceRecognitionController extends AbstractController
         return $this->json(['success' => false, 'message' => 'This route is handled by the authenticator']);
     }
 
-    /**
-     * @Route("/login/face-check", name="login_face_check", methods={"POST"})
-     */
+    #[Route('/login/face-check', name: 'login_face_check', methods: ['POST'])]
     public function checkFace(Request $request): JsonResponse
     {
         // Get the base64 image from the request

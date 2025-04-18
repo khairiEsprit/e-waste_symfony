@@ -9,24 +9,24 @@
 
     <form action="{{ path('security_login') }}" method="post" class="login__form" novalidate>
         <h1 class="login__title">{{ 'security.login_title'|trans }}</h1>
-        
+
         {% if error %}
         <div class="login__alert">
             <i class="ri-error-warning-line login__alert-icon"></i>
             <div class="login__alert-text">{{ error.messageKey|trans(error.messageData, 'security') }}</div>
         </div>
         {% endif %}
-        
+
         <div class="login__content">
             <div class="login__box">
                 <i class="ri-user-3-line login__icon"></i>
                 <div class="login__box-input">
-                    <input name="_username" 
-                           value="{{ last_username }}" 
-                           type="email" 
-                           required 
-                           class="login__input" 
-                           id="login-email" 
+                    <input name="_username"
+                           value="{{ last_username }}"
+                           type="email"
+                           required
+                           class="login__input"
+                           id="login-email"
                            placeholder=" "
                            oninvalid="this.setCustomValidity('')"
                            oninput="validateEmail(this)">
@@ -38,11 +38,11 @@
             <div class="login__box">
                 <i class="ri-lock-2-line login__icon"></i>
                 <div class="login__box-input">
-                    <input name="_password" 
-                           type="password" 
-                           required 
-                           class="login__input" 
-                           id="login-pass" 
+                    <input name="_password"
+                           type="password"
+                           required
+                           class="login__input"
+                           id="login-pass"
                            placeholder=" "
                            oninvalid="this.setCustomValidity('')"
                            oninput="validatePassword(this)">
@@ -65,6 +65,12 @@
         <input type="hidden" name="_csrf_token" value="{{ csrf_token('authenticate') }}"/>
 
         <button type="submit" class="login__button">{{ 'security.login_btn'|trans }}</button>
+
+        {# Face Recognition Login Button #}
+        <a href="#" id="face-recognition-btn" class="login__button login__button--face">
+            <i class="ri-face-recognition-line login__icon--social"></i>
+            <span>Login with Face Recognition</span>
+        </a>
 
         {# Refactored Google Login Button #}
      <div class="login__social">
@@ -208,7 +214,7 @@
         border-radius: 4px;
         transition: background-color 0.3s;
     }
-    
+
     .login__input:focus {
         background: rgba(255, 255, 255, 0.15);
     }
@@ -231,7 +237,7 @@
     }
 
     .login__input.has-error {
-  background-color: transparent;      
+  background-color: transparent;
     }
 
     .login__social {
@@ -245,7 +251,7 @@
         margin-bottom: 0.5rem;
     }
 
-    .login__button--social {
+    .login__button--social, .login__button--face {
         background-color: white;
         color: black;
         border: none;
@@ -257,6 +263,12 @@
         border-radius: 0.5rem;
         font-weight: var(--font-medium);
         margin-bottom: 0.5rem;
+        text-decoration: none;
+    }
+
+    .login__button--face {
+        background-color: #4CAF50;
+        color: white;
     }
 
     .login__register {
@@ -277,7 +289,7 @@
         function closeModal() {
             document.getElementById('errorModal').style.display = 'none';
         }
-    
+
         // Add error class to inputs when there's an error
         document.addEventListener('DOMContentLoaded', function() {
             const error = document.querySelector('.login__error');
@@ -292,7 +304,7 @@
            function validateEmail(input) {
         const errorDiv = document.getElementById('email-error');
         const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
-        
+
         if (input.value.trim() === '') {
             errorDiv.textContent = 'Email is required';
             input.classList.add('has-error');
@@ -310,7 +322,7 @@
 
     function validatePassword(input) {
         const errorDiv = document.getElementById('password-error');
-        
+
         if (input.value.trim() === '') {
             errorDiv.textContent = 'Password is required';
             input.classList.add('has-error');
@@ -325,14 +337,350 @@
     document.querySelector('.login__form').addEventListener('submit', function(e) {
         const emailInput = document.getElementById('login-email');
         const passwordInput = document.getElementById('login-pass');
-        
+
         const isEmailValid = validateEmail(emailInput);
         const isPasswordValid = validatePassword(passwordInput);
-        
+
         if (!isEmailValid || !isPasswordValid) {
             e.preventDefault();
         }
     });
+
+    // Face Recognition Modal
+    document.getElementById('face-recognition-btn').addEventListener('click', function(e) {
+        e.preventDefault();
+        showFaceRecognitionModal();
+    });
+
+    function showFaceRecognitionModal() {
+        // Create modal container
+        const modalOverlay = document.createElement('div');
+        modalOverlay.className = 'modal-overlay';
+        modalOverlay.id = 'faceRecognitionModal';
+
+        // Create modal content
+        const modalContent = document.createElement('div');
+        modalContent.className = 'modal-content face-recognition-modal';
+
+        // Add modal header
+        const modalHeader = document.createElement('div');
+        modalHeader.className = 'modal-header';
+        modalHeader.innerHTML = `
+            <h2>Face Recognition Login</h2>
+            <button class="close-btn" onclick="closeFaceModal()">×</button>
+        `;
+
+        // Add webcam container
+        const webcamContainer = document.createElement('div');
+        webcamContainer.className = 'webcam-container';
+        webcamContainer.innerHTML = `
+            <video id="login-webcam" class="webcam-video" autoplay playsinline></video>
+            <div class="webcam-overlay"></div>
+            <div class="webcam-guide"></div>
+            <div class="webcam-status">Initializing camera...</div>
+        `;
+
+        // Add buttons
+        const buttonContainer = document.createElement('div');
+        buttonContainer.className = 'button-container';
+        buttonContainer.innerHTML = `
+            <button id="login-btn-capture" class="btn-capture" disabled>
+                <i class="ri-camera-line"></i> Capture Photo
+            </button>
+            <p class="or-text">Or</p>
+            <label for="login-file-upload" class="btn-upload">
+                <i class="ri-upload-line"></i> Upload Photo
+            </label>
+            <input id="login-file-upload" type="file" accept="image/*" style="display: none;">
+        `;
+
+        // Add alert container
+        const alertContainer = document.createElement('div');
+        alertContainer.id = 'face-login-alert-container';
+        alertContainer.className = 'alert-container';
+
+        // Assemble modal
+        modalContent.appendChild(modalHeader);
+        modalContent.appendChild(alertContainer);
+        modalContent.appendChild(webcamContainer);
+        modalContent.appendChild(buttonContainer);
+        modalOverlay.appendChild(modalContent);
+
+        // Add to document
+        document.body.appendChild(modalOverlay);
+
+        // Initialize webcam
+        initFaceLoginWebcam();
+
+        // Setup event listeners
+        setupFaceLoginEvents();
+    }
+
+    function closeFaceModal() {
+        const modal = document.getElementById('faceRecognitionModal');
+        if (modal) {
+            // Stop webcam if it's running
+            const video = document.getElementById('login-webcam');
+            if (video && video.srcObject) {
+                const tracks = video.srcObject.getTracks();
+                tracks.forEach(track => track.stop());
+            }
+
+            // Remove modal
+            document.body.removeChild(modal);
+        }
+    }
+
+    function initFaceLoginWebcam() {
+        const webcamElement = document.getElementById('login-webcam');
+        const webcamStatus = document.querySelector('.webcam-status');
+        const captureBtn = document.getElementById('login-btn-capture');
+
+        if (navigator.mediaDevices && navigator.mediaDevices.getUserMedia) {
+            navigator.mediaDevices.getUserMedia({ video: { facingMode: 'user' } })
+                .then(function(stream) {
+                    webcamElement.srcObject = stream;
+                    webcamStatus.textContent = 'Camera ready. Position your face within the guide.';
+                    captureBtn.disabled = false;
+                })
+                .catch(function(error) {
+                    webcamStatus.textContent = 'Camera access denied or not available.';
+                    showFaceLoginAlert('warning', 'Camera access denied or not available. You can still upload a photo.');
+                    console.error('Error accessing webcam:', error);
+                });
+        } else {
+            webcamStatus.textContent = 'Your browser does not support webcam access.';
+            showFaceLoginAlert('warning', 'Your browser does not support webcam access. Please use a modern browser or upload a photo.');
+        }
+    }
+
+    function setupFaceLoginEvents() {
+        const captureBtn = document.getElementById('login-btn-capture');
+        const fileUpload = document.getElementById('login-file-upload');
+
+        // Capture button
+        captureBtn.addEventListener('click', function() {
+            const webcamElement = document.getElementById('login-webcam');
+            const canvas = document.createElement('canvas');
+            canvas.width = webcamElement.videoWidth;
+            canvas.height = webcamElement.videoHeight;
+
+            const context = canvas.getContext('2d');
+            context.drawImage(webcamElement, 0, 0, canvas.width, canvas.height);
+
+            const capturedImage = canvas.toDataURL('image/jpeg');
+            authenticateWithFace(capturedImage);
+        });
+
+        // File upload
+        fileUpload.addEventListener('change', function(e) {
+            if (e.target.files && e.target.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(event) {
+                    authenticateWithFace(event.target.result);
+                };
+                reader.readAsDataURL(e.target.files[0]);
+            }
+        });
+    }
+
+    function showFaceLoginAlert(type, message) {
+        const alertContainer = document.getElementById('face-login-alert-container');
+        alertContainer.innerHTML = `
+            <div class="alert alert-${type}">
+                <i class="ri-${type === 'success' ? 'checkbox-circle' : 'error-warning'}-line"></i>
+                <span>${message}</span>
+            </div>
+        `;
+    }
+
+    function authenticateWithFace(base64Image) {
+        showFaceLoginAlert('info', 'Processing your face... Please wait.');
+
+        // Disable buttons during processing
+        document.getElementById('login-btn-capture').disabled = true;
+        document.getElementById('login-file-upload').disabled = true;
+
+        // Send the image to the server for authentication
+        fetch('/login/face', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-Requested-With': 'XMLHttpRequest'
+            },
+            body: JSON.stringify({ face_image: base64Image })
+        })
+        .then(response => response.json())
+        .then(data => {
+            if (data.success) {
+                showFaceLoginAlert('success', 'Authentication successful! Redirecting...');
+                setTimeout(() => {
+                    window.location.href = data.redirect || '/';
+                }, 1500);
+            } else {
+                showFaceLoginAlert('error', data.message || 'Authentication failed. Please try again.');
+                // Re-enable buttons
+                document.getElementById('login-btn-capture').disabled = false;
+                document.getElementById('login-file-upload').disabled = false;
+            }
+        })
+        .catch(error => {
+            console.error('Error during face authentication:', error);
+            showFaceLoginAlert('error', 'An error occurred during authentication. Please try again.');
+            // Re-enable buttons
+            document.getElementById('login-btn-capture').disabled = false;
+            document.getElementById('login-file-upload').disabled = false;
+        });
+    }
     </script>
+
+<style>
+    /* Face Recognition Modal Styles */
+    .face-recognition-modal {
+        max-width: 500px;
+        padding: 0;
+        overflow: hidden;
+    }
+
+    .modal-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        padding: 15px 20px;
+        background-color: #4CAF50;
+        color: white;
+    }
+
+    .modal-header h2 {
+        margin: 0;
+        font-size: 1.5rem;
+        color: white;
+    }
+
+    .close-btn {
+        background: none;
+        border: none;
+        color: white;
+        font-size: 1.5rem;
+        cursor: pointer;
+    }
+
+    .webcam-container {
+        position: relative;
+        width: 100%;
+        height: 300px;
+        overflow: hidden;
+        background-color: #000;
+    }
+
+    .webcam-video {
+        width: 100%;
+        height: 100%;
+        object-fit: cover;
+    }
+
+    .webcam-overlay {
+        position: absolute;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background: rgba(0, 0, 0, 0.2);
+    }
+
+    .webcam-guide {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 200px;
+        height: 200px;
+        border: 2px dashed white;
+        border-radius: 50%;
+        box-shadow: 0 0 0 9999px rgba(0, 0, 0, 0.5);
+    }
+
+    .webcam-status {
+        position: absolute;
+        bottom: 10px;
+        left: 0;
+        width: 100%;
+        text-align: center;
+        color: white;
+        background-color: rgba(0, 0, 0, 0.5);
+        padding: 5px;
+    }
+
+    .button-container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 20px;
+    }
+
+    .btn-capture, .btn-upload {
+        display: inline-block;
+        padding: 10px 20px;
+        margin: 5px 0;
+        background-color: #4CAF50;
+        color: white;
+        border: none;
+        border-radius: 5px;
+        cursor: pointer;
+        font-weight: bold;
+        text-align: center;
+    }
+
+    .btn-capture:disabled {
+        background-color: #cccccc;
+        cursor: not-allowed;
+    }
+
+    .btn-upload {
+        background-color: #2196F3;
+    }
+
+    .or-text {
+        margin: 10px 0;
+        color: #666;
+    }
+
+    .alert-container {
+        padding: 10px 20px;
+    }
+
+    .alert {
+        padding: 10px;
+        border-radius: 5px;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+    }
+
+    .alert i {
+        margin-right: 10px;
+        font-size: 1.2rem;
+    }
+
+    .alert-success {
+        background-color: rgba(76, 175, 80, 0.2);
+        color: #4CAF50;
+    }
+
+    .alert-error {
+        background-color: rgba(244, 67, 54, 0.2);
+        color: #F44336;
+    }
+
+    .alert-warning {
+        background-color: rgba(255, 152, 0, 0.2);
+        color: #FF9800;
+    }
+
+    .alert-info {
+        background-color: rgba(33, 150, 243, 0.2);
+        color: #2196F3;
+    }
+</style>
 
 {% endblock %}

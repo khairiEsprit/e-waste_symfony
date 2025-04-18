@@ -41,10 +41,10 @@ class FaceRecognitionService
         $this->requestStack = $requestStack;
         $this->security = $security;
         $this->params = $params;
-        
+
         // Define the directory where face photos will be stored
         $this->facePhotosDir = $params->get('kernel.project_dir') . '/var/uploads/face_photos';
-        
+
         // Create directory if it doesn't exist
         if (!is_dir($this->facePhotosDir)) {
             mkdir($this->facePhotosDir, 0755, true);
@@ -60,7 +60,7 @@ class FaceRecognitionService
             $response = $this->httpClient->request('GET', self::FACE_API_URL . '/health', [
                 'timeout' => 3,
             ]);
-            
+
             return $response->getStatusCode() === 200;
         } catch (\Exception $e) {
             $this->logger->error('Face recognition service health check failed: ' . $e->getMessage());
@@ -80,7 +80,7 @@ class FaceRecognitionService
                 ],
                 'timeout' => 10,
             ]);
-            
+
             return $response->toArray();
         } catch (\Exception $e) {
             $this->logger->error('Face detection failed: ' . $e->getMessage());
@@ -103,7 +103,7 @@ class FaceRecognitionService
                 ],
                 'timeout' => 15,
             ]);
-            
+
             return $response->toArray();
         } catch (\Exception $e) {
             $this->logger->error('Face embedding extraction failed: ' . $e->getMessage());
@@ -127,7 +127,7 @@ class FaceRecognitionService
                 ],
                 'timeout' => 5,
             ]);
-            
+
             return $response->toArray();
         } catch (\Exception $e) {
             $this->logger->error('Face embedding comparison failed: ' . $e->getMessage());
@@ -151,7 +151,7 @@ class FaceRecognitionService
                 ],
                 'timeout' => 15,
             ]);
-            
+
             return $response->toArray();
         } catch (\Exception $e) {
             $this->logger->error('Face verification failed: ' . $e->getMessage());
@@ -172,25 +172,25 @@ class FaceRecognitionService
         if (!$detectionResult['success']) {
             return $detectionResult;
         }
-        
+
         // Extract face embeddings
         $embeddingResult = $this->extractEmbeddings($base64Image);
         if (!$embeddingResult['success']) {
             return $embeddingResult;
         }
-        
+
         // Save the embeddings to the user
         $user->setFaceEmbeddings(json_encode($embeddingResult['embedding']));
         $user->setFaceRecognitionEnabled(true);
-        
+
         // Save the face photo
         $photoPath = $this->saveFacePhoto($user, $base64Image);
         $user->setFacePhotoPath($photoPath);
-        
+
         // Persist changes
         $this->entityManager->persist($user);
         $this->entityManager->flush();
-        
+
         return [
             'success' => true,
             'message' => 'Face recognition setup successful'
@@ -204,32 +204,32 @@ class FaceRecognitionService
     {
         // Get all users with face recognition enabled
         $users = $this->entityManager->getRepository(User::class)->findBy(['isFaceRecognitionEnabled' => true]);
-        
+
         if (empty($users)) {
             return [
                 'success' => false,
                 'message' => 'No users with face recognition enabled'
             ];
         }
-        
+
         // Extract embeddings from the provided image
         $embeddingResult = $this->extractEmbeddings($base64Image);
         if (!$embeddingResult['success']) {
             return $embeddingResult;
         }
-        
+
         $bestMatch = null;
         $highestSimilarity = 0;
-        
+
         // Compare with all users' embeddings
         foreach ($users as $user) {
             $storedEmbeddings = json_decode($user->getFaceEmbeddings(), true);
             if (!$storedEmbeddings) {
                 continue;
             }
-            
+
             $comparisonResult = $this->compareEmbeddings($embeddingResult['embedding'], $storedEmbeddings);
-            
+
             if ($comparisonResult['success'] && $comparisonResult['similarity'] > $highestSimilarity) {
                 $highestSimilarity = $comparisonResult['similarity'];
                 $bestMatch = [
@@ -239,25 +239,25 @@ class FaceRecognitionService
                 ];
             }
         }
-        
+
         // Log the authentication attempt
         $request = $this->requestStack->getCurrentRequest();
         $ipAddress = $request ? $request->getClientIp() : null;
         $userAgent = $request ? $request->headers->get('User-Agent') : null;
-        
+
         $attempt = new FaceLoginAttempt();
         $attempt->setIpAddress($ipAddress);
         $attempt->setUserAgent($userAgent);
-        
+
         if ($bestMatch && $bestMatch['is_match']) {
             $user = $bestMatch['user'];
             $attempt->setUser($user);
             $attempt->setSuccess(true);
             $attempt->setConfidenceScore($bestMatch['similarity']);
-            
+
             $this->entityManager->persist($attempt);
             $this->entityManager->flush();
-            
+
             return [
                 'success' => true,
                 'user' => $user,
@@ -272,11 +272,11 @@ class FaceRecognitionService
             } else {
                 $attempt->setErrorMessage('Face recognition failed: No matching face found');
             }
-            
+
             $attempt->setSuccess(false);
             $this->entityManager->persist($attempt);
             $this->entityManager->flush();
-            
+
             return [
                 'success' => false,
                 'message' => 'Face recognition failed. Please try again or use your password.'
@@ -291,7 +291,7 @@ class FaceRecognitionService
     {
         $repository = $this->entityManager->getRepository(FaceLoginAttempt::class);
         $failedAttempts = $repository->countRecentFailedAttempts($user, self::RATE_LIMIT_WINDOW_MINUTES);
-        
+
         return $failedAttempts >= self::MAX_FAILED_ATTEMPTS;
     }
 
@@ -302,7 +302,7 @@ class FaceRecognitionService
     {
         $repository = $this->entityManager->getRepository(FaceLoginAttempt::class);
         $failedAttempts = $repository->countRecentFailedAttemptsFromIp($ipAddress, self::RATE_LIMIT_WINDOW_MINUTES);
-        
+
         return $failedAttempts >= self::MAX_FAILED_ATTEMPTS * 2; // Higher threshold for IP-based rate limiting
     }
 
@@ -313,7 +313,7 @@ class FaceRecognitionService
     {
         $user->setFaceRecognitionEnabled(false);
         $user->setFaceEmbeddings(null);
-        
+
         // Delete the face photo if it exists
         if ($user->getFacePhotoPath()) {
             $photoPath = $this->params->get('kernel.project_dir') . $user->getFacePhotoPath();
@@ -322,7 +322,7 @@ class FaceRecognitionService
             }
             $user->setFacePhotoPath(null);
         }
-        
+
         $this->entityManager->persist($user);
         $this->entityManager->flush();
     }
@@ -336,14 +336,14 @@ class FaceRecognitionService
         if (strpos($base64Image, ';base64,') !== false) {
             list(, $base64Image) = explode(';base64,', $base64Image);
         }
-        
+
         // Generate a unique filename
         $filename = 'face_' . $user->getId() . '_' . uniqid() . '.jpg';
         $filepath = $this->facePhotosDir . '/' . $filename;
-        
+
         // Save the file
         file_put_contents($filepath, base64_decode($base64Image));
-        
+
         // Return the relative path
         return '/var/uploads/face_photos/' . $filename;
     }

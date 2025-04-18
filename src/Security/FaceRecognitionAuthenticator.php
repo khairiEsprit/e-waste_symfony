@@ -59,7 +59,7 @@ class FaceRecognitionAuthenticator extends AbstractAuthenticator implements Auth
 
         // Authenticate with face recognition
         $result = $this->faceRecognitionService->authenticateWithFace($base64Image);
-        
+
         if (!$result['success']) {
             throw new CustomUserMessageAuthenticationException($result['message'] ?? 'Face recognition failed. Please try again or use email/password login.');
         }

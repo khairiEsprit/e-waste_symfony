@@ -11,7 +11,7 @@
             background-size: cover;
             position: relative;
         }
-        
+
         .profile-card {
             background: #fff;
             border-radius: 15px;
@@ -20,12 +20,12 @@
             transition: all 0.3s ease;
             margin-bottom: 30px;
         }
-        
+
         .profile-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
-        
+
         .profile-header {
             background: #013220;
             padding: 30px;
@@ -33,8 +33,8 @@
             color: #fff;
             position: relative;
         }
-        
-        .profile-img {
+
+        .profile-img, .profile-preview-img {
             width: 150px;
             height: 150px;
             border-radius: 50%;
@@ -43,28 +43,46 @@
             margin: 0 auto 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
             transition: all 0.3s ease;
+            position: relative;
+            overflow: hidden;
+            background-color: #f8f9fa;
         }
-        
-        .profile-img:hover {
+
+        .profile-img:hover, .profile-preview-img:hover {
             transform: scale(1.05);
+            border-color: #ACE1AF;
         }
-        
+
+        .profile-image-container {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(145deg, #29AB87, #013220);
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
         .profile-name {
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 5px;
         }
-        
+
         .profile-role {
             font-size: 16px;
             opacity: 0.9;
             margin-bottom: 15px;
         }
-        
+
         .profile-actions {
             margin-top: 20px;
         }
-        
+
         .profile-edit-btn {
             background: #fff;
             color: #013220;
@@ -76,20 +94,20 @@
             text-decoration: none;
             display: inline-block;
         }
-        
+
         .profile-edit-btn:hover {
             background: transparent;
             color: #fff;
         }
-        
+
         .profile-body {
             padding: 30px;
         }
-        
+
         .profile-info {
             margin-bottom: 30px;
         }
-        
+
         .info-title {
             font-size: 20px;
             font-weight: 600;
@@ -98,13 +116,13 @@
             padding-bottom: 10px;
             border-bottom: 2px solid #29AB87;
         }
-        
+
         .info-item {
             display: flex;
             margin-bottom: 15px;
             align-items: center;
         }
-        
+
         .info-icon {
             width: 40px;
             height: 40px;
@@ -117,23 +135,23 @@
             margin-right: 15px;
             flex-shrink: 0;
         }
-        
+
         .info-text {
             flex-grow: 1;
         }
-        
+
         .info-label {
             font-size: 14px;
             color: #6c757d;
             margin-bottom: 3px;
         }
-        
+
         .info-value {
             font-size: 16px;
             font-weight: 500;
             color: #212529;
         }
-        
+
         .stats-card {
             background: #f8f9fa;
             border-radius: 10px;
@@ -142,30 +160,30 @@
             margin-bottom: 20px;
             transition: all 0.3s ease;
         }
-        
+
         .stats-card:hover {
             background: #ACE1AF;
             transform: translateY(-5px);
         }
-        
+
         .stats-icon {
             font-size: 30px;
             color: #013220;
             margin-bottom: 10px;
         }
-        
+
         .stats-value {
             font-size: 24px;
             font-weight: 700;
             color: #013220;
             margin-bottom: 5px;
         }
-        
+
         .stats-label {
             font-size: 14px;
             color: #6c757d;
         }
-        
+
         .alert-success {
             background-color: #d4edda;
             color: #155724;
@@ -174,23 +192,29 @@
             margin-bottom: 20px;
             animation: fadeIn 0.5s ease-in-out;
         }
-        
+
         @keyframes fadeIn {
             from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
+
         @keyframes pulse {
-            0% { transform: scale(1); }
-            50% { transform: scale(1.05); }
-            100% { transform: scale(1); }
+            0% { transform: scale(1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
+            50% { transform: scale(1.02); box-shadow: 0 8px 20px rgba(0, 0, 0, 0.4); }
+            100% { transform: scale(1); box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
         }
-        
+
         .pulse-animation {
-            animation: pulse 2s infinite;
+            animation: pulse 3s infinite ease-in-out;
         }
-     
-      
+
+        @keyframes profilePulse {
+            0% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
+            50% { box-shadow: 0 8px 25px rgba(41, 171, 135, 0.5); }
+            100% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
+        }
+
+
     </style>
 {% endblock %}
 
@@ -202,16 +226,18 @@
                 <i class="bi bi-check-circle-fill"></i> {{ message }}
             </div>
         {% endfor %}
-        
+
         <div class="row">
             <div class="col-lg-4">
                 <div class="profile-card" data-aos="fade-right" data-aos-delay="100">
                     <div class="profile-header">
-                        {% if user.profileImage %}
-                                        <img src={{user.profileImage}} alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
-                        {% else %}
-                            <img src="{{ asset('assets/front/assets/img/default-avatar.png') }}" alt="{{ user.fullName }}" class="profile-img">
-                        {% endif %}
+                        <div class="profile-image-container profile-pulse">
+                            {% if user.profileImage %}
+                                <img src="{{user.profileImage}}" alt="{{ user.fullName }}" class="profile-img" id="profile-image-preview">
+                            {% else %}
+                                <img src="{{ asset('assets/front/assets/img/default-avatar.png') }}" alt="{{ user.fullName }}" class="profile-img">
+                            {% endif %}
+                        </div>
                         <h2 class="profile-name">{{ user.fullName }}</h2>
                         <p class="profile-role">
                           Member
@@ -289,7 +315,7 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="col-lg-8">
                 <div class="profile-card" data-aos="fade-left" data-aos-delay="200">
                     <div class="profile-body">
@@ -323,7 +349,7 @@
                                 </div>
                             </div>
                         </div>
-                        
+
                         <div class="mt-4">
                             <h3 class="info-title">Recent Activity</h3>
                             <div class="text-center py-5">
@@ -332,7 +358,7 @@
                                 <a href="#" class="btn btn-primary mt-2">Start Recycling Now</a>
                             </div>
                         </div>
-                        
+
                         <div class="mt-4">
                             <h3 class="info-title">Environmental Impact</h3>
                             <div class="row">
@@ -374,21 +400,29 @@
             once: true,
             mirror: false
         });
-        
+
         // Add hover effects
         document.addEventListener('DOMContentLoaded', function() {
-            const profileImg = document.querySelector('.profile-img');
-            
-            if (profileImg) {
-                profileImg.addEventListener('mouseover', function() {
-                    this.style.transform = 'scale(1.05) rotate(5deg)';
+            const profileImgs = document.querySelectorAll('.profile-img, .profile-preview-img');
+
+            profileImgs.forEach(img => {
+                img.addEventListener('mouseover', function() {
+                    this.style.transform = 'scale(1.05)';
+                    this.style.borderColor = '#ACE1AF';
                 });
-                
-                profileImg.addEventListener('mouseout', function() {
+
+                img.addEventListener('mouseout', function() {
                     this.style.transform = 'scale(1)';
+                    this.style.borderColor = '#fff';
                 });
+            });
+
+            // Add subtle pulse effect to profile image container
+            const profileContainer = document.querySelector('.profile-image-container');
+            if (profileContainer) {
+                profileContainer.classList.add('pulse-animation');
             }
-            
+
             // Fade out success alerts after 5 seconds
             const alerts = document.querySelectorAll('.alert-success');
             if (alerts.length > 0) {
@@ -397,7 +431,7 @@
                         alert.style.opacity = '0';
                         alert.style.transform = 'translateY(-10px)';
                         alert.style.transition = 'opacity 0.5s ease, transform 0.5s ease';
-                        
+
                         setTimeout(function() {
                             alert.style.display = 'none';
                         }, 500);
