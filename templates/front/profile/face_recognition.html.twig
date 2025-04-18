@@ -1,0 +1,598 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Face Recognition Setup{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .face-recognition-section {
+            padding: 120px 0 60px;
+            background: linear-gradient(rgba(0, 105, 62, 0.9), rgba(1, 50, 32, 0.9)), url('{{ asset('assets/front/assets/img/hero-bg.jpg') }}') fixed center center;
+            background-size: cover;
+            position: relative;
+        }
+        
+        .face-recognition-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+        }
+        
+        .face-recognition-header {
+            background: #013220;
+            padding: 30px;
+            text-align: center;
+            color: #fff;
+        }
+        
+        .face-recognition-title {
+            font-size: 28px;
+            font-weight: 700;
+            margin-bottom: 10px;
+        }
+        
+        .face-recognition-subtitle {
+            font-size: 16px;
+            opacity: 0.9;
+        }
+        
+        .face-recognition-body {
+            padding: 30px;
+        }
+        
+        .webcam-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 20px;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .webcam-video {
+            width: 100%;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .webcam-overlay {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            border: 2px dashed #29AB87;
+            border-radius: 10px;
+            pointer-events: none;
+            box-sizing: border-box;
+        }
+        
+        .webcam-guide {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 200px;
+            height: 200px;
+            border: 2px dashed #29AB87;
+            border-radius: 50%;
+            pointer-events: none;
+        }
+        
+        .webcam-status {
+            position: absolute;
+            bottom: 10px;
+            left: 0;
+            width: 100%;
+            text-align: center;
+            padding: 5px;
+            background-color: rgba(0, 0, 0, 0.5);
+            color: #fff;
+            font-size: 14px;
+            border-radius: 0 0 10px 10px;
+        }
+        
+        .btn-capture {
+            background: #013220;
+            color: #fff;
+            border: 2px solid #013220;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        
+        .btn-capture:hover {
+            background: #00693E;
+            border-color: #00693E;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-upload {
+            background: transparent;
+            color: #013220;
+            border: 2px solid #013220;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+            margin-right: 10px;
+        }
+        
+        .btn-upload:hover {
+            background: #013220;
+            color: #fff;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .btn-disable {
+            background: #dc3545;
+            color: #fff;
+            border: 2px solid #dc3545;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        
+        .btn-disable:hover {
+            background: #c82333;
+            border-color: #bd2130;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .face-recognition-info {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+        
+        .face-recognition-info h3 {
+            color: #013220;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+        
+        .face-recognition-info p {
+            color: #6c757d;
+            font-size: 14px;
+            line-height: 1.6;
+        }
+        
+        .face-recognition-info ul {
+            padding-left: 20px;
+            margin-top: 10px;
+        }
+        
+        .face-recognition-info li {
+            margin-bottom: 5px;
+            color: #6c757d;
+        }
+        
+        .face-preview {
+            width: 200px;
+            height: 200px;
+            border-radius: 50%;
+            object-fit: cover;
+            margin: 0 auto 20px;
+            display: block;
+            border: 5px solid #fff;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .face-preview-container {
+            text-align: center;
+            margin-bottom: 30px;
+        }
+        
+        .face-preview-title {
+            font-size: 18px;
+            font-weight: 600;
+            color: #013220;
+            margin-bottom: 5px;
+        }
+        
+        .face-preview-subtitle {
+            font-size: 14px;
+            color: #6c757d;
+        }
+        
+        .hidden {
+            display: none;
+        }
+        
+        .alert {
+            padding: 15px;
+            border-radius: 10px;
+            margin-bottom: 20px;
+        }
+        
+        .alert-success {
+            background-color: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+        }
+        
+        .alert-danger {
+            background-color: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+        }
+        
+        .alert-warning {
+            background-color: #fff3cd;
+            color: #856404;
+            border: 1px solid #ffeeba;
+        }
+        
+        .spinner {
+            border: 4px solid rgba(0, 0, 0, 0.1);
+            width: 36px;
+            height: 36px;
+            border-radius: 50%;
+            border-left-color: #013220;
+            animation: spin 1s linear infinite;
+            display: inline-block;
+            vertical-align: middle;
+            margin-right: 10px;
+        }
+        
+        @keyframes spin {
+            0% { transform: rotate(0deg); }
+            100% { transform: rotate(360deg); }
+        }
+        
+        .loading-text {
+            display: inline-block;
+            vertical-align: middle;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<section class="face-recognition-section">
+    <div class="container" data-aos="fade-up">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="face-recognition-card">
+                    <div class="face-recognition-header">
+                        <h2 class="face-recognition-title">Face Recognition Authentication</h2>
+                        <p class="face-recognition-subtitle">Set up face recognition for secure login</p>
+                    </div>
+                    
+                    <div class="face-recognition-body">
+                        {% if not serviceAvailable %}
+                            <div class="alert alert-warning">
+                                <strong>Face Recognition Service Unavailable</strong>
+                                <p>The face recognition service is currently unavailable. Please try again later.</p>
+                            </div>
+                        {% else %}
+                            <div id="alerts-container"></div>
+                            
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <div class="face-recognition-info">
+                                        <h3>About Face Recognition Authentication</h3>
+                                        <p>Face recognition authentication provides an additional secure way to log in to your account. Once enabled, you can log in using your face instead of typing your password.</p>
+                                        <h3>How it Works</h3>
+                                        <ul>
+                                            <li>We capture a photo of your face and securely store its unique features.</li>
+                                            <li>When you log in, you can choose to authenticate with your face.</li>
+                                            <li>Your face is compared to the stored data to verify your identity.</li>
+                                            <li>You can disable face recognition at any time.</li>
+                                        </ul>
+                                        <h3>Privacy & Security</h3>
+                                        <p>Your face data is encrypted and stored securely. We do not share this data with third parties.</p>
+                                    </div>
+                                    
+                                    {% if user.isFaceRecognitionEnabled %}
+                                        <div class="face-preview-container">
+                                            <h3 class="face-preview-title">Face Recognition is Enabled</h3>
+                                            <p class="face-preview-subtitle">You can disable it at any time</p>
+                                            <button id="btn-disable" class="btn-disable">
+                                                <i class="bi bi-x-circle"></i> Disable Face Recognition
+                                            </button>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                                
+                                <div class="col-md-6">
+                                    {% if not user.isFaceRecognitionEnabled %}
+                                        <div id="setup-container">
+                                            <h3>Set Up Face Recognition</h3>
+                                            <p>Please position your face within the guide and ensure good lighting.</p>
+                                            
+                                            <div class="webcam-container">
+                                                <video id="webcam" class="webcam-video" autoplay playsinline></video>
+                                                <div class="webcam-overlay"></div>
+                                                <div class="webcam-guide"></div>
+                                                <div class="webcam-status">Initializing camera...</div>
+                                            </div>
+                                            
+                                            <div class="text-center">
+                                                <button id="btn-capture" class="btn-capture" disabled>
+                                                    <i class="bi bi-camera"></i> Capture Photo
+                                                </button>
+                                                <p class="mt-2">Or</p>
+                                                <label for="file-upload" class="btn-upload">
+                                                    <i class="bi bi-upload"></i> Upload Photo
+                                                </label>
+                                                <input id="file-upload" type="file" accept="image/*" class="hidden">
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="preview-container" class="hidden">
+                                            <h3>Review Your Photo</h3>
+                                            <p>Is this photo clear and well-lit?</p>
+                                            
+                                            <div class="face-preview-container">
+                                                <img id="face-preview" class="face-preview" src="" alt="Face Preview">
+                                            </div>
+                                            
+                                            <div class="text-center">
+                                                <button id="btn-retry" class="btn-upload">
+                                                    <i class="bi bi-arrow-counterclockwise"></i> Try Again
+                                                </button>
+                                                <button id="btn-confirm" class="btn-capture">
+                                                    <i class="bi bi-check-lg"></i> Confirm & Enable
+                                                </button>
+                                            </div>
+                                        </div>
+                                        
+                                        <div id="processing-container" class="hidden text-center">
+                                            <div class="spinner"></div>
+                                            <span class="loading-text">Processing your photo...</span>
+                                        </div>
+                                    {% endif %}
+                                </div>
+                            </div>
+                        {% endif %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            {% if serviceAvailable and not user.isFaceRecognitionEnabled %}
+                // Variables
+                const webcamElement = document.getElementById('webcam');
+                const webcamStatus = document.querySelector('.webcam-status');
+                const captureBtn = document.getElementById('btn-capture');
+                const fileUploadInput = document.getElementById('file-upload');
+                const setupContainer = document.getElementById('setup-container');
+                const previewContainer = document.getElementById('preview-container');
+                const processingContainer = document.getElementById('processing-container');
+                const facePreview = document.getElementById('face-preview');
+                const retryBtn = document.getElementById('btn-retry');
+                const confirmBtn = document.getElementById('btn-confirm');
+                const alertsContainer = document.getElementById('alerts-container');
+                
+                let stream = null;
+                let capturedImage = null;
+                
+                // Initialize webcam
+                async function initWebcam() {
+                    try {
+                        stream = await navigator.mediaDevices.getUserMedia({
+                            video: {
+                                width: { ideal: 1280 },
+                                height: { ideal: 720 },
+                                facingMode: 'user'
+                            }
+                        });
+                        
+                        webcamElement.srcObject = stream;
+                        webcamStatus.textContent = 'Camera ready. Position your face within the guide.';
+                        captureBtn.disabled = false;
+                    } catch (err) {
+                        webcamStatus.textContent = 'Camera access denied or not available.';
+                        showAlert('warning', 'Camera access denied or not available. You can still upload a photo.');
+                        console.error('Error accessing webcam:', err);
+                    }
+                }
+                
+                // Initialize webcam
+                initWebcam();
+                
+                // Capture photo from webcam
+                captureBtn.addEventListener('click', function() {
+                    const canvas = document.createElement('canvas');
+                    canvas.width = webcamElement.videoWidth;
+                    canvas.height = webcamElement.videoHeight;
+                    
+                    const context = canvas.getContext('2d');
+                    context.drawImage(webcamElement, 0, 0, canvas.width, canvas.height);
+                    
+                    capturedImage = canvas.toDataURL('image/jpeg');
+                    facePreview.src = capturedImage;
+                    
+                    setupContainer.classList.add('hidden');
+                    previewContainer.classList.remove('hidden');
+                });
+                
+                // Handle file upload
+                fileUploadInput.addEventListener('change', function(e) {
+                    if (e.target.files.length > 0) {
+                        const file = e.target.files[0];
+                        const reader = new FileReader();
+                        
+                        reader.onload = function(event) {
+                            capturedImage = event.target.result;
+                            facePreview.src = capturedImage;
+                            
+                            setupContainer.classList.add('hidden');
+                            previewContainer.classList.remove('hidden');
+                        };
+                        
+                        reader.readAsDataURL(file);
+                    }
+                });
+                
+                // Retry button
+                retryBtn.addEventListener('click', function() {
+                    previewContainer.classList.add('hidden');
+                    setupContainer.classList.remove('hidden');
+                    capturedImage = null;
+                });
+                
+                // Confirm button
+                confirmBtn.addEventListener('click', function() {
+                    if (!capturedImage) {
+                        showAlert('danger', 'No image captured or uploaded.');
+                        return;
+                    }
+                    
+                    previewContainer.classList.add('hidden');
+                    processingContainer.classList.remove('hidden');
+                    
+                    // First check if the image contains a valid face
+                    checkFace(capturedImage)
+                        .then(result => {
+                            if (result.success) {
+                                // If face is valid, proceed with setup
+                                return setupFaceRecognition(capturedImage);
+                            } else {
+                                throw new Error(result.message || 'No valid face detected in the image.');
+                            }
+                        })
+                        .then(result => {
+                            if (result.success) {
+                                showAlert('success', 'Face recognition has been successfully enabled!');
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            } else {
+                                throw new Error(result.message || 'Failed to set up face recognition.');
+                            }
+                        })
+                        .catch(error => {
+                            showAlert('danger', error.message);
+                            processingContainer.classList.add('hidden');
+                            setupContainer.classList.remove('hidden');
+                        });
+                });
+                
+                // Check if image contains a valid face
+                async function checkFace(base64Image) {
+                    try {
+                        const response = await fetch('{{ path('login_face_check') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ image: base64Image })
+                        });
+                        
+                        return await response.json();
+                    } catch (error) {
+                        console.error('Error checking face:', error);
+                        return { success: false, message: 'Error checking face: ' + error.message };
+                    }
+                }
+                
+                // Setup face recognition
+                async function setupFaceRecognition(base64Image) {
+                    try {
+                        const response = await fetch('{{ path('profile_face_recognition_setup') }}', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                            },
+                            body: JSON.stringify({ image: base64Image })
+                        });
+                        
+                        return await response.json();
+                    } catch (error) {
+                        console.error('Error setting up face recognition:', error);
+                        return { success: false, message: 'Error setting up face recognition: ' + error.message };
+                    }
+                }
+                
+                // Show alert
+                function showAlert(type, message) {
+                    const alertDiv = document.createElement('div');
+                    alertDiv.className = `alert alert-${type}`;
+                    alertDiv.innerHTML = message;
+                    
+                    alertsContainer.innerHTML = '';
+                    alertsContainer.appendChild(alertDiv);
+                    
+                    // Auto-dismiss after 5 seconds
+                    setTimeout(() => {
+                        alertDiv.remove();
+                    }, 5000);
+                }
+            {% endif %}
+            
+            {% if serviceAvailable and user.isFaceRecognitionEnabled %}
+                // Disable face recognition
+                document.getElementById('btn-disable').addEventListener('click', async function() {
+                    if (confirm('Are you sure you want to disable face recognition? You will need to set it up again if you want to use it in the future.')) {
+                        try {
+                            const response = await fetch('{{ path('profile_face_recognition_disable') }}', {
+                                method: 'POST',
+                                headers: {
+                                    'Content-Type': 'application/json',
+                                }
+                            });
+                            
+                            const result = await response.json();
+                            
+                            if (result.success) {
+                                const alertDiv = document.createElement('div');
+                                alertDiv.className = 'alert alert-success';
+                                alertDiv.innerHTML = 'Face recognition has been disabled.';
+                                
+                                document.getElementById('alerts-container').innerHTML = '';
+                                document.getElementById('alerts-container').appendChild(alertDiv);
+                                
+                                setTimeout(() => {
+                                    window.location.reload();
+                                }, 2000);
+                            } else {
+                                const alertDiv = document.createElement('div');
+                                alertDiv.className = 'alert alert-danger';
+                                alertDiv.innerHTML = result.message || 'Failed to disable face recognition.';
+                                
+                                document.getElementById('alerts-container').innerHTML = '';
+                                document.getElementById('alerts-container').appendChild(alertDiv);
+                            }
+                        } catch (error) {
+                            console.error('Error disabling face recognition:', error);
+                            
+                            const alertDiv = document.createElement('div');
+                            alertDiv.className = 'alert alert-danger';
+                            alertDiv.innerHTML = 'Error disabling face recognition: ' + error.message;
+                            
+                            document.getElementById('alerts-container').innerHTML = '';
+                            document.getElementById('alerts-container').appendChild(alertDiv);
+                        }
+                    }
+                });
+            {% endif %}
+        });
+    </script>
+{% endblock %}

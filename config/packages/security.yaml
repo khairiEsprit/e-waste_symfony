@@ -27,6 +27,8 @@ security:
             lazy: true
             user_checker: App\Appaydin\PdUser\Security\UserChecker
             entry_point: form_login
+            custom_authenticators:
+                - App\Security\FaceRecognitionAuthenticator
             form_login:
                 use_referer: true
                 login_path: security_login
