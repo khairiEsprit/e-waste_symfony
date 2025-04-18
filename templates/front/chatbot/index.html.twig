@@ -4,13 +4,13 @@
 
 {% block body %}
     <div class="full-page-bg"></div>
-    <section class="content-wrapper py-5" style="margin-top: 80px;">
+    <section class="content-wrapper py-10">
         <div class="container">
             <!-- Title section above the card -->
-            <div class="row justify-content-center mb-5 mt-4">
+            <div class="row justify-content-center mb-5">
                 <div class="col-lg-10 text-center animate-fade-in">
-                    <h1 class="display-4 text-white mb-3">Waste Classification</h1>
-                    <p class="lead text-white">This helpful chatbot assists you in recognizing whether your waste is recyclable or organic.</p>
+                    <h1 class="section-title text-white">Waste Classification Assistant</h1>
+                    <p class="lead text-white">Our intelligent chatbot helps you identify whether your waste is recyclable or organic</p>
                 </div>
             </div>
 
@@ -18,40 +18,45 @@
             <div class="row justify-content-center">
                 <div class="col-lg-8 col-md-10">
                     <div class="card-custom animate-slide-up">
-                        <div class="text-center mb-4 animate-fade-in">
-                            <h2 class="h4 text-dark">Upload an image of your waste item</h2>
-                            <p class="text-muted">This helpful chatbot assists you in recognizing whether your waste is recyclable or organic. Simply upload an image of your waste below, and I’ll analyze it for you!</p>
+                        <div class="card-header" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
+                            <h5 class="card-title mb-0">AI Waste Classification</h5>
                         </div>
-
-                        <div class="chat-messages" id="chat-messages">
-                            <!-- Welcome message -->
-                            <div class="chat-message bot-message">
-                                <strong style="color: var(--primary-dark);">Bot:</strong> Welcome to the Waste Classification Chatbot! Upload an image of your waste item, and I'll help you determine if it's recyclable or organic.
-                                <span class="timestamp" style="opacity: 0.8; color: var(--text-muted);">{{ "now"|date('H:i') }}</span>
+                        <div class="card-body">
+                            <div class="text-center mb-4 animate-fade-in">
+                                <h2 class="h4 text-dark">Upload an image of your waste item</h2>
+                                <p class="text-muted">Simply upload an image of your waste below, and our AI will analyze it for you!</p>
                             </div>
 
-                            <!-- Pending message indicator -->
-                            <div class="pending-message" id="pending-indicator" style="display: none;">
-                                <div class="loading-dots">
-                                    <span></span>
-                                    <span></span>
-                                    <span></span>
+                            <div class="chat-messages" id="chat-messages">
+                                <!-- Welcome message -->
+                                <div class="chat-message bot-message">
+                                    <strong>Bot:</strong> Welcome to the Waste Classification Chatbot! Upload an image of your waste item, and I'll help you determine if it's recyclable or organic.
+                                    <span class="timestamp">{{ "now"|date('H:i') }}</span>
                                 </div>
-                                <span class="pending-text">Analyzing your waste...</span>
+
+                                <!-- Pending message indicator -->
+                                <div class="pending-message" id="pending-indicator" style="display: none;">
+                                    <div class="loading-dots">
+                                        <span></span>
+                                        <span></span>
+                                        <span></span>
+                                    </div>
+                                    <span class="pending-text">Analyzing your waste...</span>
+                                </div>
                             </div>
+
+                            <form id="chat-form" action="{{ path('chat_upload') }}" method="post" enctype="multipart/form-data" class="mt-4">
+                                <div class="input-group animate-input">
+                                    <input type="text" name="message" placeholder="Ask a question about your waste item (optional)" class="form-control chat-input">
+                                    <input type="file" name="image" accept="image/*" required class="form-control chat-file">
+                                    <button type="submit" class="btn-custom" id="submit-btn">Send</button>
+                                </div>
+                            </form>
+
+                            {% for message in app.flashes('error') %}
+                                <div class="alert-custom alert-custom-danger text-center mt-3 animate-slide-up">{{ message }}</div>
+                            {% endfor %}
                         </div>
-
-                        <form id="chat-form" action="{{ path('chat_upload') }}" method="post" enctype="multipart/form-data" class="mt-4">
-                            <div class="input-group animate-input">
-                                <input type="text" name="message" placeholder="Ask a question about your waste item (optional)" class="form-control chat-input">
-                                <input type="file" name="image" accept="image/*" required class="form-control chat-file">
-                                <button type="submit" class="btn-custom" id="submit-btn">Send</button>
-                            </div>
-                        </form>
-
-                        {% for message in app.flashes('error') %}
-                            <div class="alert-custom alert-custom-danger text-center mt-3 animate-slide-up">{{ message }}</div>
-                        {% endfor %}
                     </div>
                 </div>
             </div>
@@ -66,36 +71,40 @@
     overflow: hidden;
 }
 
-/* Card styling is now handled by our unified theme */
-
-/* Typography is now handled by our unified theme */
-
+/* Chat messages container */
 .chat-messages {
     max-height: 400px;
     overflow-y: auto;
-    padding: 20px;
-    background: white;
-    border-radius: 15px;
-    margin-bottom: 25px;
+    padding: 15px;
+    background: var(--light);
+    border-radius: var(--radius-md);
+    margin-bottom: 20px;
     position: relative;
-    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
+/* Individual chat message styling */
 .chat-message {
-    padding: 15px 20px;
-    margin: 15px 0;
-    border-radius: 15px;
+    padding: 12px 15px;
+    margin: 12px 0;
+    border-radius: var(--radius-md);
     animation: slideIn 0.4s ease-out, fadeIn 0.4s ease-out;
     word-wrap: break-word;
     transition: transform 0.2s ease;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
-    font-size: 16px;
+    box-shadow: var(--shadow-sm);
+    font-family: var(--font-family-base);
+    font-size: 1rem;
     line-height: 1.5;
 }
 
 .chat-message:hover {
     transform: scale(1.02);
+}
+
+.chat-message strong {
+    color: var(--primary-dark);
+    font-weight: 600;
 }
 
 .user-message {
@@ -115,7 +124,7 @@
 
 .timestamp {
     display: block;
-    font-size: 12px;
+    font-size: 0.75rem;
     opacity: 0;
     transition: opacity 0.3s ease;
     margin-top: 5px;
@@ -126,79 +135,71 @@
     opacity: 0.8;
 }
 
+/* Form input styling */
 .chat-input,
 .chat-file {
     padding: 12px;
-    font-size: 15px;
-    border: none;
+    font-size: 0.95rem;
+    border: 1px solid var(--border-color);
     transition: all 0.3s ease;
+    border-radius: var(--radius-md);
 }
 
 .chat-input:focus,
 .chat-file:focus {
-    box-shadow: 0 0 10px rgba(var(--primary-medium), 0.3);
+    box-shadow: 0 0 0 0.2rem rgba(0, 105, 62, 0.15);
+    border-color: var(--primary-medium);
     outline: none;
 }
 
-.chat-submit {
-    padding: 12px 25px;
+.btn-custom {
+    background: var(--primary-medium);
+    color: white;
+    border: none;
+    padding: 0.6rem 1.5rem;
+    border-radius: var(--radius-pill);
+    font-weight: 500;
     transition: all 0.3s ease;
-    position: relative;
-    overflow: hidden;
+    box-shadow: var(--shadow-sm);
 }
 
-.chat-submit:disabled {
+.btn-custom:hover {
+    background: var(--primary-dark);
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-md);
+}
+
+.btn-custom:disabled {
     opacity: 0.6;
     cursor: not-allowed;
 }
 
-.chat-submit:hover {
-    background: var(--primary-dark);
-    transform: translateY(-2px);
-}
-
-.chat-submit::after {
-    content: '';
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    width: 0;
-    height: 0;
-    background: rgba(255, 255, 255, 0.2);
-    border-radius: 50%;
-    transform: translate(-50%, -50%);
-    transition: width 0.4s ease, height 0.4s ease;
-}
-
-.chat-submit:hover::after {
-    width: 200px;
-    height: 200px;
-}
-
 .chat-image {
-    max-width: 220px;
+    max-width: 200px;
     height: auto;
-    margin-top: 12px;
-    border-radius: 8px;
+    margin-top: 10px;
+    border-radius: var(--radius-md);
     display: block;
     transition: transform 0.3s ease;
+    box-shadow: var(--shadow-sm);
 }
 
 .chat-image:hover {
-    transform: scale(1.1);
+    transform: scale(1.05);
+    box-shadow: var(--shadow-md);
 }
 
 /* Pending State Styles */
 .pending-message {
-    padding: 15px 20px;
-    margin: 15px 0;
-    border-radius: 15px;
+    padding: 12px 15px;
+    margin: 12px 0;
+    border-radius: var(--radius-md);
     background: white;
     color: var(--primary-dark);
     display: flex;
     align-items: center;
     animation: fadeIn 0.3s ease-out;
-    box-shadow: 0 3px 10px rgba(0, 0, 0, 0.1);
+    box-shadow: var(--shadow-sm);
     border: 1px solid rgba(0, 0, 0, 0.05);
 }
 
@@ -225,7 +226,7 @@
 }
 
 .pending-text {
-    font-size: 14px;
+    font-size: 0.9rem;
     color: var(--text-dark);
 }
 
@@ -244,11 +245,6 @@
 @keyframes fadeIn {
     from { opacity: 0; }
     to { opacity: 1; }
-}
-
-@keyframes backgroundPulse {
-    0% { background-position: 0% 50%; }
-    100% { background-position: 100% 50%; }
 }
 
 @keyframes bounce {
@@ -341,11 +337,11 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
         img.src = URL.createObjectURL(fileInput.files[0]);
         img.className = 'chat-image'; // Add the class here
         img.alt = 'Uploaded waste image';
-        userMessage.innerHTML = `<strong style="color: var(--primary-dark);">User:</strong> ${messageContent}`;
+        userMessage.innerHTML = `<strong>User:</strong> ${messageContent}`;
         userMessage.appendChild(img);
-        userMessage.innerHTML += `<span class="timestamp" style="color: var(--text-muted);">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+        userMessage.innerHTML += `<span class="timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
     } else {
-        userMessage.innerHTML = `<strong style="color: var(--primary-dark);">User:</strong> ${messageContent} <span class="timestamp" style="color: var(--text-muted);">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+        userMessage.innerHTML = `<strong>User:</strong> ${messageContent} <span class="timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
     }
 
     messages.insertBefore(userMessage, pendingIndicator);
@@ -353,7 +349,7 @@ document.getElementById('chat-form').addEventListener('submit', function(e) {
     // Add bot response
     const botMessage = document.createElement('div');
     botMessage.className = 'chat-message bot-message';
-    botMessage.innerHTML = `<strong style="color: var(--primary-dark);">Bot:</strong> ${data.message} <span class="timestamp" style="color: var(--text-muted);">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
+    botMessage.innerHTML = `<strong>Bot:</strong> ${data.message} <span class="timestamp">${new Date().toLocaleTimeString([], {hour: '2-digit', minute:'2-digit'})}</span>`;
     messages.insertBefore(botMessage, pendingIndicator);
 
     // Hide pending indicator and reset form

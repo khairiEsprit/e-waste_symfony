@@ -3,14 +3,17 @@
 {% block title %}Modifier la Demande{% endblock %}
 
 {% block body %}
-<br>
-<br>
-<div class="container mt-5">
+<div class="full-page-bg"></div>
+<section class="content-wrapper py-5">
+<div class="container mb-5 mt-4">
     <div class="title-container">
-        <h1 class="main-title">Modifier la Demande</h1>
+        <h1 class="section-title text-white animate-fade-in">Modifier la Demande</h1>
     </div>
 
-    <div class="card custom-card">
+    <div class="card-custom animate-slide-up" style="border: 1px solid #000; margin-bottom: 2rem;">
+        <div class="card-header" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
+            <h5 class="card-title mb-0">Formulaire de modification</h5>
+        </div>
         <div class="card-body">
             {{ include('front/demande/_form.html.twig', {'button_label': 'Modifier'}) }}
             <div class="delete-button-container mt-3">
@@ -19,108 +22,179 @@
         </div>
     </div>
 </div>
+</section>
 {% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
-    .title-container {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .main-title {
-        color: #333;
-        font-size: 2.5rem;
-        font-weight: 600;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-    }
-
-    .custom-card {
-        background: #ffffff;
-        border-radius: 15px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        border: none;
-        overflow: hidden;
-        max-width: 800px;
-        margin: 0 auto;
-    }
-
-    .card-body {
-        padding: 2rem;
-    }
-
     /* Form styling */
+    .form-group {
+        margin-bottom: 1.5rem;
+    }
+
     .form-label {
-        color: #2C5E1A;
+        color: #000; /* Black text */
         font-weight: 600;
-        margin-bottom: 0.5rem;
+        margin-bottom: 0.75rem;
+        font-size: 1rem;
     }
 
     .form-control {
-        border-radius: 10px;
-        border: 1px solid #e0e0e0;
-        padding: 0.75rem;
-        margin-bottom: 1rem;
+        border-radius: var(--radius-md);
+        border: 1px solid #000; /* Black border */
+        padding: 12px 15px;
+        font-size: 1rem;
+        transition: var(--transition-normal);
+        background-color: var(--light);
+        color: #000; /* Black text */
     }
 
     .form-control:focus {
-        border-color: #2C5E1A;
-        box-shadow: 0 0 0 0.2rem rgba(44, 94, 26, 0.25);
+        border-color: var(--primary-medium);
+        box-shadow: 0 0 0 0.2rem rgba(0, 105, 62, 0.15);
+        background-color: white;
+    }
+
+    .form-control::placeholder {
+        color: var(--text-light);
+        opacity: 0.7;
+    }
+
+    textarea.form-control {
+        min-height: 120px;
+        resize: vertical;
+    }
+
+    /* Input group styling */
+    .input-group {
+        position: relative;
+        display: flex;
+        flex-wrap: wrap;
+        align-items: stretch;
+        width: 100%;
+    }
+
+    .input-group-text {
+        display: flex;
+        align-items: center;
+        padding: 0.5rem 1rem;
+        font-size: 1rem;
+        font-weight: 400;
+        color: var(--primary-medium);
+        text-align: center;
+        white-space: nowrap;
+        background-color: var(--light);
+        border: 1px solid #e0e0e0;
+        border-radius: var(--radius-md);
+        border-top-right-radius: 0;
+        border-bottom-right-radius: 0;
+    }
+
+    .input-group > .form-control {
+        position: relative;
+        flex: 1 1 auto;
+        width: 1%;
+        min-width: 0;
+        border-top-left-radius: 0;
+        border-bottom-left-radius: 0;
     }
 
     /* Custom button styling */
     .custom-btn {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px 25px;
-        border-radius: 25px;
+        justify-content: center;
+        gap: 10px;
+        padding: 0.6rem 1.5rem;
+        border-radius: var(--radius-pill);
         text-decoration: none;
-        transition: all 0.3s ease;
+        transition: var(--transition-normal);
         border: none;
-        font-size: 16px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-size: 1rem;
+        font-weight: 500;
+        box-shadow: var(--shadow-sm);
         cursor: pointer;
+        background: var(--primary-medium);
+        color: white;
+    }
+
+    .custom-btn:hover {
+        background: var(--primary-dark);
+        color: white;
+        transform: translateY(-3px);
+        box-shadow: var(--shadow-md);
     }
 
     .btn-back {
-        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        background: var(--primary-light);
         color: white;
     }
 
     .btn-back:hover {
-        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        background: var(--primary-dark);
         transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
         color: white;
         text-decoration: none;
     }
 
     .btn-edit {
-        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        background: var(--primary-medium);
         color: white;
     }
 
     .btn-edit:hover {
-        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        background: var(--primary-dark);
         transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
         color: white;
         text-decoration: none;
     }
 
     .btn-delete {
-        background: linear-gradient(145deg, #dc3545, #c82333);
+        background: var(--danger);
         color: white;
     }
 
     .btn-delete:hover {
-        background: linear-gradient(145deg, #c82333, #dc3545);
+        background: #b02a37;
         transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
         color: white;
         text-decoration: none;
+    }
+
+    /* Form validation styling */
+    .is-invalid {
+        border-color: var(--danger);
+    }
+
+    .invalid-feedback {
+        color: var(--danger);
+        font-size: 0.875rem;
+        margin-top: 0.5rem;
+    }
+
+    /* Animation for the form */
+    .card-custom.animate-slide-up {
+        animation-duration: 0.6s;
+    }
+
+    .delete-button-container {
+        margin-top: 1.5rem;
+        padding-top: 1.5rem;
+        border-top: 1px solid rgba(0, 0, 0, 0.1);
+    }
+
+    @media (max-width: 768px) {
+        .card-body {
+            padding: 1.5rem;
+        }
+
+        .form-control {
+            padding: 10px 12px;
+        }
     }
 </style>
 {% endblock %}

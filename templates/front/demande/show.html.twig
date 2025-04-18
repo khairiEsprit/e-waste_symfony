@@ -1,17 +1,20 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Demande{% endblock %}
+{% block title %}Détails de la Demande{% endblock %}
 
 {% block body %}
-<br><br>
-<div class="container mt-5">
+<div class="full-page-bg"></div>
+<section class="content-wrapper py-5">
+<div class="container mb-5 mt-4">
     <div class="title-container">
-        <h1 class="main-title">Détails de la Demande</h1>
+        <h1 class="section-title text-white animate-fade-in">Détails de la Demande</h1>
     </div>
 
-    <div class="card custom-card">
+    <div class="card-custom animate-slide-up" style="border: 1px solid #000; margin-bottom: 2rem;">
+        <div class="card-header" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
+            <h5 class="card-title mb-0">{{ demande.type }}</h5>
+        </div>
         <div class="card-body">
-            <h5 class="card-title type-badge">{{ demande.type }}</h5>
             <div class="info-container">
                 <div class="info-item">
                     <div class="info-label">
@@ -20,7 +23,7 @@
                     </div>
                     <div class="info-content">{{ demande.adresse }}</div>
                 </div>
-                
+
                 <div class="info-item">
                     <div class="info-label">
                         <i class="fas fa-envelope"></i>
@@ -71,73 +74,47 @@
         </div>
 
         <div class="card-footer">
-            <a href="{{ path('app_demande_index') }}" class="custom-btn btn-back">
-                <i class="fas fa-arrow-left"></i> Retour à la liste
-            </a>
-            <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="custom-btn btn-edit">
-                <i class="fas fa-edit"></i> Modifier
-            </a>
+            <div class="d-flex justify-content-between">
+                <a href="{{ path('app_demande_index') }}" class="custom-btn btn-back">
+                    <i class="fas fa-arrow-left"></i> Retour à la liste
+                </a>
+                <a href="{{ path('app_demande_edit', {'id': demande.id}) }}" class="custom-btn btn-edit">
+                    <i class="fas fa-edit"></i> Modifier
+                </a>
+            </div>
         </div>
     </div>
 </div>
+</section>
 {% endblock %}
 
 {% block stylesheets %}
 {{ parent() }}
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/all.min.css">
 <style>
-    .title-container {
-        text-align: center;
-        margin-bottom: 40px;
-    }
-
-    .main-title {
-        color: #333;
-        font-size: 2.5rem;
-        font-weight: 600;
-        margin: 0;
-        padding: 0;
-        font-family: Arial, sans-serif;
-    }
-
-    .custom-card {
-        background: #ffffff;
-        border-radius: 15px;
-        box-shadow: 0 8px 30px rgba(0, 0, 0, 0.1);
-        border: none;
-        margin: 0 auto;
-        max-width: 800px;
-        overflow: hidden;
-    }
-
-    .type-badge {
-        display: inline-block;
-        background: #2C5E1A;
-        color: white;
-        padding: 8px 15px;
-        border-radius: 20px;
-        font-size: 1rem;
-        margin-bottom: 20px;
-    }
-
+    /* Info container styling */
     .info-container {
         display: flex;
         flex-direction: column;
-        gap: 20px;
+        gap: 15px;
+        margin-top: 10px;
     }
 
     .info-item {
         display: flex;
         align-items: flex-start;
         padding: 15px;
-        background: #f8f9fa;
-        border-radius: 10px;
-        transition: all 0.3s ease;
+        background: var(--light);
+        border-radius: var(--radius-md);
+        transition: var(--transition-normal);
+        border: 1px solid #000; /* Black border */
+        color: #000; /* Black text */
     }
 
     .info-item:hover {
-        background: #f0f2f5;
+        background: var(--primary-lightest);
         transform: translateX(5px);
+        box-shadow: var(--shadow-sm);
+        border: 1px solid #000; /* Maintain black border */
     }
 
     .info-label {
@@ -145,94 +122,124 @@
         display: flex;
         align-items: center;
         gap: 10px;
-        color: #2C5E1A;
-        font-weight: bold;
+        color: #000; /* Black text */
+        font-weight: 600;
     }
 
     .info-label i {
         width: 20px;
         text-align: center;
-        color: #2C5E1A;
+        color: var(--primary-medium);
     }
 
     .info-content {
         flex: 1;
         padding-left: 15px;
+        color: #000; /* Black text */
     }
 
+    /* Status badges */
     .status-badge {
         display: inline-flex;
         align-items: center;
         gap: 5px;
         padding: 8px 12px;
-        border-radius: 20px;
+        border-radius: var(--radius-pill);
         font-weight: 500;
+        box-shadow: var(--shadow-sm);
     }
 
     .status-badge.success {
         background-color: #d4edda;
         color: #155724;
+        border: 1px solid #c3e6cb;
     }
 
     .status-badge.danger {
         background-color: #f8d7da;
         color: #721c24;
+        border: 1px solid #f5c6cb;
     }
 
     .status-badge.warning {
         background-color: #fff3cd;
         color: #856404;
+        border: 1px solid #ffeeba;
     }
 
+    /* Card footer */
     .card-footer {
-        background: white;
-        border-top: 1px solid #eee;
-        padding: 20px;
-        display: flex;
-        justify-content: space-between;
-        align-items: center;
+        background: var(--background-light);
+        border-top: 1px solid rgba(0, 0, 0, 0.05);
+        padding: var(--spacing-lg);
     }
 
+    /* Button styling */
     .custom-btn {
         display: inline-flex;
         align-items: center;
-        gap: 8px;
-        padding: 10px 25px;
-        border-radius: 25px;
+        justify-content: center;
+        gap: 10px;
+        padding: 0.6rem 1.5rem;
+        border-radius: var(--radius-pill);
         text-decoration: none;
-        transition: all 0.3s ease;
+        transition: var(--transition-normal);
         border: none;
-        font-size: 16px;
-        box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+        font-size: 1rem;
+        font-weight: 500;
+        box-shadow: var(--shadow-sm);
+        cursor: pointer;
     }
 
     .btn-back {
-        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        background: var(--primary-light);
         color: white;
     }
 
     .btn-back:hover {
-        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        background: var(--primary-dark);
         transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
         color: white;
         text-decoration: none;
     }
 
     .btn-edit {
-        background: linear-gradient(145deg, #2C5E1A, #1a7718);
+        background: var(--primary-medium);
         color: white;
     }
 
     .btn-edit:hover {
-        background: linear-gradient(145deg, #1a7718, #2C5E1A);
+        background: var(--primary-dark);
         transform: translateY(-2px);
+        box-shadow: var(--shadow-md);
         color: white;
         text-decoration: none;
     }
 
     .text-muted {
-        color: #6c757d !important;
+        color: var(--text-light) !important;
         font-style: italic;
+    }
+
+    /* Animation for the card */
+    .card-custom.animate-slide-up {
+        animation-duration: 0.6s;
+    }
+
+    @media (max-width: 768px) {
+        .info-item {
+            flex-direction: column;
+        }
+
+        .info-label {
+            flex: 0 0 auto;
+            margin-bottom: 8px;
+        }
+
+        .info-content {
+            padding-left: 30px;
+        }
     }
 </style>
 {% endblock %}

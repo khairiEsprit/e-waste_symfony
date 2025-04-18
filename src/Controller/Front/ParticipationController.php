@@ -11,6 +11,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Routing\Annotation\Route;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
+use Symfony\Component\Form\FormError;
 
 
 #[Route('/participation')]
@@ -42,21 +43,21 @@ class ParticipationController extends AbstractController
     public function new(Request $request, EntityManagerInterface $entityManager): Response
     {
         $participation = new Participation();
-        
+
         // Get the event_id from the request
         $eventId = $request->query->get('event_id');
         $event = null;
-        
+
         // If event_id is provided, fetch the event
         if ($eventId) {
             $event = $entityManager->getRepository(\App\Entity\Event::class)->find($eventId);
-            
+
             // If event not found, redirect to event list with error message
             if (!$event) {
                 $this->addFlash('error', 'Événement non trouvé.');
                 return $this->redirectToRoute('app_front_event_list');
             }
-            
+
             // Associate the event with the participation
             $participation->setEvent($event);
         } else {
@@ -64,7 +65,28 @@ class ParticipationController extends AbstractController
             $this->addFlash('error', 'Vous devez sélectionner un événement.');
             return $this->redirectToRoute('app_front_event_list');
         }
-        
+
+        // Pre-fill user information if user is logged in
+        $user = $this->getUser();
+        if ($user) {
+            // Pre-fill basic information
+            if ($user->getFirstName()) {
+                $participation->setFirstName($user->getFirstName());
+            }
+
+            if ($user->getLastName()) {
+                $participation->setLastName($user->getLastName());
+            }
+
+            if ($user->getEmail()) {
+                $participation->setEmail($user->getEmail());
+            }
+
+            if ($user->getPhone()) {
+                $participation->setPhone($user->getPhone());
+            }
+        }
+
         $form = $this->createForm(ParticipationType::class, $participation);
         $form->handleRequest($request);
 
@@ -92,7 +114,7 @@ class ParticipationController extends AbstractController
                 if ($event->getRemainingPlaces() > 0) {
                     $event->setRemainingPlaces($event->getRemainingPlaces() - 1);
                 }
-                
+
                 $entityManager->persist($participation);
                 $entityManager->flush();
 
@@ -121,7 +143,28 @@ class ParticipationController extends AbstractController
         // Store original values for comparison
         $originalEmail = $participation->getEmail();
         $originalPhone = $participation->getPhone();
-        
+
+        // Pre-fill any missing information from the user if logged in
+        $user = $this->getUser();
+        if ($user) {
+            // Only pre-fill fields that are empty
+            if (!$participation->getFirstName() && $user->getFirstName()) {
+                $participation->setFirstName($user->getFirstName());
+            }
+
+            if (!$participation->getLastName() && $user->getLastName()) {
+                $participation->setLastName($user->getLastName());
+            }
+
+            if (!$participation->getEmail() && $user->getEmail()) {
+                $participation->setEmail($user->getEmail());
+            }
+
+            if (!$participation->getPhone() && $user->getPhone()) {
+                $participation->setPhone($user->getPhone());
+            }
+        }
+
         $form = $this->createForm(ParticipationType::class, $participation);
         $form->handleRequest($request);
 
@@ -138,7 +181,7 @@ class ParticipationController extends AbstractController
                         ->findOneBy(['email' => $participation->getEmail()]);
 
                     if ($existingEmail && $existingEmail->getId() !== $participation->getId()) {
-                        $form->get('email')->addError(new \Symfony\Component\Form\FormError('Cet email est déjà utilisé.'));
+                        $form->get('email')->addError(new FormError('Cet email est déjà utilisé.'));
                         $hasError = true;
                     }
                 }
@@ -149,7 +192,7 @@ class ParticipationController extends AbstractController
                         ->findOneBy(['phone' => $participation->getPhone()]);
 
                     if ($existingPhone && $existingPhone->getId() !== $participation->getId()) {
-                        $form->get('phone')->addError(new \Symfony\Component\Form\FormError('Ce numéro de téléphone est déjà utilisé.'));
+                        $form->get('phone')->addError(new FormError('Ce numéro de téléphone est déjà utilisé.'));
                         $hasError = true;
                     }
                 }
@@ -173,7 +216,7 @@ class ParticipationController extends AbstractController
     #[Route('/{id}', name: 'app_participation_delete', methods: ['POST'])]
     public function delete(Request $request, Participation $participation, EntityManagerInterface $entityManager): Response
     {
-        if ($this->isCsrfTokenValid('delete'.$participation->getId(), $request->request->get('_token'))) {
+        if ($this->isCsrfTokenValid('delete' . $participation->getId(), $request->request->get('_token'))) {
             $entityManager->remove($participation);
             $entityManager->flush();
         }

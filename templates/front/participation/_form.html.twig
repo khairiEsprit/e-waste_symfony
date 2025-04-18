@@ -1,4 +1,8 @@
-{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate'}}) }}
+{{ form_start(form, {'attr': {'class': 'needs-validation', 'novalidate': 'novalidate', 'id': 'participation-form'}}) }}
+
+<div id="prefill-notification" class="d-none alert alert-info mb-4">
+    <i class="fas fa-info-circle me-2"></i> Vos informations ont été pré-remplies. Vous pouvez les modifier si nécessaire.
+</div>
 <div class="card shadow-sm mb-4">
     <div class="card-body">
         {% for child in form %}
@@ -28,3 +32,30 @@
     </div>
 </div>
 {{ form_end(form) }}
+
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        // Check if any of the personal information fields are pre-filled
+        const firstNameField = document.querySelector('input[name="participation[firstName]"]');
+        const lastNameField = document.querySelector('input[name="participation[lastName]"]');
+        const emailField = document.querySelector('input[name="participation[email]"]');
+        const phoneField = document.querySelector('input[name="participation[phone]"]');
+
+        // If any of these fields are pre-filled, show the notification
+        if ((firstNameField && firstNameField.value) ||
+            (lastNameField && lastNameField.value) ||
+            (emailField && emailField.value) ||
+            (phoneField && phoneField.value)) {
+
+            const notification = document.getElementById('prefill-notification');
+            notification.classList.remove('d-none');
+
+            // Fade out the notification after 5 seconds
+            setTimeout(() => {
+                notification.style.transition = 'opacity 1s';
+                notification.style.opacity = '0';
+                setTimeout(() => notification.style.display = 'none', 1000);
+            }, 5000);
+        }
+    });
+</script>

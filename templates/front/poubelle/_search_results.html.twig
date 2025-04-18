@@ -187,9 +187,27 @@
     color: #000000 !important; /* Black text for quick info */
 }
 
-/* Card body content */
+/* Card body content - Collapsible content */
 .card-body-content {
     color: #000000 !important;
+    max-height: 0;
+    background: white;
+    border-radius: 10px;
+    box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
+    opacity: 0;
+    transition: max-height 0.5s ease, opacity 0.3s ease, margin 0.3s ease, padding 0.3s ease;
+    border: 1px solid rgba(0, 0, 0, 0.1);
+    overflow: hidden;
+    padding: 0 1rem;
+    margin-top: 0;
+    box-sizing: border-box;
+}
+
+.card-body-content.show {
+    max-height: 500px; /* Adjust based on your content */
+    opacity: 1;
+    padding: 1rem;
+    margin-top: 15px;
 }
 
 .card-body-content p:not(.text-muted) {
@@ -219,4 +237,6 @@
 .text-muted {
     color: #6c757d !important;
 }
+
+
 </style>

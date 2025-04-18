@@ -5,86 +5,19 @@
 {% block stylesheets %}
     {{ parent() }}
     <style>
-        /* Translation pour le contenu principal */
-        .main-content {
-            transform: translateY(70px);
-            margin-bottom: 70px;
-        }
 
-        :root {
-            --dark-green: #013220;
-            --deep-green: #00693E;
-            --medium-green: #29AB87;
-            --light-green: #ACE1AF;
-            --cream-white: #FEFEFA;
-            --orange: #FF6B35;
-            --red: #D64045;
-            --blue: #3A86FF;
-            --light-gray: #F8F9FA;
-            --dark-gray: #343A40;
-        }
+        /* Card styling is handled by the unified theme */
 
-        /* Carte principale */
-        .detail-card {
-            border: none;
-            border-radius: 16px;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.08);
-            overflow: hidden;
-            transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.1);
-            background: white;
-        }
-
-        .detail-card:hover {
-            transform: translateY(-5px);
-            box-shadow: 0 15px 35px rgba(0, 105, 62, 0.15);
-        }
-
-        .detail-card .card-header {
-            background: linear-gradient(135deg, var(--deep-green), var(--medium-green));
-            color: white;
-            padding: 25px;
-            border-bottom: none;
-            position: relative;
-            overflow: hidden;
-        }
-
-        .detail-card .card-header::before {
-            content: '';
-            position: absolute;
-            top: -50%;
-            left: -50%;
-            width: 200%;
-            height: 200%;
-            background: radial-gradient(circle, rgba(255,255,255,0.1) 0%, rgba(255,255,255,0) 70%);
-            transform: rotate(30deg);
-        }
-
-        .detail-card .card-body {
-            padding: 30px;
-            background-color: var(--light-gray);
-        }
-
-        .detail-card .card-footer {
-            background-color: white;
-            border-top: 1px solid rgba(0,0,0,0.05);
-            padding: 20px 30px;
-            display: flex;
-            flex-wrap: wrap;
-            justify-content: space-between;
-            align-items: center;
-            gap: 15px;
-        }
-
-        /* Éléments de détail */
+        /* Detail items */
         .detail-item {
             margin-bottom: 25px;
             padding-bottom: 20px;
             border-bottom: 1px solid rgba(0,0,0,0.05);
-            transition: all 0.3s ease;
+            transition: var(--transition-normal);
         }
 
         .detail-item:hover {
-            border-bottom-color: var(--medium-green);
+            border-bottom-color: var(--primary-medium);
         }
 
         .detail-item:last-child {
@@ -94,7 +27,7 @@
         }
 
         .detail-label {
-            color: var(--dark-green);
+            color: #000; /* Black text */
             font-weight: 600;
             display: flex;
             align-items: center;
@@ -107,16 +40,16 @@
         .detail-label i {
             margin-right: 10px;
             font-size: 1.1rem;
-            color: var(--medium-green);
+            color: var(--primary-medium);
         }
 
         .detail-value {
-            color: var(--dark-gray);
+            color: #000; /* Black text */
             font-size: 1.1rem;
             padding-left: 28px;
         }
 
-        /* Étoiles */
+        /* Star rating */
         .star-rating {
             display: inline-flex;
             align-items: center;
@@ -125,7 +58,7 @@
         .star-rating .fa-star {
             font-size: 1.3rem;
             margin-right: 5px;
-            transition: all 0.2s ease;
+            transition: var(--transition-normal);
         }
 
         .star-rating .fa-star:hover {
@@ -133,7 +66,7 @@
         }
 
         .star-rating .text-warning {
-            color: #FFC107 !important;
+            color: var(--warning) !important;
             text-shadow: 0 2px 4px rgba(255, 193, 7, 0.3);
         }
 
@@ -141,15 +74,17 @@
             color: #E0E0E0 !important;
         }
 
-        /* Section Avis */
+        /* Review content */
         .avis-content {
             background: white;
-            border-radius: 10px;
+            border-radius: var(--radius-md);
             padding: 20px;
-            box-shadow: 0 3px 10px rgba(0,0,0,0.03);
-            border-left: 4px solid var(--medium-green);
+            box-shadow: var(--shadow-sm);
+            border: 1px solid #000; /* Black border */
+            border-left: 4px solid var(--primary-medium);
             font-style: italic;
             position: relative;
+            color: #000; /* Black text */
         }
 
         .avis-content::before {
@@ -162,213 +97,172 @@
             font-family: serif;
             line-height: 1;
         }
-        
+
         .avis-image {
             padding: 15px;
-            border-radius: 12px;
-            background-color: rgba(172, 225, 175, 0.1);
-            border: 1px dashed rgba(0, 105, 62, 0.2);
+            border-radius: var(--radius-md);
+            background-color: rgba(0, 105, 62, 0.05);
+            border: 1px solid #000; /* Black border */
             text-align: center;
-            transition: all 0.3s ease;
+            transition: var(--transition-normal);
         }
-        
+
         .avis-image:hover {
             transform: scale(1.02);
-            box-shadow: 0 10px 25px rgba(0, 0, 0, 0.1);
-            border: 1px dashed rgba(0, 105, 62, 0.4);
+            box-shadow: var(--shadow-md);
+            border: 1px solid #000; /* Maintain black border */
         }
-        
+
         .avis-image img {
-            border-radius: 8px;
-            transition: all 0.3s ease;
+            border-radius: var(--radius-sm);
+            transition: var(--transition-normal);
             max-width: 100%;
         }
-        
+
         .avis-image img:hover {
             transform: scale(1.03);
-            box-shadow: 0 15px 35px rgba(0, 0, 0, 0.15);
+            box-shadow: var(--shadow-lg);
         }
 
-        /* Boutons améliorés */
-        .btn-glass {
-            background: rgba(255, 255, 255, 0.1);
-            backdrop-filter: blur(10px);
-            -webkit-backdrop-filter: blur(10px);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            color: white;
-            padding: 10px 25px;
-            border-radius: 50px;
-            transition: all 0.4s ease;
-            font-weight: 600;
-            display: inline-flex;
-            align-items: center;
-            justify-content: center;
-            position: relative;
-            overflow: hidden;
-            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .btn-glass:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 7px 20px rgba(0, 0, 0, 0.15);
-            background: rgba(255, 255, 255, 0.2);
-            color: white;
-        }
-
-        .btn-glass::after {
-            content: '';
-            position: absolute;
-            top: 0;
-            left: 0;
-            width: 100%;
-            height: 100%;
-            background: linear-gradient(45deg, transparent, rgba(255,255,255,0.3), transparent);
-            transform: translateX(-100%);
-            transition: 0.6s;
-        }
-
-        .btn-glass:hover::after {
-            transform: translateX(100%);
-        }
-
+        /* Button styling */
         .btn-return {
             background: white;
-            color: var(--deep-green);
-            border: 2px solid var(--deep-green);
+            color: var(--primary-dark);
+            border: 2px solid var(--primary-dark);
             padding: 10px 25px;
-            border-radius: 50px;
-            transition: all 0.4s cubic-bezier(0.25, 0.8, 0.25, 1);
+            border-radius: var(--radius-pill);
+            transition: var(--transition-normal);
             font-weight: 600;
             display: inline-flex;
             align-items: center;
         }
 
         .btn-return:hover {
-            background: var(--deep-green);
+            background: var(--primary-dark);
             color: white;
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 105, 62, 0.3);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-edit {
-            background: var(--blue);
+            background: var(--primary-medium);
             color: white;
             padding: 10px 25px;
-            border-radius: 50px;
-            transition: all 0.4s ease;
+            border-radius: var(--radius-pill);
+            transition: var(--transition-normal);
             font-weight: 600;
             border: none;
             display: inline-flex;
             align-items: center;
-            box-shadow: 0 4px 15px rgba(58, 134, 255, 0.3);
+            box-shadow: var(--shadow-sm);
         }
 
         .btn-edit:hover {
-            background: #2a75e6;
-            transform: translateY(-3px) scale(1.03);
-            box-shadow: 0 7px 20px rgba(58, 134, 255, 0.4);
+            background: var(--primary-dark);
+            transform: translateY(-3px);
+            box-shadow: var(--shadow-md);
         }
 
         .btn-delete {
             background: white;
-            color: var(--red);
-            border: 2px solid var(--red);
+            color: var(--danger);
+            border: 2px solid var(--danger);
             padding: 10px 25px;
-            border-radius: 50px;
-            transition: all 0.4s ease;
+            border-radius: var(--radius-pill);
+            transition: var(--transition-normal);
             font-weight: 600;
             display: inline-flex;
             align-items: center;
         }
 
         .btn-delete:hover {
-            background: var(--red);
+            background: var(--danger);
             color: white;
             transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(214, 64, 69, 0.3);
+            box-shadow: var(--shadow-md);
         }
 
-        /* Groupe de boutons */
+        /* Button group */
         .btn-group {
             display: flex;
             gap: 15px;
             flex-wrap: wrap;
         }
 
-        /* Badge date */
+        /* Date badge */
         .date-badge {
             background: rgba(255, 255, 255, 0.2);
             padding: 5px 15px;
-            border-radius: 50px;
+            border-radius: var(--radius-pill);
             font-weight: 600;
             backdrop-filter: blur(5px);
             -webkit-backdrop-filter: blur(5px);
             border: 1px solid rgba(255, 255, 255, 0.1);
         }
 
-        /* Style pour la boîte de dialogue SweetAlert */
+        /* SweetAlert styling */
         .swal2-popup {
-            border-radius: 16px !important;
-            font-family: inherit !important;
-            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15) !important;
+            border-radius: var(--radius-lg) !important;
+            font-family: var(--font-family-base) !important;
+            box-shadow: var(--shadow-lg) !important;
         }
 
         .swal2-title {
-            color: var(--dark-gray) !important;
+            color: var(--text-dark) !important;
             font-size: 1.5rem !important;
             font-weight: 600 !important;
         }
 
         .swal2-html-container {
-            color: #555 !important;
+            color: var(--text-medium) !important;
             font-size: 1.1rem !important;
         }
 
         .swal2-confirm {
-            background-color: var(--red) !important;
+            background-color: var(--danger) !important;
             border: none !important;
             padding: 10px 25px !important;
-            border-radius: 50px !important;
+            border-radius: var(--radius-pill) !important;
             font-weight: 600 !important;
-            transition: all 0.3s ease !important;
+            transition: var(--transition-normal) !important;
         }
 
         .swal2-confirm:hover {
             background-color: #c23338 !important;
             transform: translateY(-2px) !important;
-            box-shadow: 0 4px 10px rgba(214, 64, 69, 0.3) !important;
+            box-shadow: var(--shadow-md) !important;
         }
 
         .swal2-cancel {
-            border: 2px solid var(--dark-gray) !important;
-            color: var(--dark-gray) !important;
+            border: 2px solid var(--text-dark) !important;
+            color: var(--text-dark) !important;
             padding: 10px 25px !important;
-            border-radius: 50px !important;
+            border-radius: var(--radius-pill) !important;
             font-weight: 600 !important;
-            transition: all 0.3s ease !important;
+            transition: var(--transition-normal) !important;
         }
 
         .swal2-cancel:hover {
-            background-color: var(--light-gray) !important;
+            background-color: var(--light) !important;
             transform: translateY(-2px) !important;
-            box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1) !important;
+            box-shadow: var(--shadow-sm) !important;
         }
 
         /* Responsive */
         @media (max-width: 768px) {
-            .detail-card .card-body {
+            .card-body {
                 padding: 20px;
             }
-            
+
             .card-footer {
                 flex-direction: column;
             }
-            
+
             .btn-group {
                 width: 100%;
                 justify-content: center;
             }
-            
+
             .btn-return {
                 width: 100%;
                 justify-content: center;
@@ -385,7 +279,7 @@
         function confirmDelete(event) {
             event.preventDefault();
             const form = event.target.closest('form');
-            
+
             Swal.fire({
                 title: 'Confirmer la suppression',
                 html: 'Êtes-vous sûr de vouloir supprimer cet avis ?<br><small>Cette action est irréversible</small>',
@@ -420,15 +314,18 @@
 {% endblock %}
 
 {% block body %}
-    <div class="main-content">
-        <div class="container py-5">
-            <div class="detail-card card">
-                <div class="card-header">
+    <div class="full-page-bg"></div>
+    <section class="content-wrapper py-5">
+        <div class="container mb-5 mt-4">
+            <h1 class="section-title text-white animate-fade-in">Détails de l'avis</h1>
+
+            <div class="card-custom animate-slide-up" style="border: 1px solid #000; margin-bottom: 2rem;">
+                <div class="card-header" style="background: linear-gradient(145deg, var(--primary-medium), var(--primary-dark)); color: white;">
                     <div class="d-flex justify-content-between align-items-center">
-                        <h2 class="h4 mb-0">
+                        <h5 class="card-title mb-0">
                             <i class="fas fa-file-alt me-2"></i>
-                            Détails de l'avis #{{ avi.id }}
-                        </h2>
+                            Avis #{{ avi.id }}
+                        </h5>
                         <span class="date-badge">
                             {{ avi.createdAt|date('d/m/Y') }}
                         </span>
@@ -484,7 +381,7 @@
                             {{ avi.avis }}
                         </div>
                     </div>
-                    
+
                     {% if avi.image %}
                     <!-- Section Image -->
                     <div class="detail-item mt-4">
@@ -517,5 +414,5 @@
                 </div>
             </div>
         </div>
-    </div>
+    </section>
 {% endblock %}

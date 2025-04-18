@@ -49,10 +49,9 @@
 
             <li><a class="dropdown-item {{ app.request.attributes.get('_route') starts with 'user_actions' ? 'active' : '' }}" href="{{ path('user_actions') }}">Submit Actions</a></li>
             <li><hr class="dropdown-divider"></li>
-            <li><a class="dropdown-item">Dashboard</a></li>
             <li><a class="dropdown-item {{ app.request.attributes.get('_route') starts with 'app_demande' ? 'active' : '' }}" href="{{ path("app_demande_index") }}">Demande</a></li>
+            <li><a class="dropdown-item {{ app.request.attributes.get('_route') starts with 'app_participation' ? 'active' : '' }}" href="{{ path("app_participation_index") }}">Participations</a></li>
 
-            <li><a class="dropdown-item" href="#">My Reports</a></li>
             <li><hr class="dropdown-divider"></li>
             <li><a class="dropdown-item" href="{{ path('security_logout') }}">Logout</a></li>
         </ul>

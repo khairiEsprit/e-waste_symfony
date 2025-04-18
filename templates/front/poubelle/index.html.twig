@@ -258,24 +258,25 @@
 
         /* Contenu détaillé à afficher/masquer */
         .card-body-content {
-            display: none;
+            max-height: 0;
             background: white;
             border-radius: 10px;
-            margin-top: 15px;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+            box-shadow: 0 5px 20px rgba(0, 0, 0, 0.15);
             opacity: 0;
-            transform: translateY(-10px);
-            transition: opacity 0.3s ease, transform 0.3s ease;
+            transition: max-height 0.5s ease, opacity 0.3s ease, margin 0.3s ease, padding 0.3s ease;
             color: #000000;
             border: 1px solid rgba(0, 0, 0, 0.1);
             overflow: hidden;
+            padding: 0 1rem;
+            margin-top: 0;
+            box-sizing: border-box;
         }
 
         .card-body-content.show {
-            display: block;
+            max-height: 500px; /* Adjust based on your content */
             opacity: 1;
-            transform: translateY(0);
             padding: 1rem;
+            margin-top: 15px;
         }
 
         .card-body-content hr {

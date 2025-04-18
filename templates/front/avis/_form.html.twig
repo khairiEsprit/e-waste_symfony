@@ -55,10 +55,10 @@
                 <label for="{{ form.note.vars.id }}_{{ i }}" title="{{ i }} étoiles">★</label>
             {% endfor %}
         </div>
-        
+
         {# Hidden field to ensure the note value is always included in the form #}
         {{ form_widget(form.note, {'attr': {'class': 'd-none', 'id': 'avis_note_hidden'}}) }}
-       
+
         <div class="error-message text-danger mt-2" id="note-error"></div>
     </div>
 
@@ -105,13 +105,13 @@
         transform: scale(1.01);
         transition: all 0.3s ease;
     }
-    
+
     /* Custom file upload styling */
     .custom-file-input::-webkit-file-upload-button {
         visibility: hidden;
         width: 0;
     }
-    
+
     .custom-file-input::before {
         content: 'Choisir une image';
         display: inline-block;
@@ -127,7 +127,7 @@
         margin-right: 10px;
         transition: all 0.3s ease;
     }
-    
+
     .custom-file-input:hover::before {
         background: linear-gradient(145deg, #00693E, #29AB87);
         transform: translateY(-2px);
@@ -179,7 +179,7 @@
         left: 100%;
         top: 100%;
     }
-    
+
     .save-btn .btn-icon {
         margin-right: 10px;
         transition: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
@@ -215,25 +215,44 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // Check if the form has pre-filled data
+        const nomField = document.getElementById('avis_nom');
+        if (nomField && nomField.value) {
+            // Create a notification to inform the user that their information has been pre-filled
+            const notification = document.createElement('div');
+            notification.className = 'alert alert-info mt-3 mb-4';
+            notification.innerHTML = '<i class="fas fa-info-circle me-2"></i> Vos informations ont été pré-remplies. Vous pouvez les modifier si nécessaire.';
+
+            // Insert the notification at the top of the form
+            const form = document.getElementById('avis-form');
+            form.insertBefore(notification, form.firstChild);
+
+            // Fade out the notification after 5 seconds
+            setTimeout(() => {
+                notification.style.transition = 'opacity 1s';
+                notification.style.opacity = '0';
+                setTimeout(() => notification.remove(), 1000);
+            }, 5000);
+        }
         const imageInput = document.getElementById('avis_image');
         const previewContainer = document.getElementById('image-preview-container');
         const imagePreview = document.getElementById('image-preview');
         const removeButton = document.getElementById('remove-image-btn');
-        
+
         // Show preview when file is selected
         imageInput.addEventListener('change', function() {
             if (this.files && this.files[0]) {
                 const reader = new FileReader();
-                
+
                 reader.onload = function(e) {
                     imagePreview.src = e.target.result;
                     previewContainer.classList.remove('d-none');
                 }
-                
+
                 reader.readAsDataURL(this.files[0]);
             }
         });
-        
+
         // Remove image when button is clicked
         removeButton.addEventListener('click', function() {
             imageInput.value = '';
