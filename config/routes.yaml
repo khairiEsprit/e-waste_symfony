@@ -1,35 +1,34 @@
 controllers:
-    resource: ../src/Controller/
-    type: annotation
+  resource: ../src/Controller/
+  type: annotation
 
 kernel:
-    resource: ../src/Kernel.php
-    type: annotation
-    
+  resource: ../src/Kernel.php
+  type: annotation
+
 # authorization:
 #     resource: "@PdUserBundle/Resources/config/routing.yaml"
 #     prefix: /auth
 
 authorization:
-    resource: "../src/Appaydin/PdUser/Resources/config/routing.yaml"
-    prefix: /auth
+  resource: "../src/Appaydin/PdUser/Resources/config/routing.yaml"
+  prefix: /auth
 
 # HWI OAuth routes
 hwi_oauth_redirect:
-    resource: "@HWIOAuthBundle/Resources/config/routing/redirect.xml"
-    prefix: /connect/service
+  resource: "@HWIOAuthBundle/Resources/config/routing/redirect.xml"
+  prefix: /connect/service
 
 hwi_oauth_connect:
-    resource: "@HWIOAuthBundle/Resources/config/routing/connect.xml"
-    prefix: /connect
+  resource: "@HWIOAuthBundle/Resources/config/routing/connect.xml"
+  prefix: /connect
 
 hwi_oauth_login:
-    resource: "@HWIOAuthBundle/Resources/config/routing/login.xml"
-    prefix: /login
+  resource: "@HWIOAuthBundle/Resources/config/routing/login.xml"
+  prefix: /login
 
 # Custom route for Google OAuth check
 login_check_google:
-    path: /login/check-google
-    defaults:
-        _controller: HWI\Bundle\OAuthBundle\Controller\Connect\ConnectController::connectServiceAction
-
+  path: /login/check-google
+  defaults:
+    _controller: HWI\Bundle\OAuthBundle\Controller\Connect\ConnectController::connectServiceAction

@@ -4,15 +4,18 @@
 
 {% block stylesheets %}
     {{ parent() }}
-    <link rel="stylesheet" href="https://code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+    {# Ensure Bootstrap Icons are loaded if not already in base.html.twig #}
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    <link rel="stylesheet" href="https://code.jquery.com/ui/1.13.2/themes/base/jquery-ui.css"> {# Updated jQuery UI version for consistency #}
     <style>
+        /* --- Styles remain largely the same, ensure they support the layout --- */
         .profile-edit-section {
             padding: 120px 0 60px;
             background: linear-gradient(rgba(0, 105, 62, 0.9), rgba(1, 50, 32, 0.9)), url('{{ asset('assets/front/assets/img/hero-bg.jpg') }}') fixed center center;
             background-size: cover;
             position: relative;
         }
-        
+
         .profile-edit-card {
             background: #fff;
             border-radius: 15px;
@@ -21,51 +24,58 @@
             transition: all 0.3s ease;
             margin-bottom: 30px;
         }
-        
+
         .profile-edit-card:hover {
             transform: translateY(-5px);
             box-shadow: 0 10px 40px rgba(0, 0, 0, 0.2);
         }
-        
+
         .profile-edit-header {
-            background: #013220;
+            background: #013220; /* Deep Green */
             padding: 30px;
             text-align: center;
             color: #fff;
         }
-        
+
         .profile-edit-title {
             font-size: 28px;
             font-weight: 700;
             margin-bottom: 10px;
         }
-        
+
         .profile-edit-subtitle {
             font-size: 16px;
             opacity: 0.9;
         }
-        
+
         .profile-edit-body {
             padding: 30px;
         }
-        
+
         .form-section {
             margin-bottom: 30px;
         }
-        
+
         .section-title {
             font-size: 20px;
             font-weight: 600;
-            color: #013220;
+            color: #013220; /* Deep Green */
             margin-bottom: 20px;
             padding-bottom: 10px;
-            border-bottom: 2px solid #29AB87;
+            border-bottom: 2px solid #29AB87; /* Lighter Green */
         }
-        
+
         .form-group {
             margin-bottom: 25px;
         }
-        
+
+        .form-group label {
+            font-weight: 600;
+            color: #013220; /* Deep Green */
+            margin-bottom: 8px;
+            display: block;
+        }
+
         .form-control {
             height: 50px;
             border-radius: 8px;
@@ -74,24 +84,46 @@
             font-size: 16px;
             transition: all 0.3s ease;
         }
-        
+
         .form-control:focus {
-            border-color: #29AB87;
+            border-color: #29AB87; /* Lighter Green */
             box-shadow: 0 0 0 0.2rem rgba(41, 171, 135, 0.25);
         }
-        
+
+        /* Style for disabled inputs */
+        .form-control:disabled, .form-control[readonly] {
+            background-color: #e9ecef;
+            opacity: 1;
+            cursor: not-allowed;
+        }
+
         .form-control-file {
             padding: 10px 0;
         }
-        
+
         .invalid-feedback {
             color: #dc3545;
             font-size: 14px;
             margin-top: 5px;
+            display: block; /* Ensure error messages are always visible when needed */
         }
-        
+
+        .form-control.is-invalid {
+             border-color: #dc3545;
+             padding-right: calc(1.5em + 0.75rem);
+             background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12' width='12' height='12' fill='none' stroke='%23dc3545'%3e%3ccircle cx='6' cy='6' r='4.5'/%3e%3cpath stroke-linejoin='round' d='M5.8 3.6h.4L6 6.5z'/%3e%3ccircle cx='6' cy='8.2' r='.6' fill='%23dc3545' stroke='none'/%3e%3c/svg%3e");
+             background-repeat: no-repeat;
+             background-position: right calc(0.375em + 0.1875rem) center;
+             background-size: calc(0.75em + 0.375rem) calc(0.75em + 0.375rem);
+        }
+        .form-control.is-invalid:focus {
+             border-color: #dc3545;
+             box-shadow: 0 0 0 0.25rem rgba(220, 53, 69, 0.25);
+        }
+
+
         .btn-submit {
-            background: #013220;
+            background: #013220; /* Deep Green */
             color: #fff;
             border: 2px solid #013220;
             padding: 12px 30px;
@@ -101,14 +133,14 @@
             text-decoration: none;
             display: inline-block;
         }
-        
+
         .btn-submit:hover {
-            background: #00693E;
+            background: #00693E; /* Slightly Lighter Deep Green */
             border-color: #00693E;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
         .btn-cancel {
             background: transparent;
             color: #6c757d;
@@ -121,154 +153,220 @@
             display: inline-block;
             margin-right: 10px;
         }
-        
+
         .btn-cancel:hover {
             background: #6c757d;
             color: #fff;
             transform: translateY(-3px);
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
-        
+
+        /* --- Profile Preview Styles --- */
         .profile-preview {
             text-align: center;
             margin-bottom: 30px;
+            position: sticky; /* Make preview sticky if desired */
+            top: 100px;      /* Adjust top position as needed */
         }
-        
+
+        .profile-image-container {
+            width: 160px;
+            height: 160px;
+            border-radius: 50%;
+            padding: 5px;
+            background: linear-gradient(145deg, #29AB87, #013220); /* Lighter Green to Deep Green */
+            margin: 0 auto 15px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            position: relative;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+            transition: all 0.3s ease;
+        }
+
         .profile-preview-img {
             width: 150px;
             height: 150px;
             border-radius: 50%;
             border: 5px solid #fff;
             object-fit: cover;
-            margin: 0 auto 15px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
-            transition: all 0.3s ease;
+            transition: all 0.3s ease, transform 0.5s ease; /* Added transform transition */
+            position: relative;
+            overflow: hidden;
+            background-color: #f8f9fa;
         }
-        
+
         .profile-preview-img:hover {
             transform: scale(1.05);
+            border-color: #ACE1AF; /* Light Green */
         }
-        
+
         .profile-preview-name {
             font-size: 20px;
             font-weight: 600;
-            color: #013220;
+            color: #013220; /* Deep Green */
             margin-bottom: 5px;
+            min-height: 24px; /* Prevent layout shift when name is empty */
+            transition: opacity 0.3s ease-in-out; /* Smooth text transition */
         }
-        
+
         .profile-preview-email {
             font-size: 16px;
             color: #6c757d;
+            word-break: break-all; /* Prevent long emails overflowing */
         }
-        
-        .ui-datepicker {
+
+        /* --- Datepicker Styles (jQuery UI Customization) --- */
+         .ui-datepicker {
             padding: 10px;
             border-radius: 8px;
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-        
-        .ui-datepicker .ui-datepicker-header {
-            background: #013220;
+            border: 1px solid #ddd; /* Added border */
+            background: #fff; /* Ensure background */
+            z-index: 1000 !important; /* Ensure it's above other elements */
+            font-size: 14px; /* Slightly smaller font */
+         }
+         .ui-datepicker .ui-datepicker-header {
+            background: #013220; /* Deep Green */
             color: #fff;
             border: none;
             border-radius: 5px 5px 0 0;
-        }
-        
-        .ui-datepicker .ui-datepicker-title {
+            padding: 8px 0; /* Adjusted padding */
+         }
+         .ui-datepicker .ui-datepicker-title {
             font-weight: 600;
-        }
-        
-        .ui-datepicker .ui-datepicker-prev, 
-        .ui-datepicker .ui-datepicker-next {
+            font-size: 15px; /* Adjusted font size */
+            line-height: 1.8em;
+         }
+         .ui-datepicker .ui-datepicker-prev,
+         .ui-datepicker .ui-datepicker-next {
             background: transparent;
             border: none;
-            color: #fff;
-        }
-        
-        .ui-datepicker .ui-datepicker-prev:hover, 
-        .ui-datepicker .ui-datepicker-next:hover {
+            color: #fff !important; /* Use important to override */
+            top: 10px; /* Adjusted position */
+            cursor: pointer;
+         }
+         .ui-datepicker .ui-datepicker-prev span,
+         .ui-datepicker .ui-datepicker-next span {
+             background-image: none !important; /* Remove default icons */
+             display: inline-block;
+             width: 1.8em;
+             height: 1.8em;
+             line-height: 1.8em;
+             text-align: center;
+         }
+         .ui-datepicker .ui-datepicker-prev:hover,
+         .ui-datepicker .ui-datepicker-next:hover {
             background: rgba(255, 255, 255, 0.2);
             border: none;
+         }
+        /* Add simple arrow icons using content */
+        .ui-datepicker .ui-datepicker-prev:before {
+            content: '\25c0'; /* Left arrow */
+            font-size: 16px;
         }
-        
-        .ui-datepicker table {
+        .ui-datepicker .ui-datepicker-next:before {
+            content: '\25b6'; /* Right arrow */
+            font-size: 16px;
+        }
+
+         .ui-datepicker table {
             margin: 0.2em 0;
-        }
-        
-        .ui-datepicker th {
-            padding: 0.7em 0.3em;
-            color: #013220;
+            width: 100%; /* Ensure table fills width */
+            font-size: 14px; /* Adjusted font size */
+         }
+         .ui-datepicker th {
+            padding: 0.5em 0.3em; /* Adjusted padding */
+            color: #013220; /* Deep Green */
             font-weight: 600;
-        }
-        
-        .ui-datepicker td span, 
-        .ui-datepicker td a {
+            text-align: center; /* Center day names */
+         }
+         .ui-datepicker td span,
+         .ui-datepicker td a {
+            display: block; /* Ensure links fill cell */
             text-align: center;
-            padding: 0.5em;
+            padding: 0.4em; /* Adjusted padding */
             border-radius: 4px;
-        }
-        
-        .ui-datepicker td a.ui-state-default {
+            text-decoration: none; /* Remove underline */
+         }
+         .ui-datepicker td a.ui-state-default {
             background: transparent;
             border: none;
             color: #333;
-        }
-        
-        .ui-datepicker td a.ui-state-default:hover {
-            background: #ACE1AF;
-        }
-        
-        .ui-datepicker td a.ui-state-active {
-            background: #013220;
+         }
+         .ui-datepicker td a.ui-state-default:hover {
+            background: #ACE1AF; /* Light Green */
+            color: #013220;
+         }
+         .ui-datepicker td a.ui-state-active {
+            background: #013220; /* Deep Green */
             color: #fff;
-        }
-        
-        .ui-datepicker td a.ui-state-highlight {
-            background: #ACE1AF;
-            border: 1px solid #29AB87;
-        }
-        
+         }
+         .ui-datepicker td a.ui-state-highlight {
+            background: #ACE1AF; /* Light Green */
+            border: 1px solid #29AB87; /* Lighter Green */
+            color: #013220;
+         }
+         /* Ensure month/year selects look okay if enabled */
+         .ui-datepicker .ui-datepicker-month,
+         .ui-datepicker .ui-datepicker-year {
+             color: #fff;
+             background: #00693E;
+             border: none;
+             border-radius: 4px;
+             padding: 2px;
+             margin: 0 2px;
+         }
+
+
         .form-actions {
             display: flex;
-            justify-content: space-between;
+            justify-content: flex-end; /* Align buttons to the right */
             align-items: center;
             margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #eee; /* Add separator */
         }
-        
-        .form-group label {
-            font-weight: 600;
-            color: #013220;
-            margin-bottom: 8px;
-            display: block;
-        }
-        
+
+        /* --- Animations --- */
         @keyframes fadeIn {
-            from { opacity: 0; transform: translateY(-20px); }
+            from { opacity: 0; transform: translateY(-10px); }
             to { opacity: 1; transform: translateY(0); }
         }
-        
         .fade-in {
-            animation: fadeIn 0.5s ease-in-out;
+            animation: fadeIn 0.4s ease-in-out forwards;
         }
-        
-        .form-section {
-            animation: fadeIn 0.5s ease-in-out;
-            animation-fill-mode: both;
+
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.03); }
+            100% { transform: scale(1); }
         }
-        
-        .form-section:nth-child(1) { animation-delay: 0.1s; }
-        .form-section:nth-child(2) { animation-delay: 0.2s; }
-        .form-section:nth-child(3) { animation-delay: 0.3s; }
-        
+        .pulse-animation {
+            animation: pulse 0.5s ease-in-out;
+        }
+
+        /* Add a subtle pulse to the preview image container by default */
+        @keyframes profilePulse {
+             0% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
+             50% { box-shadow: 0 8px 25px rgba(41, 171, 135, 0.3); } /* Lighter green shadow */
+             100% { box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3); }
+        }
+        .profile-pulse {
+             animation: profilePulse 2.5s infinite ease-in-out;
+        }
+
+
+        /* --- File Upload --- */
         .file-upload-wrapper {
             position: relative;
             margin-top: 10px;
         }
-        
         .file-upload-btn {
-            background: #ACE1AF;
-            color: #013220;
-            border: 2px dashed #29AB87;
+            background: #f8f9fa; /* Light Grey Background */
+            color: #013220; /* Deep Green */
+            border: 2px dashed #29AB87; /* Lighter Green Dashed Border */
             padding: 15px;
             border-radius: 8px;
             text-align: center;
@@ -277,19 +375,18 @@
             width: 100%;
             display: block;
         }
-        
         .file-upload-btn:hover {
-            background: #29AB87;
-            color: #fff;
+            background: #e2e6ea; /* Slightly darker grey */
+            border-color: #013220; /* Deep Green */
         }
-        
         .file-upload-btn i {
             font-size: 24px;
             margin-bottom: 10px;
             display: block;
+            color: #29AB87; /* Lighter Green Icon */
         }
-        
-        input[type="file"] {
+        /* Hide the actual file input */
+        .profile-image-input {
             opacity: 0;
             position: absolute;
             top: 0;
@@ -297,13 +394,17 @@
             width: 100%;
             height: 100%;
             cursor: pointer;
+            z-index: 10; /* Make sure it's clickable */
         }
-        
         .file-name {
             margin-top: 10px;
             font-size: 14px;
             color: #6c757d;
+            text-align: center;
+            min-height: 20px; /* Prevent layout shifts */
+            word-break: break-all;
         }
+
     </style>
 {% endblock %}
 
@@ -311,7 +412,7 @@
 <section class="profile-edit-section">
     <div class="container" data-aos="fade-up">
         <div class="row justify-content-center">
-            <div class="col-lg-10">
+            <div class="col-lg-11 col-xl-10"> {# Slightly wider container for better spacing #}
                 <div class="profile-edit-card">
                     <div class="profile-edit-header">
                         <h2 class="profile-edit-title">Edit Profile</h2>
@@ -319,33 +420,41 @@
                     </div>
                     <div class="profile-edit-body">
                         <div class="row">
+                            {# Profile Preview Column #}
                             <div class="col-md-4">
                                 <div class="profile-preview" data-aos="fade-right" data-aos-delay="100">
-                                    {% if user.profileImage %}
-                                        <img src={{user.profileImage}} alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
-                                    {% else %}
-                                        <img src="{{ asset('assets/front/assets/img/default-avatar.png') }}" alt="{{ user.fullName }}" class="profile-preview-img" id="profile-image-preview">
-                                    {% endif %}
-                                    <h3 class="profile-preview-name">{{ user.fullName }}</h3>
-                                    <p class="profile-preview-email">{{ user.email }}</p>
+                                    <div class="profile-image-container profile-pulse">
+                                        {# Use a default image path if user.profileImage is null or empty #}
+                                        <img src="{{ user.profileImage | default(asset('assets/front/assets/img/default-avatar.png')) }}"
+                                             alt="Profile Preview" {# Generic alt text initially #}
+                                             class="profile-preview-img"
+                                             id="profile-image-preview">
+                                    </div>
+                                    {# These elements will be updated by JavaScript #}
+                                    <h3 class="profile-preview-name" id="profile-name-preview">{{ user.fullName }}</h3>
+                                    <p class="profile-preview-email" id="profile-email-preview">{{ user.email }}</p>
                                 </div>
                             </div>
+
+                            {# Form Column #}
                             <div class="col-md-8">
-                                {{ form_start(form, {'attr': {'class': 'profile-edit-form', 'novalidate': 'novalidate'}}) }}
+                                {{ form_start(form, {'attr': {'class': 'profile-edit-form needs-validation', 'novalidate': 'novalidate'}}) }}
+
+                                    {# Personal Information Section #}
                                     <div class="form-section" data-aos="fade-up" data-aos-delay="200">
                                         <h3 class="section-title">Personal Information</h3>
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {{ form_label(form.firstName) }}
-                                                    {{ form_widget(form.firstName) }}
+                                                    {{ form_widget(form.firstName, {'attr': {'class': 'form-control'}}) }}
                                                     {{ form_errors(form.firstName) }}
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {{ form_label(form.lastName) }}
-                                                    {{ form_widget(form.lastName) }}
+                                                    {{ form_widget(form.lastName, {'attr': {'class': 'form-control'}}) }}
                                                     {{ form_errors(form.lastName) }}
                                                 </div>
                                             </div>
@@ -354,154 +463,247 @@
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {{ form_label(form.email) }}
-                                                    {{ form_widget(form.email) }}
-                                                    {{ form_errors(form.email) }}
+                                                    {# --- MODIFICATION: Add disabled attribute --- #}
+                                                    {{ form_widget(form.email, {'attr': {'class': 'form-control', 'disabled': 'disabled'}}) }}
+                                                    {# You might not need to display errors for a disabled field #}
+                                                    {# {{ form_errors(form.email) }} #}
+                                                    <small class="form-text text-muted">Email cannot be changed.</small>
                                                 </div>
                                             </div>
                                             <div class="col-md-6">
                                                 <div class="form-group">
                                                     {{ form_label(form.phone) }}
-                                                    {{ form_widget(form.phone) }}
+                                                    {{ form_widget(form.phone, {'attr': {'class': 'form-control'}}) }}
                                                     {{ form_errors(form.phone) }}
                                                 </div>
                                             </div>
                                         </div>
                                         <div class="form-group">
                                             {{ form_label(form.birthdate) }}
-                                            {{ form_widget(form.birthdate) }}
+                                            {# Ensure the 'js-datepicker' class is added here or in the FormType #}
+                                            {{ form_widget(form.birthdate, {'attr': {'class': 'form-control js-datepicker', 'placeholder': 'MM/DD/YYYY'}}) }}
                                             {{ form_errors(form.birthdate) }}
                                         </div>
                                     </div>
-                                    
+
+                                    {# Profile Image Section #}
                                     <div class="form-section" data-aos="fade-up" data-aos-delay="300">
                                         <h3 class="section-title">Profile Image</h3>
                                         <div class="form-group">
                                             <div class="file-upload-wrapper">
+                                                 {# --- MODIFICATION: Link label directly to input ID for better accessibility --- #}
                                                 <label for="{{ form.profileImageFile.vars.id }}" class="file-upload-btn">
                                                     <i class="bi bi-cloud-upload"></i>
-                                                    <span>Click to upload a profile image</span>
+                                                    <span id="upload-text">Click to upload or change image</span>
                                                 </label>
+                                                {# --- MODIFICATION: Add class for JS selection --- #}
                                                 {{ form_widget(form.profileImageFile, {'attr': {'class': 'profile-image-input'}}) }}
-                                                <div class="file-name" id="file-name">No file selected</div>
+                                                <div class="file-name" id="file-name-display">No file selected</div>
                                             </div>
                                             {{ form_errors(form.profileImageFile) }}
-                                            <small class="form-text text-muted">
-                                                Allowed formats: JPEG, PNG, GIF. Max size: 5MB
+                                            <small class="form-text text-muted mt-2 d-block">
+                                                Allowed formats: JPG, PNG, GIF. Max size: 5MB.
                                             </small>
                                         </div>
                                     </div>
-                                    
+
+                                    {# Change Password Section #}
                                     <div class="form-section" data-aos="fade-up" data-aos-delay="400">
                                         <h3 class="section-title">Change Password</h3>
-                                        <p class="text-muted mb-4">Leave these fields empty if you don't want to change your password</p>
-                                        <div class="form-group">
-                                            {{ form_label(form.plainPassword.first) }}
-                                            {{ form_widget(form.plainPassword.first) }}
-                                            {{ form_errors(form.plainPassword.first) }}
-                                        </div>
-                                        <div class="form-group">
-                                            {{ form_label(form.plainPassword.second) }}
-                                            {{ form_widget(form.plainPassword.second) }}
-                                            {{ form_errors(form.plainPassword.second) }}
+                                        <p class="text-muted mb-3">Leave fields empty if you don't want to change the password.</p>
+                                        <div class="row">
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.plainPassword.first) }}
+                                                    {{ form_widget(form.plainPassword.first, {'attr': {'class': 'form-control'}}) }}
+                                                    {{ form_errors(form.plainPassword.first) }}
+                                                </div>
+                                            </div>
+                                            <div class="col-md-6">
+                                                <div class="form-group">
+                                                    {{ form_label(form.plainPassword.second) }}
+                                                    {{ form_widget(form.plainPassword.second, {'attr': {'class': 'form-control'}}) }}
+                                                    {{ form_errors(form.plainPassword.second) }}
+                                                </div>
+                                            </div>
                                         </div>
                                     </div>
-                                    
+
+                                    {# Form Actions #}
                                     <div class="form-actions">
-                                        <div>
-                                            <a href="{{ path('app_profile') }}" class="btn-cancel">
-                                                <i class="bi bi-arrow-left"></i> Cancel
-                                            </a>
-                                        </div>
-                                        <button type="submit" class="btn-submit">
+                                        <a href="{{ path('app_profile') }}" class="btn btn-cancel"> {# Assumes you have an 'app_profile' route #}
+                                            <i class="bi bi-x-lg"></i> Cancel
+                                        </a>
+                                        <button type="submit" class="btn btn-submit">
                                             <i class="bi bi-check-lg"></i> Save Changes
                                         </button>
                                     </div>
+
                                 {{ form_end(form) }}
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+                            </div> {# End Form Column #}
+                        </div> {# End Row #}
+                    </div> {# End profile-edit-body #}
+                </div> {# End profile-edit-card #}
+            </div> {# End Col #}
+        </div> {# End Row Justify Center #}
+    </div> {# End Container #}
 </section>
 {% endblock %}
 
 {% block javascripts %}
     {{ parent() }}
-    <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
+    {# Make sure jQuery is loaded before jQuery UI #}
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script> {# Example jQuery version #}
+    <script src="https://code.jquery.com/ui/1.13.2/jquery-ui.js"></script> {# Updated jQuery UI version #}
+    {# Make sure AOS is loaded if used #}
+    {# <script src="path/to/aos.js"></script> #}
+
     <script>
-        // Initialize AOS animations
-        AOS.init({
-            duration: 1000,
-            easing: 'ease-in-out',
-            once: true,
-            mirror: false
-        });
-        
+        // Initialize AOS animations (if used)
+        // AOS.init({
+        //     duration: 800,
+        //     easing: 'ease-in-out',
+        //     once: true,
+        //     mirror: false
+        // });
+
         $(document).ready(function() {
-            // Initialize datepicker
-            $('.js-datepicker').datepicker({
-                dateFormat: 'mm/dd/yy',
-                changeMonth: true,
-                changeYear: true,
-                yearRange: '-100:+0',
-                showAnim: 'fadeIn'
-            });
-            
-            // Profile image preview
-            $('.profile-image-input').change(function() {
+
+            // --- SELECTORS ---
+            const firstNameInput = $('#{{ form.firstName.vars.id }}');
+            const lastNameInput = $('#{{ form.lastName.vars.id }}');
+            const profileImageInput = $('#{{ form.profileImageFile.vars.id }}'); // Use the actual ID rendered by Symfony
+            const profileImagePreview = $('#profile-image-preview');
+            const profileNamePreview = $('#profile-name-preview');
+            const profileImageContainer = $('.profile-image-container');
+            const fileNameDisplay = $('#file-name-display');
+            const uploadText = $('#upload-text');
+            const datepickerInput = $('.js-datepicker');
+            const editForm = $('.profile-edit-form');
+
+            // --- INITIALIZE DATEPICKER ---
+            if (datepickerInput.length) {
+                 datepickerInput.datepicker({
+                     dateFormat: 'mm/dd/yy', // Match placeholder if used
+                     changeMonth: true,
+                     changeYear: true,
+                     yearRange: '-100:+0', // Allow selection from 100 years ago up to today
+                     showAnim: 'fadeIn',
+                     constrainInput: true // Prevent manual typing of invalid dates
+                 });
+            }
+
+            // --- LIVE PROFILE IMAGE PREVIEW ---
+            profileImageInput.on('change', function() {
                 const file = this.files[0];
                 if (file) {
+                    // Basic client-side validation (optional, do proper validation server-side)
+                    const allowedTypes = ['image/jpeg', 'image/png', 'image/gif'];
+                    const maxSize = 5 * 1024 * 1024; // 5MB
+
+                    if (!allowedTypes.includes(file.type)) {
+                        alert('Invalid file type. Please select a JPG, PNG, or GIF image.');
+                        $(this).val(''); // Clear the input
+                        fileNameDisplay.text('No file selected');
+                        uploadText.text('Click to upload or change image');
+                        return;
+                    }
+
+                    if (file.size > maxSize) {
+                        alert('File is too large. Maximum size is 5MB.');
+                        $(this).val(''); // Clear the input
+                        fileNameDisplay.text('No file selected');
+                        uploadText.text('Click to upload or change image');
+                        return;
+                    }
+
                     const reader = new FileReader();
                     reader.onload = function(e) {
-                        $('#profile-image-preview').attr('src', e.target.result);
-                        $('#profile-image-preview').addClass('pulse-animation');
+                        // Update image source
+                        profileImagePreview.attr('src', e.target.result);
+                        profileImagePreview.attr('alt', 'Profile preview for ' + file.name); // Update alt text
+
+                        // Add pulse animation to image for visual feedback
+                        profileImagePreview.addClass('pulse-animation');
+                        profileImageContainer.removeClass('profile-pulse'); // Stop infinite pulse during update
+
+                        // Remove animation class after it completes
                         setTimeout(function() {
-                            $('#profile-image-preview').removeClass('pulse-animation');
-                        }, 1000);
+                            profileImagePreview.removeClass('pulse-animation');
+                            profileImageContainer.addClass('profile-pulse'); // Resume infinite pulse
+                        }, 500); // Match animation duration
                     }
                     reader.readAsDataURL(file);
-                    $('#file-name').text(file.name);
+
+                    // Update file name display and button text
+                    fileNameDisplay.text(file.name);
+                    uploadText.text('Change image');
+
+                } else {
+                     // Handle case where user cancels file selection (though less common)
+                     // Optionally revert to original image if needed, depends on UX choice
+                     fileNameDisplay.text('No file selected');
+                     uploadText.text('Click to upload or change image');
                 }
             });
-            
-            // Real-time name preview update
-            $('#{{ form.firstName.vars.id }}').on('input', function() {
-                updatePreviewName();
-            });
-            
-            $('#{{ form.lastName.vars.id }}').on('input', function() {
-                updatePreviewName();
-            });
-            
+
+            // --- LIVE NAME PREVIEW ---
+            let nameUpdateTimeout;
             function updatePreviewName() {
-                const firstName = $('#{{ form.firstName.vars.id }}').val();
-                const lastName = $('#{{ form.lastName.vars.id }}').val();
-                $('.profile-preview-name').text(firstName + ' ' + lastName);
+                // Clear any pending timeout to avoid rapid flickering
+                clearTimeout(nameUpdateTimeout);
+
+                const firstName = firstNameInput.val().trim();
+                const lastName = lastNameInput.val().trim();
+                const fullName = (firstName + ' ' + lastName).trim();
+
+                // Add a small delay before updating to make it feel smoother
+                nameUpdateTimeout = setTimeout(function() {
+                    // Use default text if name is empty, or the calculated full name
+                    profileNamePreview.text(fullName || 'Your Name');
+
+                    // Optional: Add fade-in animation if you like
+                    profileNamePreview.addClass('fade-in');
+                    setTimeout(() => profileNamePreview.removeClass('fade-in'), 400);
+
+                    // Update alt text for the image as well
+                     profileImagePreview.attr('alt', 'Profile preview for ' + (fullName || 'User'));
+
+                }, 150); // 150ms delay
             }
-            
-            // Real-time email preview update
-            $('#{{ form.email.vars.id }}').on('input', function() {
-                const email = $(this).val();
-                $('.profile-preview-email').text(email);
-            });
-            
-            // Form validation animation
-            $('.profile-edit-form').on('submit', function(e) {
-                const form = this;
-                if (!form.checkValidity()) {
-                    e.preventDefault();
-                    e.stopPropagation();
-                    
-                    // Highlight invalid fields with animation
-                    $('.is-invalid').each(function() {
-                        $(this).parent().effect('shake', { times: 2, distance: 5 }, 500);
-                    });
-                }
-                
-                $(form).addClass('was-validated');
-            });
+
+            // Trigger update on input event for both name fields
+            firstNameInput.on('input', updatePreviewName);
+            lastNameInput.on('input', updatePreviewName);
+
+            // --- REMOVED EMAIL PREVIEW JS ---
+            // The email field is disabled, so no live preview is needed for it.
+            // The initial value is set via Twig.
+
+            // --- FORM VALIDATION (Using Bootstrap's built-in validation) ---
+             editForm.on('submit', function(event) {
+                 if (!this.checkValidity()) {
+                     event.preventDefault();
+                     event.stopPropagation();
+
+                     // Optional: Scroll to the first invalid field
+                     const firstInvalid = $(this).find(':invalid').first();
+                     if (firstInvalid.length) {
+                         $('html, body').animate({
+                             scrollTop: firstInvalid.offset().top - 100 // Adjust offset as needed
+                         }, 500);
+                         firstInvalid.focus(); // Focus the field
+                         // Add a visual shake effect (requires jQuery UI effects)
+                         firstInvalid.closest('.form-group').effect('shake', { times: 2, distance: 5 }, 500);
+                     }
+                 }
+
+                 $(this).addClass('was-validated'); // Add Bootstrap's validation classes
+             });
+
+            // Initialize the name preview on page load
+            updatePreviewName();
+
         });
     </script>
 {% endblock %}

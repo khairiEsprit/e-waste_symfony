@@ -6,7 +6,9 @@
 /config/secrets/prod/prod.decrypt.private.php
 /public/bundles/
 /var/
+venv
 /vendor/
+face_recognition_service/uploads
 ###< symfony/framework-bundle ###
 .env
 ###> phpunit/phpunit ###

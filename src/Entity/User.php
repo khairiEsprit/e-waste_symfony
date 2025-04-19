@@ -8,6 +8,7 @@ use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
 use Symfony\Component\Validator\Constraints as Assert;
 use App\Appaydin\PdUser\Model\User as BaseUser;
 use Doctrine\DBAL\Types\Types;
+use Symfony\Component\HttpFoundation\File\File;
 
 #[ORM\Entity(repositoryClass: "App\Repository\UserRepository")]
 #[ORM\Table(name: "user")]
@@ -26,6 +27,18 @@ class User extends BaseUser
 
     #[ORM\OneToMany(mappedBy: "user", targetEntity: UserReward::class, cascade: ["persist", "remove"])]
     private Collection $userRewards;
+
+    #[ORM\Column(type: "boolean", options: ["default" => false])]
+    private bool $isFaceRecognitionEnabled = false;
+
+    #[ORM\Column(type: "text", nullable: true)]
+    private ?string $faceEmbeddings = null;
+
+    #[ORM\Column(type: "string", length: 255, nullable: true)]
+    private ?string $facePhotoPath = null;
+
+    // This property won't be persisted, just used for form handling
+    private $facePhotoFile;
 
     #[ORM\OneToMany(targetEntity: Demande::class, mappedBy: 'utilisateur')]
     private Collection $demandes;
@@ -138,5 +151,49 @@ class User extends BaseUser
             $total += $userReward->getPoints();
         }
         return $total;
+    }
+
+    public function isFaceRecognitionEnabled(): bool
+    {
+        return $this->isFaceRecognitionEnabled;
+    }
+
+    public function setFaceRecognitionEnabled(bool $enabled): self
+    {
+        $this->isFaceRecognitionEnabled = $enabled;
+        return $this;
+    }
+
+    public function getFaceEmbeddings(): ?string
+    {
+        return $this->faceEmbeddings;
+    }
+
+    public function setFaceEmbeddings(?string $faceEmbeddings): self
+    {
+        $this->faceEmbeddings = $faceEmbeddings;
+        return $this;
+    }
+
+    public function getFacePhotoPath(): ?string
+    {
+        return $this->facePhotoPath;
+    }
+
+    public function setFacePhotoPath(?string $facePhotoPath): self
+    {
+        $this->facePhotoPath = $facePhotoPath;
+        return $this;
+    }
+
+    public function getFacePhotoFile()
+    {
+        return $this->facePhotoFile;
+    }
+
+    public function setFacePhotoFile($facePhotoFile): self
+    {
+        $this->facePhotoFile = $facePhotoFile;
+        return $this;
     }
 }
