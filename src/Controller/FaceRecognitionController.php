@@ -41,9 +41,22 @@ class FaceRecognitionController extends AbstractController
         // Check if face recognition service is available
         $serviceAvailable = $this->faceRecognitionService->isServiceAvailable();
 
+        // Get the number of face samples
+        $samplesCount = 0;
+        if ($user->isFaceRecognitionEnabled() && $user->getFaceEmbeddings()) {
+            $embeddings = json_decode($user->getFaceEmbeddings(), true);
+            if (isset($embeddings[0]) && is_array($embeddings[0])) {
+                $samplesCount = count($embeddings);
+            } else {
+                // Single embedding (old format)
+                $samplesCount = 1;
+            }
+        }
+
         return $this->render('front/profile/face_recognition.html.twig', [
             'user' => $user,
             'serviceAvailable' => $serviceAvailable,
+            'samplesCount' => $samplesCount,
         ]);
     }
 
@@ -112,5 +125,41 @@ class FaceRecognitionController extends AbstractController
         $result = $this->faceRecognitionService->detectFace($base64Image);
 
         return $this->json($result);
+    }
+
+    #[Route('/profile/face-recognition/add-sample', name: 'profile_face_recognition_add_sample')]
+    public function addFaceSample(): Response
+    {
+        /** @var User $user */
+        $user = $this->getUser();
+        if (!$user) {
+            return $this->redirectToRoute('security_login');
+        }
+
+        // Check if face recognition is enabled for the user
+        if (!$user->isFaceRecognitionEnabled()) {
+            return $this->redirectToRoute('profile_face_recognition');
+        }
+
+        // Check if face recognition service is available
+        $serviceAvailable = $this->faceRecognitionService->isServiceAvailable();
+
+        // Get the number of face samples
+        $samplesCount = 0;
+        if ($user->getFaceEmbeddings()) {
+            $embeddings = json_decode($user->getFaceEmbeddings(), true);
+            if (isset($embeddings[0]) && is_array($embeddings[0])) {
+                $samplesCount = count($embeddings);
+            } else {
+                // Single embedding (old format)
+                $samplesCount = 1;
+            }
+        }
+
+        return $this->render('front/profile/add_face_sample.html.twig', [
+            'user' => $user,
+            'serviceAvailable' => $serviceAvailable,
+            'samplesCount' => $samplesCount,
+        ]);
     }
 }

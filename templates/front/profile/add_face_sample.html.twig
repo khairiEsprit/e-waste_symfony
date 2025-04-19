@@ -1,6 +1,6 @@
 {% extends 'front/base.html.twig' %}
 
-{% block title %}Face Recognition Setup{% endblock %}
+{% block title %}Add Face Sample{% endblock %}
 
 {% block stylesheets %}
     {{ parent() }}
@@ -137,83 +137,6 @@
             box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
         }
 
-        .btn-disable {
-            background: #dc3545;
-            color: #fff;
-            border: 2px solid #dc3545;
-            padding: 12px 30px;
-            border-radius: 50px;
-            font-weight: 600;
-            transition: all 0.3s ease;
-            text-decoration: none;
-            display: inline-block;
-            margin-top: 20px;
-        }
-
-        .btn-disable:hover {
-            background: #c82333;
-            border-color: #bd2130;
-            transform: translateY(-3px);
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .face-recognition-info {
-            background-color: #f8f9fa;
-            border-radius: 10px;
-            padding: 20px;
-            margin-bottom: 20px;
-        }
-
-        .face-recognition-info h3 {
-            color: #013220;
-            font-size: 18px;
-            margin-bottom: 10px;
-        }
-
-        .face-recognition-info p {
-            color: #6c757d;
-            font-size: 14px;
-            line-height: 1.6;
-        }
-
-        .face-recognition-info ul {
-            padding-left: 20px;
-            margin-top: 10px;
-        }
-
-        .face-recognition-info li {
-            margin-bottom: 5px;
-            color: #6c757d;
-        }
-
-        .face-preview {
-            width: 200px;
-            height: 200px;
-            border-radius: 50%;
-            object-fit: cover;
-            margin: 0 auto 20px;
-            display: block;
-            border: 5px solid #fff;
-            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
-        }
-
-        .face-preview-container {
-            text-align: center;
-            margin-bottom: 30px;
-        }
-
-        .face-preview-title {
-            font-size: 18px;
-            font-weight: 600;
-            color: #013220;
-            margin-bottom: 5px;
-        }
-
-        .face-preview-subtitle {
-            font-size: 14px;
-            color: #6c757d;
-        }
-
         .hidden {
             display: none;
         }
@@ -263,6 +186,26 @@
             display: inline-block;
             vertical-align: middle;
         }
+
+        .face-samples-info {
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
+
+        .face-samples-info h3 {
+            color: #013220;
+            font-size: 18px;
+            margin-bottom: 10px;
+        }
+
+        .face-samples-count {
+            font-size: 24px;
+            font-weight: bold;
+            color: #013220;
+            margin: 10px 0;
+        }
     </style>
 {% endblock %}
 
@@ -273,8 +216,8 @@
             <div class="col-lg-10">
                 <div class="face-recognition-card">
                     <div class="face-recognition-header">
-                        <h2 class="face-recognition-title">Face Recognition Authentication</h2>
-                        <p class="face-recognition-subtitle">Set up face recognition for secure login</p>
+                        <h2 class="face-recognition-title">Add Face Sample</h2>
+                        <p class="face-recognition-subtitle">Add additional face samples to improve recognition accuracy</p>
                     </div>
 
                     <div class="face-recognition-body">
@@ -288,82 +231,78 @@
 
                             <div class="row">
                                 <div class="col-md-6">
-                                    <div class="face-recognition-info">
-                                        <h3>About Face Recognition Authentication</h3>
-                                        <p>Face recognition authentication provides an additional secure way to log in to your account. Once enabled, you can log in using your face instead of typing your password.</p>
-                                        <h3>How it Works</h3>
+                                    <div class="face-samples-info">
+                                        <h3>Your Face Samples</h3>
+                                        <p>Adding multiple face samples from different angles and lighting conditions can significantly improve face recognition accuracy.</p>
+
+                                        <div class="face-samples-count">
+                                            Current Samples: <span id="samples-count">{{ samplesCount }}</span>
+                                        </div>
+
+                                        <p>We recommend adding at least 3-5 samples for optimal recognition.</p>
+
+                                        <h3>Tips for Good Face Samples:</h3>
                                         <ul>
-                                            <li>We capture a photo of your face and securely store its unique features.</li>
-                                            <li>When you log in, you can choose to authenticate with your face.</li>
-                                            <li>Your face is compared to the stored data to verify your identity.</li>
-                                            <li>You can disable face recognition at any time.</li>
+                                            <li>Ensure good lighting on your face</li>
+                                            <li>Position your face clearly within the guide</li>
+                                            <li>Try different angles (straight on, slight left/right)</li>
+                                            <li>Include samples with and without glasses if you wear them</li>
                                         </ul>
-                                        <h3>Privacy & Security</h3>
-                                        <p>Your face data is encrypted and stored securely. We do not share this data with third parties.</p>
                                     </div>
 
-                                    {% if user.isFaceRecognitionEnabled %}
-                                        <div class="face-preview-container">
-                                            <h3 class="face-preview-title">Face Recognition is Enabled</h3>
-                                            <p class="face-preview-subtitle">Current Samples: {{ samplesCount }}</p>
-                                            <a href="{{ path('profile_face_recognition_add_sample') }}" class="btn-capture" style="margin-right: 10px;">
-                                                <i class="bi bi-plus-circle"></i> Add More Face Samples
-                                            </a>
-                                            <button id="btn-disable" class="btn-disable">
-                                                <i class="bi bi-x-circle"></i> Disable Face Recognition
-                                            </button>
-                                        </div>
-                                    {% endif %}
+                                    <div class="text-center">
+                                        <a href="{{ path('profile_face_recognition') }}" class="btn-upload">
+                                            <i class="bi bi-arrow-left"></i> Back to Face Recognition
+                                        </a>
+                                    </div>
                                 </div>
 
                                 <div class="col-md-6">
-                                    {% if not user.isFaceRecognitionEnabled %}
-                                        <div id="setup-container">
-                                            <h3>Set Up Face Recognition</h3>
-                                            <p>Please position your face within the guide and ensure good lighting.</p>
+                                    <div id="setup-container">
+                                        <h3>Add New Face Sample</h3>
+                                        <p>Please position your face within the guide and ensure good lighting.</p>
 
-                                            <div class="webcam-container">
-                                                <video id="webcam" class="webcam-video" autoplay playsinline></video>
-                                                <div class="webcam-overlay"></div>
-                                                <div class="webcam-guide"></div>
-                                                <div class="webcam-status">Initializing camera...</div>
-                                            </div>
-
-                                            <div class="text-center">
-                                                <button id="btn-capture" class="btn-capture" disabled>
-                                                    <i class="bi bi-camera"></i> Capture Photo
-                                                </button>
-                                                <p class="mt-2">Or</p>
-                                                <label for="file-upload" class="btn-upload">
-                                                    <i class="bi bi-upload"></i> Upload Photo
-                                                </label>
-                                                <input id="file-upload" type="file" accept="image/*" class="hidden">
-                                            </div>
+                                        <div class="webcam-container">
+                                            <video id="webcam" class="webcam-video" autoplay playsinline></video>
+                                            <div class="webcam-overlay"></div>
+                                            <div class="webcam-guide"></div>
+                                            <div class="webcam-status">Initializing camera...</div>
                                         </div>
 
-                                        <div id="preview-container" class="hidden">
-                                            <h3>Review Your Photo</h3>
-                                            <p>Is this photo clear and well-lit?</p>
+                                        <div class="text-center">
+                                            <button id="btn-capture" class="btn-capture" disabled>
+                                                <i class="bi bi-camera"></i> Capture Photo
+                                            </button>
+                                            <p class="mt-2">Or</p>
+                                            <label for="file-upload" class="btn-upload">
+                                                <i class="bi bi-upload"></i> Upload Photo
+                                            </label>
+                                            <input id="file-upload" type="file" accept="image/*" class="hidden">
+                                        </div>
+                                    </div>
 
-                                            <div class="face-preview-container">
-                                                <img id="face-preview" class="face-preview" src="" alt="Face Preview">
-                                            </div>
+                                    <div id="preview-container" class="hidden">
+                                        <h3>Review Your Photo</h3>
+                                        <p>Is this photo clear and well-lit?</p>
 
-                                            <div class="text-center">
-                                                <button id="btn-retry" class="btn-upload">
-                                                    <i class="bi bi-arrow-counterclockwise"></i> Try Again
-                                                </button>
-                                                <button id="btn-confirm" class="btn-capture">
-                                                    <i class="bi bi-check-lg"></i> Confirm & Enable
-                                                </button>
-                                            </div>
+                                        <div class="face-preview-container">
+                                            <img id="face-preview" class="face-preview" src="" alt="Face Preview">
                                         </div>
 
-                                        <div id="processing-container" class="hidden text-center">
-                                            <div class="spinner"></div>
-                                            <span class="loading-text">Processing your photo...</span>
+                                        <div class="text-center">
+                                            <button id="btn-retry" class="btn-upload">
+                                                <i class="bi bi-arrow-counterclockwise"></i> Try Again
+                                            </button>
+                                            <button id="btn-confirm" class="btn-capture">
+                                                <i class="bi bi-check-lg"></i> Add This Sample
+                                            </button>
                                         </div>
-                                    {% endif %}
+                                    </div>
+
+                                    <div id="processing-container" class="hidden text-center">
+                                        <div class="spinner"></div>
+                                        <span class="loading-text">Processing your photo...</span>
+                                    </div>
                                 </div>
                             </div>
                         {% endif %}
@@ -379,7 +318,7 @@
     {{ parent() }}
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            {% if serviceAvailable and not user.isFaceRecognitionEnabled %}
+            {% if serviceAvailable %}
                 // Variables
                 const webcamElement = document.getElementById('webcam');
                 const webcamStatus = document.querySelector('.webcam-status');
@@ -392,6 +331,7 @@
                 const retryBtn = document.getElementById('btn-retry');
                 const confirmBtn = document.getElementById('btn-confirm');
                 const alertsContainer = document.getElementById('alerts-container');
+                const samplesCountElement = document.getElementById('samples-count');
 
                 let stream = null;
                 let capturedImage = null;
@@ -535,12 +475,20 @@
                         })
                         .then(result => {
                             if (result.success) {
-                                showAlert('success', 'Face recognition has been successfully enabled!');
+                                showAlert('success', 'Face sample added successfully!');
+
+                                // Update the samples count
+                                if (result.embeddings_count) {
+                                    samplesCountElement.textContent = result.embeddings_count;
+                                }
+
+                                // Reset the UI after a short delay
                                 setTimeout(() => {
-                                    window.location.reload();
+                                    processingContainer.classList.add('hidden');
+                                    setupContainer.classList.remove('hidden');
                                 }, 2000);
                             } else {
-                                throw new Error(result.message || 'Failed to set up face recognition.');
+                                throw new Error(result.message || 'Failed to add face sample.');
                             }
                         })
                         .catch(error => {
@@ -600,53 +548,6 @@
                         alertDiv.remove();
                     }, 5000);
                 }
-            {% endif %}
-
-            {% if serviceAvailable and user.isFaceRecognitionEnabled %}
-                // Disable face recognition
-                document.getElementById('btn-disable').addEventListener('click', async function() {
-                    if (confirm('Are you sure you want to disable face recognition? You will need to set it up again if you want to use it in the future.')) {
-                        try {
-                            const response = await fetch('{{ path('profile_face_recognition_disable') }}', {
-                                method: 'POST',
-                                headers: {
-                                    'Content-Type': 'application/json',
-                                }
-                            });
-
-                            const result = await response.json();
-
-                            if (result.success) {
-                                const alertDiv = document.createElement('div');
-                                alertDiv.className = 'alert alert-success';
-                                alertDiv.innerHTML = 'Face recognition has been disabled.';
-
-                                document.getElementById('alerts-container').innerHTML = '';
-                                document.getElementById('alerts-container').appendChild(alertDiv);
-
-                                setTimeout(() => {
-                                    window.location.reload();
-                                }, 2000);
-                            } else {
-                                const alertDiv = document.createElement('div');
-                                alertDiv.className = 'alert alert-danger';
-                                alertDiv.innerHTML = result.message || 'Failed to disable face recognition.';
-
-                                document.getElementById('alerts-container').innerHTML = '';
-                                document.getElementById('alerts-container').appendChild(alertDiv);
-                            }
-                        } catch (error) {
-                            console.error('Error disabling face recognition:', error);
-
-                            const alertDiv = document.createElement('div');
-                            alertDiv.className = 'alert alert-danger';
-                            alertDiv.innerHTML = 'Error disabling face recognition: ' + error.message;
-
-                            document.getElementById('alerts-container').innerHTML = '';
-                            document.getElementById('alerts-container').appendChild(alertDiv);
-                        }
-                    }
-                });
             {% endif %}
         });
     </script>

@@ -1,0 +1,215 @@
+{% extends 'front/base.html.twig' %}
+
+{% block title %}Test Face Recognition{% endblock %}
+
+{% block stylesheets %}
+    {{ parent() }}
+    <style>
+        .test-section {
+            padding: 120px 0 60px;
+            background: linear-gradient(rgba(0, 105, 62, 0.9), rgba(1, 50, 32, 0.9)), url('{{ asset('assets/front/assets/img/hero-bg.jpg') }}') fixed center center;
+            background-size: cover;
+            position: relative;
+        }
+        
+        .test-card {
+            background: #fff;
+            border-radius: 15px;
+            box-shadow: 0 5px 30px rgba(0, 0, 0, 0.1);
+            overflow: hidden;
+            transition: all 0.3s ease;
+            margin-bottom: 30px;
+            padding: 30px;
+        }
+        
+        .webcam-container {
+            width: 100%;
+            max-width: 500px;
+            margin: 0 auto 20px;
+            position: relative;
+            border-radius: 10px;
+            overflow: hidden;
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .webcam-video {
+            width: 100%;
+            border-radius: 10px;
+            background-color: #f8f9fa;
+        }
+        
+        .btn-test {
+            background: #013220;
+            color: #fff;
+            border: 2px solid #013220;
+            padding: 12px 30px;
+            border-radius: 50px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            text-decoration: none;
+            display: inline-block;
+            margin-top: 20px;
+        }
+        
+        .btn-test:hover {
+            background: #00693E;
+            border-color: #00693E;
+            transform: translateY(-3px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.1);
+        }
+        
+        .result-container {
+            margin-top: 20px;
+            padding: 20px;
+            background-color: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+        
+        .result-title {
+            font-size: 18px;
+            font-weight: 600;
+            margin-bottom: 10px;
+        }
+        
+        .result-content {
+            font-family: monospace;
+            white-space: pre-wrap;
+            background-color: #f1f1f1;
+            padding: 10px;
+            border-radius: 5px;
+            max-height: 300px;
+            overflow-y: auto;
+        }
+    </style>
+{% endblock %}
+
+{% block body %}
+<section class="test-section">
+    <div class="container" data-aos="fade-up">
+        <div class="row justify-content-center">
+            <div class="col-lg-10">
+                <div class="test-card">
+                    <h2 class="mb-4">Test Face Recognition API</h2>
+                    
+                    <div class="webcam-container">
+                        <video id="webcam" class="webcam-video" autoplay playsinline></video>
+                    </div>
+                    
+                    <div class="text-center">
+                        <button id="btn-capture" class="btn-test">Capture Photo</button>
+                    </div>
+                    
+                    <div id="result-container" class="result-container">
+                        <h3 class="result-title">API Response:</h3>
+                        <div id="result-content" class="result-content"></div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</section>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const webcamElement = document.getElementById('webcam');
+            const captureBtn = document.getElementById('btn-capture');
+            const resultContainer = document.getElementById('result-container');
+            const resultContent = document.getElementById('result-content');
+            
+            // Initialize webcam
+            async function initWebcam() {
+                try {
+                    const stream = await navigator.mediaDevices.getUserMedia({
+                        video: {
+                            width: { ideal: 1280 },
+                            height: { ideal: 720 },
+                            facingMode: 'user'
+                        }
+                    });
+                    
+                    webcamElement.srcObject = stream;
+                    captureBtn.disabled = false;
+                } catch (err) {
+                    console.error('Error accessing webcam:', err);
+                    alert('Camera access denied or not available.');
+                }
+            }
+            
+            // Initialize webcam
+            initWebcam();
+            
+            // Capture photo and test API
+            captureBtn.addEventListener('click', function() {
+                const canvas = document.createElement('canvas');
+                canvas.width = webcamElement.videoWidth;
+                canvas.height = webcamElement.videoHeight;
+                
+                const context = canvas.getContext('2d');
+                context.drawImage(webcamElement, 0, 0, canvas.width, canvas.height);
+                
+                const capturedImage = canvas.toDataURL('image/jpeg');
+                
+                // Test detect-face endpoint
+                testDetectFace(capturedImage);
+            });
+            
+            // Test detect-face endpoint
+            async function testDetectFace(base64Image) {
+                try {
+                    const response = await fetch('http://localhost:5000/detect-face', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ image: base64Image })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    // Display result
+                    resultContainer.style.display = 'block';
+                    resultContent.textContent = JSON.stringify(result, null, 2);
+                    
+                    // If face detection successful, test extract-embedding
+                    if (result.success) {
+                        testExtractEmbedding(base64Image);
+                    }
+                } catch (error) {
+                    console.error('Error testing detect-face:', error);
+                    resultContainer.style.display = 'block';
+                    resultContent.textContent = 'Error: ' + error.message;
+                }
+            }
+            
+            // Test extract-embedding endpoint
+            async function testExtractEmbedding(base64Image) {
+                try {
+                    const response = await fetch('http://localhost:5000/extract-embedding', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ image: base64Image })
+                    });
+                    
+                    const result = await response.json();
+                    
+                    // Append result
+                    resultContent.textContent += '\n\nExtract Embedding Result:\n' + 
+                        JSON.stringify({
+                            success: result.success,
+                            model: result.model,
+                            embeddingLength: result.embedding ? result.embedding.length : 0
+                        }, null, 2);
+                } catch (error) {
+                    console.error('Error testing extract-embedding:', error);
+                    resultContent.textContent += '\n\nError testing extract-embedding: ' + error.message;
+                }
+            }
+        });
+    </script>
+{% endblock %}

@@ -461,14 +461,37 @@
         // Capture button
         captureBtn.addEventListener('click', function() {
             const webcamElement = document.getElementById('login-webcam');
+
+            // Get the dimensions of the video
+            const videoWidth = webcamElement.videoWidth;
+            const videoHeight = webcamElement.videoHeight;
+
+            // Calculate the center of the video
+            const centerX = videoWidth / 2;
+            const centerY = videoHeight / 2;
+
+            // Calculate the size of the square crop (use the smaller dimension)
+            const cropSize = Math.min(videoWidth, videoHeight) * 0.8; // 80% of the smaller dimension
+
+            // Calculate the crop coordinates
+            const cropX = centerX - (cropSize / 2);
+            const cropY = centerY - (cropSize / 2);
+
+            // Create a canvas for the cropped image
             const canvas = document.createElement('canvas');
-            canvas.width = webcamElement.videoWidth;
-            canvas.height = webcamElement.videoHeight;
+            canvas.width = cropSize;
+            canvas.height = cropSize;
 
+            // Draw the cropped image on the canvas
             const context = canvas.getContext('2d');
-            context.drawImage(webcamElement, 0, 0, canvas.width, canvas.height);
+            context.drawImage(
+                webcamElement,
+                cropX, cropY, cropSize, cropSize, // Source coordinates and dimensions
+                0, 0, cropSize, cropSize // Destination coordinates and dimensions
+            );
 
-            const capturedImage = canvas.toDataURL('image/jpeg');
+            // Convert the canvas to a data URL
+            const capturedImage = canvas.toDataURL('image/jpeg', 0.9); // 0.9 quality
             authenticateWithFace(capturedImage);
         });
 
@@ -477,7 +500,38 @@
             if (e.target.files && e.target.files[0]) {
                 const reader = new FileReader();
                 reader.onload = function(event) {
-                    authenticateWithFace(event.target.result);
+                    // Create an image element to get dimensions
+                    const img = new Image();
+                    img.onload = function() {
+                        // Calculate the center of the image
+                        const centerX = img.width / 2;
+                        const centerY = img.height / 2;
+
+                        // Calculate the size of the square crop (use the smaller dimension)
+                        const cropSize = Math.min(img.width, img.height) * 0.8; // 80% of the smaller dimension
+
+                        // Calculate the crop coordinates
+                        const cropX = centerX - (cropSize / 2);
+                        const cropY = centerY - (cropSize / 2);
+
+                        // Create a canvas for the cropped image
+                        const canvas = document.createElement('canvas');
+                        canvas.width = cropSize;
+                        canvas.height = cropSize;
+
+                        // Draw the cropped image on the canvas
+                        const context = canvas.getContext('2d');
+                        context.drawImage(
+                            img,
+                            cropX, cropY, cropSize, cropSize, // Source coordinates and dimensions
+                            0, 0, cropSize, cropSize // Destination coordinates and dimensions
+                        );
+
+                        // Convert the canvas to a data URL
+                        const capturedImage = canvas.toDataURL('image/jpeg', 0.9); // 0.9 quality
+                        authenticateWithFace(capturedImage);
+                    };
+                    img.src = event.target.result;
                 };
                 reader.readAsDataURL(e.target.files[0]);
             }
@@ -501,17 +555,75 @@
         document.getElementById('login-btn-capture').disabled = true;
         document.getElementById('login-file-upload').disabled = true;
 
-        // Send the image to the server for authentication
-        fetch('/login/face', {
-            method: 'POST',
-            headers: {
-                'Content-Type': 'application/json',
-                'X-Requested-With': 'XMLHttpRequest'
-            },
-            body: JSON.stringify({ face_image: base64Image })
+        console.log('Preparing to send face authentication request');
+
+        // Log the first 100 characters of the image data for debugging
+        console.log('Image data (first 100 chars):', base64Image.substring(0, 100));
+
+        // First check if the face recognition service is available
+        fetch('http://localhost:5000/health')
+        .then(response => {
+            if (!response.ok) {
+                throw new Error('Face recognition service is not available');
+            }
+            return response.json();
         })
-        .then(response => response.json())
-        .then(data => {
+        .then(healthData => {
+            console.log('Face recognition service health check:', healthData);
+
+            // If service is available, proceed with authentication
+            // Send the image to the server for authentication
+            return fetch('/login/face', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-Requested-With': 'XMLHttpRequest'
+                },
+                body: JSON.stringify({ face_image: base64Image })
+            });
+        })
+        .then(response => {
+            console.log('Authentication response status:', response.status);
+            // Store the status code for debugging
+            const statusCode = response.status;
+
+            // Try to parse the response as JSON
+            return response.text().then(text => {
+                try {
+                    // Try to parse as JSON
+                    const data = JSON.parse(text);
+                    return { statusCode, data };
+                } catch (e) {
+                    // If not JSON, return the raw text for debugging
+                    return { statusCode, rawResponse: text, isJson: false };
+                }
+            });
+        })
+        .then(result => {
+            console.log('Authentication response:', result);
+
+            if (result.isJson === false) {
+                // Check if this is a redirect response (302, 301, etc.)
+                if (result.statusCode >= 300 && result.statusCode < 400) {
+                    // Extract the redirect URL from the response
+                    const redirectMatch = result.rawResponse.match(/Redirecting to ([^"]+)/);
+                    if (redirectMatch && redirectMatch[1]) {
+                        showFaceLoginAlert('success', 'Authentication successful! Redirecting...');
+                        setTimeout(() => {
+                            window.location.href = redirectMatch[1];
+                        }, 1500);
+                        return;
+                    }
+                }
+
+                // If not a redirect or couldn't extract URL, show error
+                showFaceLoginAlert('error', 'Received invalid response from server. Please try again.');
+                console.error('Non-JSON response received:', result.rawResponse);
+                return;
+            }
+
+            const data = result.data;
+
             if (data.success) {
                 showFaceLoginAlert('success', 'Authentication successful! Redirecting...');
                 setTimeout(() => {
@@ -519,14 +631,14 @@
                 }, 1500);
             } else {
                 showFaceLoginAlert('error', data.message || 'Authentication failed. Please try again.');
-                // Re-enable buttons
-                document.getElementById('login-btn-capture').disabled = false;
-                document.getElementById('login-file-upload').disabled = false;
+                console.error('Authentication failed:', data);
             }
         })
         .catch(error => {
             console.error('Error during face authentication:', error);
-            showFaceLoginAlert('error', 'An error occurred during authentication. Please try again.');
+            showFaceLoginAlert('error', 'An error occurred during authentication: ' + error.message);
+        })
+        .finally(() => {
             // Re-enable buttons
             document.getElementById('login-btn-capture').disabled = false;
             document.getElementById('login-file-upload').disabled = false;

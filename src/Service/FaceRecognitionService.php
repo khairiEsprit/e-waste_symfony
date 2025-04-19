@@ -179,8 +179,25 @@ class FaceRecognitionService
             return $embeddingResult;
         }
 
-        // Save the embeddings to the user
-        $user->setFaceEmbeddings(json_encode($embeddingResult['embedding']));
+        // Check if user already has face embeddings
+        $existingEmbeddings = $user->getFaceEmbeddings();
+        $embeddings = [];
+
+        if (!empty($existingEmbeddings)) {
+            // If user already has embeddings, add the new one to the array
+            $embeddings = json_decode($existingEmbeddings, true);
+
+            // If it's not an array of arrays (old format with single embedding), convert it
+            if (isset($embeddings[0]) && !is_array($embeddings[0])) {
+                $embeddings = [$embeddings];
+            }
+        }
+
+        // Add the new embedding to the array
+        $embeddings[] = $embeddingResult['embedding'];
+
+        // Save the embeddings to the user (now as an array of embeddings)
+        $user->setFaceEmbeddings(json_encode($embeddings));
         $user->setFaceRecognitionEnabled(true);
 
         // Save the face photo
@@ -193,7 +210,8 @@ class FaceRecognitionService
 
         return [
             'success' => true,
-            'message' => 'Face recognition setup successful'
+            'message' => 'Face recognition setup successful',
+            'embeddings_count' => count($embeddings)
         ];
     }
 
@@ -223,20 +241,41 @@ class FaceRecognitionService
 
         // Compare with all users' embeddings
         foreach ($users as $user) {
-            $storedEmbeddings = json_decode($user->getFaceEmbeddings(), true);
-            if (!$storedEmbeddings) {
+            $storedEmbeddingsJson = $user->getFaceEmbeddings();
+            if (!$storedEmbeddingsJson) {
                 continue;
             }
 
-            $comparisonResult = $this->compareEmbeddings($embeddingResult['embedding'], $storedEmbeddings);
+            $storedEmbeddings = json_decode($storedEmbeddingsJson, true);
 
-            if ($comparisonResult['success'] && $comparisonResult['similarity'] > $highestSimilarity) {
-                $highestSimilarity = $comparisonResult['similarity'];
-                $bestMatch = [
-                    'user' => $user,
-                    'similarity' => $comparisonResult['similarity'],
-                    'is_match' => $comparisonResult['is_match']
-                ];
+            // Check if it's an array of embeddings or a single embedding
+            if (isset($storedEmbeddings[0]) && is_array($storedEmbeddings[0])) {
+                // Multiple embeddings - compare with each and take the best match
+                foreach ($storedEmbeddings as $embedding) {
+                    $comparisonResult = $this->compareEmbeddings($embeddingResult['embedding'], $embedding);
+
+                    if ($comparisonResult['success'] && $comparisonResult['similarity'] > $highestSimilarity) {
+                        $highestSimilarity = $comparisonResult['similarity'];
+                        $bestMatch = [
+                            'user' => $user,
+                            'similarity' => $comparisonResult['similarity'],
+                            'is_match' => $comparisonResult['is_match']
+                        ];
+                    }
+                }
+            } else {
+                // Single embedding (old format)
+                $comparisonResult = $this->compareEmbeddings($embeddingResult['embedding'], $storedEmbeddings);
+                
+
+                if ($comparisonResult['success'] && $comparisonResult['similarity'] > $highestSimilarity) {
+                    $highestSimilarity = $comparisonResult['similarity'];
+                    $bestMatch = [
+                        'user' => $user,
+                        'similarity' => $comparisonResult['similarity'],
+                        'is_match' => $comparisonResult['is_match']
+                    ];
+                }
             }
         }
 
